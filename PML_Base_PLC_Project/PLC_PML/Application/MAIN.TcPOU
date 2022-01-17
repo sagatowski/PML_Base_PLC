@@ -29,7 +29,8 @@ fbMyMachine.CyclicLogic();
 
 
 // Add other Main CyclicLogic here
-fbMainHMIConnection();]]></ST>
+fbMainHMIConnection();
+//test]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{0c84ac41-2efe-4430-b0e8-a78a2e3a34ca}">
@@ -61,6 +62,7 @@ fbMainHMIConnection(sTopLevelMachine 	:= fbMyMachine.ModuleName);
       <LineId Id="23" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="27" Count="0" />
+      <LineId Id="39" Count="0" />
     </LineIds>
     <LineIds Name="MAIN.Initialize">
       <LineId Id="7" Count="0" />
