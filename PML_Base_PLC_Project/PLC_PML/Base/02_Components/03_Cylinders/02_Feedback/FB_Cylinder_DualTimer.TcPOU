@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Cylinder_DualTimer" Id="{8c5cc0da-3f20-4dda-bfe6-4c6ccc1647cc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualTimer EXTENDS FB_CylinderBase
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{a524d52e-6673-48b1-bb0b-410b1f52e431}" />
+    <Method Name="HardwareUpdate" Id="{e72e7efd-a880-4ee1-acf4-8f52bb9874b2}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD HardwareUpdate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSimExtend_TON();		//Call timer FB
+fbSimRetract_TON();		//Call timer FB
+GenerateFeedback(TRUE, TRUE);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Cylinder_DualTimer">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_DualTimer.HardwareUpdate">
+      <LineId Id="13" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

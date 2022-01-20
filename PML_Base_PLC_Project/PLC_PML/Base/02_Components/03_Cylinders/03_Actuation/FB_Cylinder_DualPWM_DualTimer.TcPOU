@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Cylinder_DualPWM_DualTimer" Id="{bd0765f9-d5b5-41eb-b703-2e3258d3ef4c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualPWM_DualTimer EXTENDS FB_Cylinder_DualTimer
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbPWMControl		: FB_Enfield_LSV_PWM_SolenoidControl;
+	
+	//Internal Property Values
+	nDutyCycle		: INT := 100;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{86bd10f2-4685-4f68-bfaf-180b998b454c}" />
+    <Property Name="DutyCycle" Id="{2746359f-fb36-4e69-8211-8f6a3620eaf5}">
+      <Declaration><![CDATA[PROPERTY DutyCycle : INT]]></Declaration>
+      <Get Name="Get" Id="{e4bc2f3b-cdd0-4d18-8858-256c10af0d95}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DutyCycle := nDutyCycle;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d94aded6-354e-4ec6-afa1-1d48406a77c9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nDutyCycle := DutyCycle;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="HardwareUpdate" Id="{d7d74fec-42f1-4a65-95cb-b8d380a432fa}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD HardwareUpdate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.HardwareUpdate();
+
+IF bExtendCommand THEN
+	fbPWMControl.Actuate(nDutyCycle);
+ELSIF bRetractCommand THEN
+	fbPWMControl.Actuate(nDutyCycle * -1);
+ELSE
+	fbPWMControl.Actuate(0);
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Cylinder_DualPWM_DualTimer">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.DutyCycle.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.DutyCycle.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.HardwareUpdate">
+      <LineId Id="11" Count="0" />
+      <LineId Id="17" Count="2" />
+      <LineId Id="21" Count="3" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="12" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

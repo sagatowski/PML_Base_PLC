@@ -134,6 +134,74 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="GenerateFeedback" Id="{39effa7c-ba5c-4a87-a1d4-a2f793cecf52}">
+      <Declaration><![CDATA[METHOD GenerateFeedback : BOOL
+VAR_INPUT
+	bGenerateRetractedFeedback			: BOOL;
+	bGenerateExtendedFeedback				: BOOL;
+END_VAR
+VAR
+	bTempExtendedFeedback		: BOOL;
+	bTempRetractedFeedback		: BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF fbSimExtend_TON.Q THEN		//Whenever the extend timer completes, set status to extended and turn off the timer
+		bTempExtendedFeedback := TRUE;
+		fbSimExtend_TON.IN := FALSE;
+	END_IF
+	
+	IF fbSimRetract_TON.Q THEN		//Whenever the retract timer completes, set status to retracted and turn off the timer
+		bTempRetractedFeedback := TRUE;
+		fbSimRetract_TON.IN := FALSE;
+	END_IF
+	
+	IF bIncomingRequest THEN
+		IF bExtendRequest THEN					//Whenever a new extend request comes in, check to see if we are still currently timing a retract action
+			IF fbSimRetract_TON.IN THEN			//If a retract action is still in progress, appropriately scale the extend time to account for the distance traveled during the in-process retraction
+				fbSimExtend_TON.PT := tExtendTime * (TIME_TO_UDINT(fbSimRetract_TON.ET) / TIME_TO_UDINT(tRetractTime));		//partial extend time = (full distance extend time) * (proportional distance covered during retraction)
+				bSimRetractCommand := FALSE;
+				fbSimRetract_TON.IN := FALSE;	//Disable retract timer
+			ELSE
+				fbSimExtend_TON.PT := tExtendTime;	//If no retraction was active, assume we are currently at fully retracted position, or this is the first command the cylinder has received, so initialize to full extend time
+			END_IF
+			bTempRetractedFeedback := FALSE;
+			bSimRetractCommand := FALSE;
+			bSimExtendCommand := TRUE;
+			fbSimExtend_TON.IN := TRUE;				//Activate the extension timer
+		ELSIF bRetractRequest THEN					//Same as above, but reversed
+			IF fbSimExtend_TON.IN THEN
+				fbSimRetract_TON.PT := tRetractTime * (TIME_TO_UDINT(fbSimExtend_TON.ET) / TIME_TO_UDINT(tRetractTime));
+				bSimExtendCommand := FALSE;
+				fbSimExtend_TON.IN := FALSE;
+			ELSE
+				fbSimRetract_TON.PT := tRetractTime;
+			END_IF
+			bTempExtendedFeedback := FALSE;
+			fbSimRetract_TON.IN := TRUE;
+			bSimExtendCommand := FALSE;
+			bSimRetractCommand := TRUE;
+		ELSE
+			bTempExtendedFeedback := FALSE;
+			bTempRetractedFeedback := FALSE;
+			
+			fbSimExtend_TON.IN := FALSE;			
+			fbSimRetract_TON.IN := FALSE;
+			
+			bSimExtendCommand := FALSE;
+			bSimRetractCommand := FALSE;
+		END_IF
+		bIncomingRequest := FALSE;
+	END_IF
+	
+	IF bGenerateExtendedFeedback THEN
+		bExtended := bTempExtendedFeedback;
+	END_IF
+	
+	IF bGenerateRetractedFeedback THEN
+		bRetracted := bTempRetractedFeedback;
+	END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="HMICommunication" Id="{53a5999d-4f0f-49ef-ab47-409900876100}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD HMICommunication : BOOL]]></Declaration>
       <Implementation>
@@ -362,55 +430,7 @@ END_VAR
 	
 	fbSimExtend_TON();		//Call timer FB
 	fbSimRetract_TON();		//Call timer FB
-	
-	IF fbSimExtend_TON.Q THEN		//Whenever the extend timer completes, set status to extended and turn off the timer
-		bExtended := TRUE;
-		fbSimExtend_TON.IN := FALSE;
-	END_IF
-	
-	IF fbSimRetract_TON.Q THEN		//Whenever the retract timer completes, set status to retracted and turn off the timer
-		bRetracted := TRUE;
-		fbSimRetract_TON.IN := FALSE;
-	END_IF
-	
-	IF bIncomingRequest THEN
-		IF bExtendRequest THEN					//Whenever a new extend request comes in, check to see if we are still currently timing a retract action
-			IF fbSimRetract_TON.IN THEN			//If a retract action is still in progress, appropriately scale the extend time to account for the distance traveled during the in-process retraction
-				fbSimExtend_TON.PT := tExtendTime * (TIME_TO_UDINT(fbSimRetract_TON.ET) / TIME_TO_UDINT(tRetractTime));		//partial extend time = (full distance extend time) * (proportional distance covered during retraction)
-				bSimRetractCommand := FALSE;
-				fbSimRetract_TON.IN := FALSE;	//Disable retract timer
-			ELSE
-				fbSimExtend_TON.PT := tExtendTime;	//If no retraction was active, assume we are currently at fully retracted position, or this is the first command the cylinder has received, so initialize to full extend time
-			END_IF
-			bRetracted := FALSE;
-			bSimRetractCommand := FALSE;
-			bSimExtendCommand := TRUE;
-			fbSimExtend_TON.IN := TRUE;				//Activate the extension timer
-		ELSIF bRetractRequest THEN					//Same as above, but reversed
-			IF fbSimExtend_TON.IN THEN
-				fbSimRetract_TON.PT := tRetractTime * (TIME_TO_UDINT(fbSimExtend_TON.ET) / TIME_TO_UDINT(tRetractTime));
-				bSimExtendCommand := FALSE;
-				fbSimExtend_TON.IN := FALSE;
-			ELSE
-				fbSimRetract_TON.PT := tRetractTime;
-			END_IF
-			bExtended := FALSE;
-			fbSimRetract_TON.IN := TRUE;
-			bSimExtendCommand := FALSE;
-			bSimRetractCommand := TRUE;
-		ELSE
-			bExtended := FALSE;
-			bRetracted := FALSE;
-			
-			fbSimExtend_TON.IN := FALSE;			
-			fbSimRetract_TON.IN := FALSE;
-			
-			bSimExtendCommand := FALSE;
-			bSimRetractCommand := FALSE;
-		END_IF
-		bIncomingRequest := FALSE;
-	END_IF
-	
+	GenerateFeedback(TRUE, TRUE);
 	bExtending := fbSimExtend_TON.IN;
 	bRetracting := fbSimRetract_TON.IN;
 ELSE
@@ -493,6 +513,16 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_CylinderBase.ExtendTime.Set">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.GenerateFeedback">
+      <LineId Id="6" Count="47" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="66" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderBase.HMICommunication">
       <LineId Id="5" Count="0" />
@@ -589,42 +619,8 @@ END_VAR
       <LineId Id="139" Count="1" />
       <LineId Id="138" Count="0" />
       <LineId Id="125" Count="0" />
-      <LineId Id="72" Count="1" />
-      <LineId Id="103" Count="0" />
-      <LineId Id="99" Count="0" />
-      <LineId Id="105" Count="3" />
-      <LineId Id="110" Count="0" />
-      <LineId Id="127" Count="0" />
-      <LineId Id="83" Count="1" />
-      <LineId Id="91" Count="1" />
-      <LineId Id="94" Count="0" />
-      <LineId Id="153" Count="0" />
-      <LineId Id="111" Count="1" />
-      <LineId Id="93" Count="0" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="161" Count="0" />
-      <LineId Id="152" Count="0" />
-      <LineId Id="85" Count="1" />
-      <LineId Id="96" Count="2" />
-      <LineId Id="154" Count="0" />
-      <LineId Id="113" Count="1" />
-      <LineId Id="95" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="162" Count="0" />
-      <LineId Id="151" Count="0" />
-      <LineId Id="128" Count="2" />
-      <LineId Id="158" Count="0" />
-      <LineId Id="131" Count="1" />
-      <LineId Id="160" Count="0" />
-      <LineId Id="159" Count="0" />
-      <LineId Id="157" Count="0" />
-      <LineId Id="87" Count="0" />
-      <LineId Id="137" Count="0" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="116" Count="0" />
-      <LineId Id="118" Count="0" />
-      <LineId Id="134" Count="0" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="166" Count="0" />
       <LineId Id="143" Count="0" />
       <LineId Id="147" Count="0" />
       <LineId Id="144" Count="0" />
