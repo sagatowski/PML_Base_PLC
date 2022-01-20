@@ -6,31 +6,31 @@ VAR_INPUT
 	iMasterDataStructure_Adder		: ITF_Tree_IndexBased;			//Interface for adding new children to the master machine tree data representation
 END_VAR
 VAR
-	//ITF_PackMLBase internal property variables
-	bEnabled			: BOOL;					//Enables or disables the packml Machine of the module (prevents the module from going past idle)
-	eMode				: E_PMLUnitMode;		//Current UnitMode of the module
-	eModeCommand		: E_PMLUnitMode; 				//Current Commanded UnitMode of the module
+	//ITF_PMLModuleBase internal property variables
+	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
+	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
+	bLogStateChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
 	nModuleID			: DINT;					//Unique identifying number for the module
 	sModuleName			: STRING;				//Human-readable module name for user-side messaging
-	eState				: Tc3_PackML_V2.E_PMLState;
+	bEnabled			: BOOL;					//Enables or disables the packml Machine of the module (prevents the module from going past idle)
+	eModeCommand		: E_PMLUnitMode; 				//Current Commanded UnitMode of the module
 	eStateCommand		: Tc3_PackML_V2.E_PMLCommand;
-	bLogStateChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
-	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
-
-	stPMLModuleBaseHMI	: ST_PMLModuleBase_HMI;		//Handles atatus and cointrol communications with the HMI
-	stPMLModuleBaseVISU	: ST_PMLModuleBase_VISU;	//Handles the status and control with Visulizations
-
-	//Administration of FB Variables
-	bInitialized 					: BOOL;					//TRUE when initialization code of the object is complete
-	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
-	sID_Name						: STRING;				//"Module XX - 'Module Name' " Alarm and message utility phrase based off of nMachine ID and sMachineName
-	fbExternalControl				: FB_ModuleExternalCommandControl;
-	// Packtags data
-	//{attribute 'OPC.UA.DA' := '1'}
-	//{attribute 'OPC.UA.DA.StructuredType' := '1'}
-	//packTags						: T_PackMLTags;		//PackTags instantiation
+	eMode				: E_PMLUnitMode;		//Current UnitMode of the module
+	eState				: Tc3_PackML_V2.E_PMLState;
 	
-	//State and Mode control
+	//ITF_ModuleSequenceControl internal property variables
+	stSequenceControl 		: ST_ModuleSequenceControl;		//Provides variables with which the ModuleSequenceControl interface may interact 
+
+	//Communication Variables
+	stPMLModuleBaseHMI	: ST_PMLModuleBase_HMI;		//Handles status and control communications with the HMI
+	stPMLModuleBaseVISU	: ST_PMLModuleBase_VISU;	//Handles status and control communications with Visualizations
+	fbExternalControl	: FB_ModuleExternalCommandControl;	//Handles commands from HMI/VISUS ^^ kind of overlaps with the structures above - TODO: Improve
+
+	//Administration and Configuration Variables
+	bInitialized 					: BOOL;					//TRUE when initialization code of the object is complete
+	sID_Name						: STRING;				//"Module XX - 'Module Name' " Alarm and message utility phrase based off of nMachine ID and sMachineName
+	
+	//State and Mode control blocks
 	fbModeManager 					: PML_UnitModeManager; 	//Manages operating mode transitions and rules
 	fbStateMachine 					: PML_StateMachine; 	//Manages PackML state transitions
 	fbCustomModes 					: PML_UnitModeConfig;	//Used to define custom machine modes if desired
@@ -46,30 +46,30 @@ VAR
 	
 	//Alarming and Logging variables - Some may or may not be necessary depending on final alarm system implementation ----------------------------------------------
 	//These are for the newer TMC Excel import style alarm system
-	a_fbPMLAlarms						: ARRAY[1..48] OF FB_TcAlarm;	//Array of alarms for PackML state and mode changes that exist in any PackML enabled module
+	a_fbPMLAlarms					: ARRAY[1..48] OF FB_TcAlarm;	//Array of alarms for PackML state and mode changes that exist in any PackML enabled module
 	a_fbBaseAlarms					: ARRAY[1..32] OF FB_TcAlarm;		//Array of alarms for general module Alarms				
-	fbPMLStateLogger				: FB_PMLStateLogger;	//Logs PackML state changes
-	fbPMLModeLogger					: FB_PMLModeLogger;	//Logs PackML Mode changes
+	fbPMLStateLogger				: FB_PMLStateLogger;				//Logs PackML state changes
+	fbPMLModeLogger					: FB_PMLModeLogger;					//Logs PackML Mode changes
 
 	// Alarm handling
-	bActiveAlarm					: BOOL;					//module has an active alarm					
-
-	//Sequence Control Structure
-	stSequenceControl 		: ST_ModuleSequenceControl;		//Provides variables with which the ModuleSequenceControl interface may interact 
+	bActiveAlarm					: BOOL;					//module has an active alarm		TODO: Implement			
 
 	//********************************************************************************************************************
 	// Sub Module variables
 	// Used mostly for EMs and Machines, but ok for CM. They are just null	
-	a_ITF_PackMLBase					: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase;
-	a_ITF_Components				: ARRAY[1..MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase;	
+	a_ITF_PackMLBase				: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase;	
 	// Array of the PML sub unit info array used by the statemachine
 	a_stPMLSubUnitInfo				: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ST_PMLSubUnitInfo;
 	nNumberOfSubModules				: UDINT := 0;	//calculated number of instantiated sub modules
-	nNumberOfComponents				: UDINT := 0;	//calculated number of instantiated components
-	// This is the information for each modules subunits.
+	// This is the information for each module's submodules.
 	PMLSubUnitInfoRef				: ST_PMLSubUnitInfoRef;				// Reference to the subunit information, used by the state machine
 	//********************************************************************************************************************
 	
+	//Component variables - Allow iterative control of child components (Mostly used with Control Modules, but usable anywhere)
+	a_ITF_Components				: ARRAY[1..MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase;
+	nNumberOfComponents				: UDINT := 0;	//calculated number of instantiated components
+	
+	//Miscellaneous Variables
 	nIndex				: UDINT;		//Generic iteration value
 END_VAR
 ]]></Declaration>
@@ -120,7 +120,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Begin;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="BlockSequence" Id="{4347c5ec-4277-403c-a5e9-8ef55e169c4f}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -130,7 +130,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Block;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CancelSequence" Id="{50b4bc96-fdc0-4391-922d-d491a3a297a0}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -140,7 +140,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Cancel;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CreateEvents" Id="{6bbb8cab-407d-45ac-8da1-6eb5ce7199bf}" FolderPath="Methods\">
@@ -868,8 +868,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Unholding" Id="{d2ff920f-b2b8-44a1-a393-a69ebe202c6f}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[METHOD M_Unholding
-VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Unholding]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -997,7 +996,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Reiterate;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ResumeSequence" Id="{76c80610-20fe-4670-9fe9-0966252cec48}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -1007,7 +1006,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Resume;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="RevertSequence" Id="{3698f9a0-68d8-4502-8866-8f470bd7cc8e}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -1015,7 +1014,7 @@ stSequenceControl.bNewCommand := TRUE;]]></ST>
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Revert;
-stSequenceControl.bNewCommand := TRUE;
+stSequenceControl.bCommandPulse := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -1168,7 +1167,8 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.BeginSequence">
-      <LineId Id="8" Count="1" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.BlockSequence">
       <LineId Id="9" Count="0" />
