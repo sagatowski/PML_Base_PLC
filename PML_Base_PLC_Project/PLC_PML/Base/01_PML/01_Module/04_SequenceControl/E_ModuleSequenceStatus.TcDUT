@@ -8,7 +8,7 @@ TYPE E_ModuleSequenceStatus :
 	Dormant,
 	Busy,
 	Waiting,
-	Complete,
+	Finished,
 	Canceled
 );
 END_TYPE
