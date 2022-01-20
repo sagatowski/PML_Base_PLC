@@ -59,7 +59,7 @@
 ]]></Declaration>
     </Method>
     <Property Name="Simulate" Id="{bf683f89-b05a-4051-a8af-1aeaecf654a4}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY Simulate : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{dece0953-1f5d-41bd-a40d-61b0a627d255}">

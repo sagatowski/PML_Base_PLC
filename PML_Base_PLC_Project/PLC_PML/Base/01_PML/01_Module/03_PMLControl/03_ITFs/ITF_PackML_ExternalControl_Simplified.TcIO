@@ -4,7 +4,7 @@
     <Declaration><![CDATA[INTERFACE ITF_PackML_ExternalControl_Simplified
 ]]></Declaration>
     <Property Name="ClearEnabled" Id="{b8bd1ccd-38e5-44ab-9eac-62f1a61a7536}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY ClearEnabled : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{d8e3f3a7-9121-4f0e-9b22-b3dd39c1cd05}">
@@ -15,7 +15,7 @@ PROPERTY ClearEnabled : BOOL
       </Set>
     </Property>
     <Property Name="ClearPressed" Id="{ac61034c-b84c-4b3f-a7b1-6d646095341f}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY ClearPressed : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{94aba287-04ef-4aed-ab71-3429650bf8f9}">

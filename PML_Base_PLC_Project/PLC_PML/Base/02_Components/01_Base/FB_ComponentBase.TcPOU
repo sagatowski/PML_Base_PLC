@@ -240,7 +240,7 @@ nErrorID := 0;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Simulate" Id="{ebb42854-1266-4f6c-84a1-4c0a912b758b}" FolderPath="01_ITF_ComponentBase\01_Properties\01_Config\">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY Simulate : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{17d1377a-ffdb-4d07-8b8e-165928f3cf8f}">
