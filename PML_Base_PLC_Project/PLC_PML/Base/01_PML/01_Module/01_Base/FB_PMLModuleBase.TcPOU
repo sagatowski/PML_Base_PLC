@@ -60,10 +60,12 @@ VAR
 	//********************************************************************************************************************
 	// Sub Module variables
 	// Used mostly for EMs and Machines, but ok for CM. They are just null	
-	a_itfPackMLBase					: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ITF_PMLModuleBase;
+	a_ITF_PackMLBase					: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase;
+	a_ITF_Components				: ARRAY[1..MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase;	
 	// Array of the PML sub unit info array used by the statemachine
-	a_stPMLSubUnitInfo				: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ST_PMLSubUnitInfo;
-	udNumberOfSubUnits				: UDINT := 0;	//Defined number of instantiated Module
+	a_stPMLSubUnitInfo				: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ST_PMLSubUnitInfo;
+	nNumberOfSubModules				: UDINT := 0;	//calculated number of instantiated sub modules
+	nNumberOfComponents				: UDINT := 0;	//calculated number of instantiated components
 	// This is the information for each modules subunits.
 	PMLSubUnitInfoRef				: ST_PMLSubUnitInfoRef;				// Reference to the subunit information, used by the state machine
 	//********************************************************************************************************************
@@ -165,9 +167,15 @@ IF NOT bInitialized THEN			//Force initialization code of the object
 END_IF
 
 //  call the subunits
-FOR i := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[i].CyclicLogic();								//Call the main cyclic loop of the subunits 
-	a_stPMLSubUnitInfo[i].eState := a_itfPackMLBase[i].State;  	//Reflect the state of the subunits to the state machine of the module
+FOR i := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[i].CyclicLogic();								//Call the main cyclic loop of the subunits 
+	a_stPMLSubUnitInfo[i].eState := a_ITF_PackMLBase[i].State;  	//Reflect the state of the subunits to the state machine of the module
+END_FOR
+
+FOR i:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[i] <> 0 THEN
+		a_ITF_Components[i].CyclicLogic();
+	END_IF
 END_FOR
 
 // Mode control loop of the module
@@ -287,10 +295,17 @@ END_VAR]]></Declaration>
         <ST><![CDATA[sID_Name := CONCAT(CONCAT(CONCAT(CONCAT(CONCAT('Module ', sAncestorIDs), DINT_TO_STRING(nModuleID)), ' - '), sModuleName), ' '); 	//Creates a utility string for alarms and other messaging that reads (example text) - "Module 10 - Main Casepacker" to be followed by the alarm or message info
 
 // Figure out how many SubUnits - they should be from 1 to X and not skip any.
-udNumberOfSubUnits := 0;
-FOR i:=1 TO MAX_NO_OF_SUBUNITS DO
-	IF a_itfPackMLBase[i] <> 0 THEN
-		udNumberOfSubUnits:=udNumberOfSubUnits+1;
+nNumberOfSubModules := 0;
+FOR i:=1 TO MAX_NO_OF_SUBMODULES DO
+	IF a_ITF_PackMLBase[i] <> 0 THEN
+		nNumberOfSubModules:=nNumberOfSubModules+1;
+	END_IF
+END_FOR
+
+nNumberOfComponents := 0;
+FOR i:=1 TO MAX_NO_OF_COMPONENTS DO
+	IF a_ITF_Components[i] <> 0 THEN
+		nNumberOfComponents:=nNumberOfComponents+1;
 	END_IF
 END_FOR
 
@@ -299,15 +314,21 @@ fbExternalControl.Module := THIS^;
 // <BASIC INITIALIZATION CODE, DO NOT CHANGE>
 // Initialize subunit overview used by state machine
 PMLSubUnitInfoRef.ArraySize := SIZEOF(a_stPMLSubUnitInfo);
-PMLSubUnitInfoRef.NoOfSubUnits := udNumberOfSubUnits;
+PMLSubUnitInfoRef.NoOfSubUnits := nNumberOfSubModules;
 PMLSubUnitInfoRef.pArray := ADR(a_stPMLSubUnitInfo);
 // Point the state machine to the locally defined subunit info 
 fbStateMachine.stSubUnitInfoRef := PMLSubUnitInfoRef;
 // <\BASIC INITIALIZATION CODE, DO NOT CHANGE>
 
 // Activate all subunits by default, or change accordingly
-FOR i:=1 TO udNumberOfSubUnits DO
+FOR i:=1 TO nNumberOfSubModules DO
 	a_stPMLSubUnitInfo[i].Active	:= TRUE;					// Follows Main State Machine
+END_FOR
+
+FOR i:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[i] <> 0 THEN
+		a_ITF_Components[i].Enabled := TRUE;
+	END_IF
 END_FOR
 
 CreateEvents();]]></ST>
@@ -379,16 +400,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send abort command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady := TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Aborted);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Aborted);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -412,16 +433,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send clear command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO	
-	a_itfPackMLBase[nModuleNo].StateCommand	:=	ePMLCommand_Clear;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO	
+	a_ITF_PackMLBase[nModuleNo].StateCommand	:=	ePMLCommand_Clear;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -457,16 +478,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send complete command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Complete;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Complete;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Complete);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Complete);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -514,16 +535,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send hold command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Hold;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Hold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Held);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Held);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -587,8 +608,8 @@ IF fbModeManager.eModeStatus <> eLastMode  THEN
 			Mode := fbModeManager.eModeStatus);	
 	END_IF	
 	// Change SubModules
-	FOR i := 1 TO udNumberOfSubUnits DO
-		a_itfPackMLBase[i].ModeCommand := fbModeManager.eModeStatus;		//Call the SetMode loop of the subunits 
+	FOR i := 1 TO nNumberOfSubModules DO
+		a_ITF_PackMLBase[i].ModeCommand := fbModeManager.eModeStatus;		//Call the SetMode loop of the subunits 
 	END_FOR
 
 END_IF ]]></ST>
@@ -610,16 +631,16 @@ END_VAR]]></Declaration>
 //Perform State tasks here
 // Send clear/reset command to all sub modules
 //As long as this module is in the "Resetting" state, it will attempt to get all modules to Idle by sending abort, clear, and reset commands as appropriate to its children until they do
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	IF a_itfPackMLBase[nModuleNo].State=ePMLState_Stopped THEN
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Reset;
-	ELSIF a_itfPackMLBase[nModuleNo].State=ePMLState_Aborted THEN
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Clear;
-	ELSIF a_itfPackMLBase[nModuleNo].State=ePMLState_Clearing OR a_itfPackMLBase[nModuleNo].State=ePMLState_Stopping 
-		OR a_itfPackMLBase[nModuleNo].State=ePMLState_Resetting OR a_itfPackMLBase[nModuleNo].State=ePMLState_Idle THEN
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	IF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Stopped THEN
+		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Reset;
+	ELSIF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Aborted THEN
+		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Clear;
+	ELSIF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Clearing OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Stopping 
+		OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Resetting OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Idle THEN
 		;
 	ELSE
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
 	END_IF
 END_FOR
 
@@ -627,8 +648,8 @@ bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by 
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Idle);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Idle);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -652,16 +673,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send start command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Start;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Start;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -802,16 +823,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send stop command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Stop;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Stop;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -847,16 +868,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send suspend command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Suspend;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Suspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Suspended);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Suspended);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -892,16 +913,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unhold command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unhold;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unhold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -925,16 +946,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unsuspend command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unsuspend;
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unsuspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nModuleNo := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -1193,7 +1214,10 @@ END_IF]]></ST>
       <LineId Id="16" Count="3" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CyclicLogic">
-      <LineId Id="50" Count="15" />
+      <LineId Id="50" Count="14" />
+      <LineId Id="108" Count="4" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="69" Count="4" />
       <LineId Id="91" Count="0" />
       <LineId Id="83" Count="0" />
@@ -1254,9 +1278,13 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.initialize">
       <LineId Id="9" Count="0" />
       <LineId Id="17" Count="7" />
+      <LineId Id="48" Count="5" />
+      <LineId Id="47" Count="0" />
       <LineId Id="43" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="25" Count="13" />
+      <LineId Id="55" Count="4" />
+      <LineId Id="54" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="7" Count="0" />
     </LineIds>

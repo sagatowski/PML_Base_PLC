@@ -10,7 +10,7 @@ VAR
 	fbEquipmentModule1			: FB_TestEquipment;
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
+	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
 
 	// Other machine specific variables here
 END_VAR
@@ -57,10 +57,9 @@ VAR
 	i								: UDINT;		//Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
-FOR i := 1 TO MAX_NO_OF_SUBUNITS DO
-	a_itfPackMLBase[i] := a_itfPackMLBase_init[i];
+        <ST><![CDATA[// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
+FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
+	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
 fbEquipmentModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
@@ -86,14 +85,7 @@ SUPER^.Initialize();
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.Initialize">
-      <LineId Id="108" Count="0" />
-      <LineId Id="100" Count="1" />
-      <LineId Id="106" Count="1" />
-      <LineId Id="98" Count="0" />
-      <LineId Id="114" Count="5" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="99" Count="0" />
-      <LineId Id="29" Count="1" />
+      <LineId Id="123" Count="14" />
       <LineId Id="112" Count="0" />
     </LineIds>
   </POU>

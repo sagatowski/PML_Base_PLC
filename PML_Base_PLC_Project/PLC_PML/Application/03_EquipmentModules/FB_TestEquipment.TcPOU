@@ -9,7 +9,7 @@ VAR
 	fb_EM1_ControlModule1		: FB_TestControl;
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ITF_PMLModuleBase := [fb_EM1_ControlModule1](*, fbSubModule2,*);
+	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fb_EM1_ControlModule1](*, fbSubModule2,*);
 
 	// Other machine specific variables here
 END_VAR
@@ -58,8 +58,8 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 // Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
-FOR i := 1 TO MAX_NO_OF_SUBUNITS DO
-	a_itfPackMLBase[i] := a_itfPackMLBase_init[i];
+FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
+	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
 fb_EM1_ControlModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
