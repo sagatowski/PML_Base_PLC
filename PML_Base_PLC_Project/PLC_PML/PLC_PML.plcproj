@@ -160,6 +160,21 @@
     <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_DualSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_NoSensor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_RetractedSensor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_ExtendedSensor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualSensor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualTimer.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualSolenoid_DualSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>

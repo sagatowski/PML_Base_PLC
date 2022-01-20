@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
-  <POU Name="FB_Cylinder_DualTimer" Id="{8c5cc0da-3f20-4dda-bfe6-4c6ccc1647cc}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualTimer EXTENDS FB_CylinderBase
+  <POU Name="FB_Cylinder_NoSensor" Id="{8c5cc0da-3f20-4dda-bfe6-4c6ccc1647cc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_NoSensor EXTENDS FB_CylinderBase
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -21,15 +21,24 @@ END_VAR
       <Implementation>
         <ST><![CDATA[fbSimExtend_TON();		//Call timer FB
 fbSimRetract_TON();		//Call timer FB
-GenerateFeedback(TRUE, TRUE);]]></ST>
+
+GenerateFeedback(bExtend := bExtendCommand,
+				 bRetract := bRetractCommand,
+				 bExtended_Generated => bExtendedFeedback,
+				 bRetracted_Generated => bRetractedFeedback);
+				 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_Cylinder_DualTimer">
+    <LineIds Name="FB_Cylinder_NoSensor">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Cylinder_DualTimer.HardwareUpdate">
+    <LineIds Name="FB_Cylinder_NoSensor.HardwareUpdate">
       <LineId Id="13" Count="1" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="24" Count="1" />
+      <LineId Id="23" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

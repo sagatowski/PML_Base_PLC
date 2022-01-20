@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_Cylinder_DualPWM_DualTimer" Id="{bd0765f9-d5b5-41eb-b703-2e3258d3ef4c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualPWM_DualTimer EXTENDS FB_Cylinder_DualTimer
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualPWM_DualTimer EXTENDS FB_Cylinder_NoSensor
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
