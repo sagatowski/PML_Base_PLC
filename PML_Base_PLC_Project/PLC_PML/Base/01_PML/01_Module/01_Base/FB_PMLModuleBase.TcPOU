@@ -6,31 +6,31 @@ VAR_INPUT
 	iMasterDataStructure_Adder		: ITF_Tree_IndexBased;			//Interface for adding new children to the master machine tree data representation
 END_VAR
 VAR
-	//ITF_PackMLBase internal property variables
-	bEnabled			: BOOL;					//Enables or disables the packml Machine of the module (prevents the module from going past idle)
-	eMode				: E_PMLUnitMode;		//Current UnitMode of the module
-	eModeCommand		: E_PMLUnitMode; 				//Current Commanded UnitMode of the module
+	//ITF_PMLModuleBase internal property variables
+	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
+	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
+	bLogStateChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
 	nModuleID			: DINT;					//Unique identifying number for the module
 	sModuleName			: STRING;				//Human-readable module name for user-side messaging
-	eState				: Tc3_PackML_V2.E_PMLState;
+	bEnabled			: BOOL;					//Enables or disables the packml Machine of the module (prevents the module from going past idle)
+	eModeCommand		: E_PMLUnitMode; 				//Current Commanded UnitMode of the module
 	eStateCommand		: Tc3_PackML_V2.E_PMLCommand;
-	bLogStateChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
-	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
-
-	stPMLModuleBaseHMI	: ST_PMLModuleBase_HMI;		//Handles atatus and cointrol communications with the HMI
-	stPMLModuleBaseVISU	: ST_PMLModuleBase_VISU;	//Handles the status and control with Visulizations
-
-	//Administration of FB Variables
-	bInitialized 					: BOOL;					//TRUE when initialization code of the object is complete
-	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
-	sID_Name						: STRING;				//"Module XX - 'Module Name' " Alarm and message utility phrase based off of nMachine ID and sMachineName
-	fbExternalControl				: FB_ModuleExternalCommandControl;
-	// Packtags data
-	//{attribute 'OPC.UA.DA' := '1'}
-	//{attribute 'OPC.UA.DA.StructuredType' := '1'}
-	//packTags						: T_PackMLTags;		//PackTags instantiation
+	eMode				: E_PMLUnitMode;		//Current UnitMode of the module
+	eState				: Tc3_PackML_V2.E_PMLState;
 	
-	//State and Mode control
+	//ITF_ModuleSequenceControl internal property variables
+	stSequenceControl 		: ST_ModuleSequenceControl;		//Provides variables with which the ModuleSequenceControl interface may interact 
+
+	//Communication Variables
+	stPMLModuleBaseHMI	: ST_PMLModuleBase_HMI;		//Handles status and control communications with the HMI
+	stPMLModuleBaseVISU	: ST_PMLModuleBase_VISU;	//Handles status and control communications with Visualizations
+	fbExternalControl	: FB_ModuleExternalCommandControl;	//Handles commands from HMI/VISUS ^^ kind of overlaps with the structures above - TODO: Improve
+
+	//Administration and Configuration Variables
+	bInitialized 					: BOOL;					//TRUE when initialization code of the object is complete
+	sID_Name						: STRING;				//"Module XX - 'Module Name' " Alarm and message utility phrase based off of nMachine ID and sMachineName
+	
+	//State and Mode control blocks
 	fbModeManager 					: PML_UnitModeManager; 	//Manages operating mode transitions and rules
 	fbStateMachine 					: PML_StateMachine; 	//Manages PackML state transitions
 	fbCustomModes 					: PML_UnitModeConfig;	//Used to define custom machine modes if desired
@@ -46,28 +46,31 @@ VAR
 	
 	//Alarming and Logging variables - Some may or may not be necessary depending on final alarm system implementation ----------------------------------------------
 	//These are for the newer TMC Excel import style alarm system
-	a_fbPMLAlarms						: ARRAY[1..48] OF FB_TcAlarm;	//Array of alarms for PackML state and mode changes that exist in any PackML enabled module
+	a_fbPMLAlarms					: ARRAY[1..48] OF FB_TcAlarm;	//Array of alarms for PackML state and mode changes that exist in any PackML enabled module
 	a_fbBaseAlarms					: ARRAY[1..32] OF FB_TcAlarm;		//Array of alarms for general module Alarms				
-	fbPMLStateLogger				: FB_PMLStateLogger;	//Logs PackML state changes
-	fbPMLModeLogger					: FB_PMLModeLogger;	//Logs PackML Mode changes
+	fbPMLStateLogger				: FB_PMLStateLogger;				//Logs PackML state changes
+	fbPMLModeLogger					: FB_PMLModeLogger;					//Logs PackML Mode changes
 
 	// Alarm handling
-	bActiveAlarm					: BOOL;					//module has an active alarm					
-
-	//Sequence Control Structure
-	stSequenceControl 		: ST_ModuleSequenceControl;		//Provides variables with which the ModuleSequenceControl interface may interact 
+	bActiveAlarm					: BOOL;					//module has an active alarm		TODO: Implement			
 
 	//********************************************************************************************************************
 	// Sub Module variables
 	// Used mostly for EMs and Machines, but ok for CM. They are just null	
-	a_itfPackMLBase					: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ITF_PMLModuleBase;
+	a_ITF_PackMLBase				: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase;	
 	// Array of the PML sub unit info array used by the statemachine
-	a_stPMLSubUnitInfo				: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ST_PMLSubUnitInfo;
-	udNumberOfSubUnits				: UDINT := 0;	//Defined number of instantiated Module
-	// This is the information for each modules subunits.
+	a_stPMLSubUnitInfo				: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ST_PMLSubUnitInfo;
+	nNumberOfSubModules				: UDINT := 0;	//calculated number of instantiated sub modules
+	// This is the information for each module's submodules.
 	PMLSubUnitInfoRef				: ST_PMLSubUnitInfoRef;				// Reference to the subunit information, used by the state machine
 	//********************************************************************************************************************
 	
+	//Component variables - Allow iterative control of child components (Mostly used with Control Modules, but usable anywhere)
+	a_ITF_Components				: ARRAY[1..MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase;
+	nNumberOfComponents				: UDINT := 0;	//calculated number of instantiated components
+	
+	//Miscellaneous Variables
+	nIndex				: UDINT;		//Generic iteration value
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -112,14 +115,32 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ClearSequence" Id="{dcba97bd-08c3-483f-adfa-ad522b2b09dd}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD ClearSequence : BOOL
+    <Method Name="BeginSequence" Id="{39f6151a-a937-4fc0-8b1e-dd2269ada972}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD BeginSequence : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Begin;
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockSequence" Id="{4347c5ec-4277-403c-a5e9-8ef55e169c4f}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD BlockSequence : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Clear;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Block;
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CancelSequence" Id="{50b4bc96-fdc0-4391-922d-d491a3a297a0}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD CancelSequence : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Cancel;
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CreateEvents" Id="{6bbb8cab-407d-45ac-8da1-6eb5ce7199bf}" FolderPath="Methods\">
@@ -165,9 +186,15 @@ IF NOT bInitialized THEN			//Force initialization code of the object
 END_IF
 
 //  call the subunits
-FOR i := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[i].CyclicLogic();								//Call the main cyclic loop of the subunits 
-	a_stPMLSubUnitInfo[i].eState := a_itfPackMLBase[i].State;  	//Reflect the state of the subunits to the state machine of the module
+FOR i := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[i].CyclicLogic();								//Call the main cyclic loop of the subunits 
+	a_stPMLSubUnitInfo[i].eState := a_ITF_PackMLBase[i].State;  	//Reflect the state of the subunits to the state machine of the module
+END_FOR
+
+FOR i:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[i] <> 0 THEN
+		a_ITF_Components[i].CyclicLogic();
+	END_IF
 END_FOR
 
 // Mode control loop of the module
@@ -181,14 +208,6 @@ VISUCommunication();
 fbExternalControl();
 
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="DisableSequence" Id="{444f5096-9aab-4bc2-b9f5-9531fe7c014a}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD DisableSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Disable;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Enabled" Id="{a21599c5-6ae5-44f0-9223-afd1d8212c97}" FolderPath="01_ITF_PMLModuleBase\01_Properties\02_Control\">
@@ -210,16 +229,6 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="EnableSequence" Id="{b53d18a6-d3b4-46e2-9541-da47e7fe0b97}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD EnableSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Enable;
-stSequenceControl.bNewCommand := TRUE;
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="HMICommunication" Id="{0f3b5e33-30dd-42a6-9468-c84dc53cce4a}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD HMICommunication : BOOL]]></Declaration>
       <Implementation>
@@ -287,10 +296,17 @@ END_VAR]]></Declaration>
         <ST><![CDATA[sID_Name := CONCAT(CONCAT(CONCAT(CONCAT(CONCAT('Module ', sAncestorIDs), DINT_TO_STRING(nModuleID)), ' - '), sModuleName), ' '); 	//Creates a utility string for alarms and other messaging that reads (example text) - "Module 10 - Main Casepacker" to be followed by the alarm or message info
 
 // Figure out how many SubUnits - they should be from 1 to X and not skip any.
-udNumberOfSubUnits := 0;
-FOR i:=1 TO MAX_NO_OF_SUBUNITS DO
-	IF a_itfPackMLBase[i] <> 0 THEN
-		udNumberOfSubUnits:=udNumberOfSubUnits+1;
+nNumberOfSubModules := 0;
+FOR i:=1 TO MAX_NO_OF_SUBMODULES DO
+	IF a_ITF_PackMLBase[i] <> 0 THEN
+		nNumberOfSubModules:=nNumberOfSubModules+1;
+	END_IF
+END_FOR
+
+nNumberOfComponents := 0;
+FOR i:=1 TO MAX_NO_OF_COMPONENTS DO
+	IF a_ITF_Components[i] <> 0 THEN
+		nNumberOfComponents:=nNumberOfComponents+1;
 	END_IF
 END_FOR
 
@@ -299,15 +315,21 @@ fbExternalControl.Module := THIS^;
 // <BASIC INITIALIZATION CODE, DO NOT CHANGE>
 // Initialize subunit overview used by state machine
 PMLSubUnitInfoRef.ArraySize := SIZEOF(a_stPMLSubUnitInfo);
-PMLSubUnitInfoRef.NoOfSubUnits := udNumberOfSubUnits;
+PMLSubUnitInfoRef.NoOfSubUnits := nNumberOfSubModules;
 PMLSubUnitInfoRef.pArray := ADR(a_stPMLSubUnitInfo);
 // Point the state machine to the locally defined subunit info 
 fbStateMachine.stSubUnitInfoRef := PMLSubUnitInfoRef;
 // <\BASIC INITIALIZATION CODE, DO NOT CHANGE>
 
 // Activate all subunits by default, or change accordingly
-FOR i:=1 TO udNumberOfSubUnits DO
+FOR i:=1 TO nNumberOfSubModules DO
 	a_stPMLSubUnitInfo[i].Active	:= TRUE;					// Follows Main State Machine
+END_FOR
+
+FOR i:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[i] <> 0 THEN
+		a_ITF_Components[i].Enabled := TRUE;
+	END_IF
 END_FOR
 
 CreateEvents();]]></ST>
@@ -365,11 +387,7 @@ END_VAR
       </Implementation>
     </Method>
     <Method Name="M_Aborting" Id="{ff7d5dfb-dd97-4700-92b4-3318a8a33dc3}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Aborting'}
-METHOD M_Aborting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Aborting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -379,16 +397,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send abort command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady := TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Aborted);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Aborted);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -398,11 +416,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Clearing" Id="{6112c2e2-beb3-4b32-8c5f-7d289837fbce}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Clearing'}
-METHOD M_Clearing
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Clearing]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -412,16 +426,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send clear command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO	
-	a_itfPackMLBase[nModuleNo].StateCommand	:=	ePMLCommand_Clear;
+FOR nIndex := 1 TO nNumberOfSubModules DO	
+	a_ITF_PackMLBase[nIndex].StateCommand	:=	ePMLCommand_Clear;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -443,11 +457,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Completing" Id="{25f6dadc-f2af-4e8f-bc90-78652fde6245}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Completing'}
-METHOD M_Completing
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Completing]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -457,16 +467,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send complete command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Complete;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Complete;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Complete);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Complete);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -500,11 +510,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Holding" Id="{4c4a9600-833f-4e2c-8c49-79d528d4d25d}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Holding'}
-METHOD M_Holding
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Holding]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -514,16 +520,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send hold command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Hold;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Hold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Held);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Held);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -587,19 +593,15 @@ IF fbModeManager.eModeStatus <> eLastMode  THEN
 			Mode := fbModeManager.eModeStatus);	
 	END_IF	
 	// Change SubModules
-	FOR i := 1 TO udNumberOfSubUnits DO
-		a_itfPackMLBase[i].ModeCommand := fbModeManager.eModeStatus;		//Call the SetMode loop of the subunits 
+	FOR i := 1 TO nNumberOfSubModules DO
+		a_ITF_PackMLBase[i].ModeCommand := fbModeManager.eModeStatus;		//Call the SetMode loop of the subunits 
 	END_FOR
 
 END_IF ]]></ST>
       </Implementation>
     </Method>
     <Method Name="M_Resetting" Id="{3807e2e0-6258-4c91-9f18-5b08f4f71847}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Resetting'}
-METHOD M_Resetting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Resetting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -610,16 +612,16 @@ END_VAR]]></Declaration>
 //Perform State tasks here
 // Send clear/reset command to all sub modules
 //As long as this module is in the "Resetting" state, it will attempt to get all modules to Idle by sending abort, clear, and reset commands as appropriate to its children until they do
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	IF a_itfPackMLBase[nModuleNo].State=ePMLState_Stopped THEN
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Reset;
-	ELSIF a_itfPackMLBase[nModuleNo].State=ePMLState_Aborted THEN
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Clear;
-	ELSIF a_itfPackMLBase[nModuleNo].State=ePMLState_Clearing OR a_itfPackMLBase[nModuleNo].State=ePMLState_Stopping 
-		OR a_itfPackMLBase[nModuleNo].State=ePMLState_Resetting OR a_itfPackMLBase[nModuleNo].State=ePMLState_Idle THEN
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	IF a_ITF_PackMLBase[nIndex].State=ePMLState_Stopped THEN
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Reset;
+	ELSIF a_ITF_PackMLBase[nIndex].State=ePMLState_Aborted THEN
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Clear;
+	ELSIF a_ITF_PackMLBase[nIndex].State=ePMLState_Clearing OR a_ITF_PackMLBase[nIndex].State=ePMLState_Stopping 
+		OR a_ITF_PackMLBase[nIndex].State=ePMLState_Resetting OR a_ITF_PackMLBase[nIndex].State=ePMLState_Idle THEN
 		;
 	ELSE
-		a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 	END_IF
 END_FOR
 
@@ -627,8 +629,8 @@ bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by 
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Idle);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Idle);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -638,11 +640,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Starting" Id="{ebd7ebd1-f8aa-4a46-a1fd-eef86be59683}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Starting'}
-METHOD M_Starting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Starting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -652,16 +650,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send start command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Start;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Start;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -788,11 +786,7 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="M_Stopping" Id="{b850a62e-c080-4fe2-bfc2-bbdfb38993b9}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Stopping'}
-METHOD M_Stopping
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Stopping]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -802,16 +796,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send stop command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Stop;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Stop;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -833,11 +827,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Suspending" Id="{9bd4e4e9-27b1-45dc-a32e-d60e4d2d284c}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Suspending'}
-METHOD M_Suspending
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Suspending]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -847,16 +837,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send suspend command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Suspend;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Suspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Suspended);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Suspended);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -878,11 +868,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Unholding" Id="{d2ff920f-b2b8-44a1-a393-a69ebe202c6f}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Unholding'}
-METHOD M_Unholding
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Unholding]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -892,16 +878,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unhold command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unhold;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Unhold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -911,11 +897,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Unsuspending" Id="{4c1e1471-15af-4f3d-8afa-3204208e7981}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Unsuspending'}
-METHOD M_Unsuspending
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Unsuspending]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -925,16 +907,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unsuspend command to all sub modules
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	a_itfPackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unsuspend;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Unsuspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO udNumberOfSubUnits DO
-	bSubModulesReady := bSubModulesReady AND (a_itfPackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -1007,13 +989,14 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ResetSequence" Id="{3698f9a0-68d8-4502-8866-8f470bd7cc8e}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD ResetSequence : BOOL
+    <Method Name="ReiterateSequence" Id="{6f466533-54e8-4315-827d-ec1d45dee989}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD ReiterateSequence : BOOL
+VAR_INPUT
+END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Reset;
-stSequenceControl.bNewCommand := TRUE;
-]]></ST>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Reiterate;
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ResumeSequence" Id="{76c80610-20fe-4670-9fe9-0966252cec48}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -1023,7 +1006,16 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Resume;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
+stSequenceControl.bCommandPulse := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RevertSequence" Id="{3698f9a0-68d8-4502-8866-8f470bd7cc8e}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD RevertSequence : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Revert;
+stSequenceControl.bCommandPulse := TRUE;
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="SequenceCommand" Id="{ff6a4431-2a46-4e98-9e1a-d26293008816}" FolderPath="03_ITF_ModuleSequenceControl\01_Properties\">
@@ -1058,14 +1050,6 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="StartSequence" Id="{39f6151a-a937-4fc0-8b1e-dd2269ada972}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD StartSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Start;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="State" Id="{d1cab4fd-2e03-4869-8dbf-e461f1addf3b}" FolderPath="01_ITF_PMLModuleBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY State : Tc3_PackML_V2.E_PMLState
 ]]></Declaration>
@@ -1182,8 +1166,17 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.AncestorIDs.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.ClearSequence">
-      <LineId Id="8" Count="1" />
+    <LineIds Name="FB_PMLModuleBase.BeginSequence">
+      <LineId Id="12" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.BlockSequence">
+      <LineId Id="9" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.CancelSequence">
+      <LineId Id="6" Count="0" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CreateEvents">
       <LineId Id="6" Count="0" />
@@ -1193,7 +1186,10 @@ END_IF]]></ST>
       <LineId Id="16" Count="3" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CyclicLogic">
-      <LineId Id="50" Count="15" />
+      <LineId Id="50" Count="14" />
+      <LineId Id="108" Count="4" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="69" Count="4" />
       <LineId Id="91" Count="0" />
       <LineId Id="83" Count="0" />
@@ -1202,21 +1198,11 @@ END_IF]]></ST>
       <LineId Id="74" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.DisableSequence">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Set">
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_PMLModuleBase.EnableSequence">
-      <LineId Id="10" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.HMICommunication">
       <LineId Id="43" Count="2" />
@@ -1254,9 +1240,13 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.initialize">
       <LineId Id="9" Count="0" />
       <LineId Id="17" Count="7" />
+      <LineId Id="48" Count="5" />
+      <LineId Id="47" Count="0" />
       <LineId Id="43" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="25" Count="13" />
+      <LineId Id="55" Count="4" />
+      <LineId Id="54" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="7" Count="0" />
     </LineIds>
@@ -1430,14 +1420,18 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.ModuleName.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.ResetSequence">
+    <LineIds Name="FB_PMLModuleBase.ReiterateSequence">
+      <LineId Id="6" Count="0" />
       <LineId Id="5" Count="0" />
-      <LineId Id="4" Count="0" />
-      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.ResumeSequence">
       <LineId Id="6" Count="0" />
       <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.RevertSequence">
+      <LineId Id="5" Count="0" />
+      <LineId Id="4" Count="0" />
+      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.SequenceCommand.Get">
       <LineId Id="2" Count="0" />
@@ -1447,9 +1441,6 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.SequenceStatus.Get">
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_PMLModuleBase.StartSequence">
-      <LineId Id="8" Count="1" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.State.Get">
       <LineId Id="2" Count="0" />

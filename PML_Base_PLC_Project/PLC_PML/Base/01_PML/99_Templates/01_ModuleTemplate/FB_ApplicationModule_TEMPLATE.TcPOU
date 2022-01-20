@@ -9,12 +9,20 @@
 
 FUNCTION_BLOCK ABSTRACT FB_ApplicationModule_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
-	//Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
+	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
 	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBUNITS] OF ITF_PMLModuleBase (*:= [fbSubModule1, fbSubModule2,*);
+	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase (*:= [fbSubModule1, fbSubModule2,*);
+
+	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+	//fbComponent1				: FB_ComponentBase (Extension);		// Component instantiation
+	//fbComponent2				: FB_ComponentBase (Extension);		// Component instantiation
+	
+	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase (*:= [	fbComponent1,
+																											fbComponent2]*);
 
 	// Other machine specific variables here
 END_VAR
@@ -41,7 +49,7 @@ END_VAR
       <Folder Name="03_Status" Id="{49d473b9-52dd-4d23-948d-b6a2dc357f76}" />
     </Folder>
     <Folder Name="03_Methods" Id="{7a7ecdb0-5f2b-448e-937a-8df184a6286e}" />
-    <Method Name="CyclicLogic" Id="{12422e5e-a5c0-4929-9ad9-b99a74293d93}" FolderPath="03_Methods\">
+    <Method Name="CyclicLogic" Id="{12422e5e-a5c0-4929-9ad9-b99a74293d93}" FolderPath="01_SUPER_Overrides\02_Methods\">
       <Declaration><![CDATA[// 
 // Cyclic Code
 METHOD CyclicLogic
@@ -54,7 +62,7 @@ SUPER^.CyclicLogic();
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="Initialize" Id="{442f3bf5-5552-4c37-b5b2-a49ca36d752d}" FolderPath="03_Methods\">
+    <Method Name="Initialize" Id="{442f3bf5-5552-4c37-b5b2-a49ca36d752d}" FolderPath="01_SUPER_Overrides\02_Methods\">
       <Declaration><![CDATA[METHOD Initialize
 VAR
 	i								: UDINT;		//Generic iteration value
@@ -62,8 +70,8 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 // Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
-FOR i := 1 TO MAX_NO_OF_SUBUNITS DO
-	a_itfPackMLBase[i] := a_itfPackMLBase_init[i];
+FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
+	a_ITF_PackMLBase[i] := a_ITF_PackMLBase_init[i];
 END_FOR
 
 

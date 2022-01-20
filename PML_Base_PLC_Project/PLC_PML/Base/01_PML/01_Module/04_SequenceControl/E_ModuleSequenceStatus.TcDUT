@@ -5,12 +5,11 @@
 {attribute 'strict'}
 TYPE E_ModuleSequenceStatus :
 (
-	Idle,
+	Dormant,
 	Busy,
 	Waiting,
-	Complete,
-	Disabled,
-	Error
+	Finished,
+	Canceled
 );
 END_TYPE
 ]]></Declaration>

@@ -15,24 +15,14 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[CASE eCommand OF
-	E_ModuleSequenceCommand.Clear:
+	E_ModuleSequenceCommand.Begin:
 		FOR i := 1 TO nSubCount DO
-			itfSequenceArray[i].ClearSequence();
+			itfSequenceArray[i].BeginSequence();
 		END_FOR
 		
-	E_ModuleSequenceCommand.Disable:
+	E_ModuleSequenceCommand.Block:
 		FOR i := 1 TO nSubCount DO
-			itfSequenceArray[i].DisableSequence();
-		END_FOR
-	
-	E_ModuleSequenceCommand.Enable:
-		FOR i := 1 TO nSubCount DO
-			itfSequenceArray[i].EnableSequence();
-		END_FOR
-	
-	E_ModuleSequenceCommand.Reset:
-		FOR i := 1 TO nSubCount DO
-			itfSequenceArray[i].ResetSequence();
+			itfSequenceArray[i].BlockSequence();
 		END_FOR
 	
 	E_ModuleSequenceCommand.Resume:
@@ -40,9 +30,19 @@ END_VAR
 			itfSequenceArray[i].ResumeSequence();
 		END_FOR
 	
-	E_ModuleSequenceCommand.Start:
+	E_ModuleSequenceCommand.Revert:
 		FOR i := 1 TO nSubCount DO
-			itfSequenceArray[i].StartSequence();
+			itfSequenceArray[i].RevertSequence();
+		END_FOR
+	
+	E_ModuleSequenceCommand.Cancel:
+		FOR i := 1 TO nSubCount DO
+			itfSequenceArray[i].CancelSequence();
+		END_FOR
+	
+	E_ModuleSequenceCommand.Reiterate:
+		FOR i := 1 TO nSubCount DO
+			itfSequenceArray[i].ReiterateSequence();
 		END_FOR
 	
 END_CASE]]></ST>
