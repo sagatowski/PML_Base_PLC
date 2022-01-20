@@ -70,6 +70,7 @@ VAR
 	PMLSubUnitInfoRef				: ST_PMLSubUnitInfoRef;				// Reference to the subunit information, used by the state machine
 	//********************************************************************************************************************
 	
+	nIndex				: UDINT;		//Generic iteration value
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -386,11 +387,7 @@ END_VAR
       </Implementation>
     </Method>
     <Method Name="M_Aborting" Id="{ff7d5dfb-dd97-4700-92b4-3318a8a33dc3}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Aborting'}
-METHOD M_Aborting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Aborting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -400,16 +397,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send abort command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady := TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Aborted);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Aborted);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -419,11 +416,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Clearing" Id="{6112c2e2-beb3-4b32-8c5f-7d289837fbce}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Clearing'}
-METHOD M_Clearing
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Clearing]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -433,16 +426,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send clear command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO	
-	a_ITF_PackMLBase[nModuleNo].StateCommand	:=	ePMLCommand_Clear;
+FOR nIndex := 1 TO nNumberOfSubModules DO	
+	a_ITF_PackMLBase[nIndex].StateCommand	:=	ePMLCommand_Clear;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -464,11 +457,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Completing" Id="{25f6dadc-f2af-4e8f-bc90-78652fde6245}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Completing'}
-METHOD M_Completing
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Completing]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -478,16 +467,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send complete command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Complete;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Complete;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Complete);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Complete);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -521,11 +510,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Holding" Id="{4c4a9600-833f-4e2c-8c49-79d528d4d25d}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Holding'}
-METHOD M_Holding
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Holding]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -535,16 +520,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send hold command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Hold;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Hold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Held);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Held);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -616,11 +601,7 @@ END_IF ]]></ST>
       </Implementation>
     </Method>
     <Method Name="M_Resetting" Id="{3807e2e0-6258-4c91-9f18-5b08f4f71847}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Resetting'}
-METHOD M_Resetting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Resetting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -631,16 +612,16 @@ END_VAR]]></Declaration>
 //Perform State tasks here
 // Send clear/reset command to all sub modules
 //As long as this module is in the "Resetting" state, it will attempt to get all modules to Idle by sending abort, clear, and reset commands as appropriate to its children until they do
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	IF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Stopped THEN
-		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Reset;
-	ELSIF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Aborted THEN
-		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Clear;
-	ELSIF a_ITF_PackMLBase[nModuleNo].State=ePMLState_Clearing OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Stopping 
-		OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Resetting OR a_ITF_PackMLBase[nModuleNo].State=ePMLState_Idle THEN
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	IF a_ITF_PackMLBase[nIndex].State=ePMLState_Stopped THEN
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Reset;
+	ELSIF a_ITF_PackMLBase[nIndex].State=ePMLState_Aborted THEN
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Clear;
+	ELSIF a_ITF_PackMLBase[nIndex].State=ePMLState_Clearing OR a_ITF_PackMLBase[nIndex].State=ePMLState_Stopping 
+		OR a_ITF_PackMLBase[nIndex].State=ePMLState_Resetting OR a_ITF_PackMLBase[nIndex].State=ePMLState_Idle THEN
 		;
 	ELSE
-		a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Abort;
+		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 	END_IF
 END_FOR
 
@@ -648,8 +629,8 @@ bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by 
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Idle);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Idle);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -659,11 +640,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Starting" Id="{ebd7ebd1-f8aa-4a46-a1fd-eef86be59683}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Starting'}
-METHOD M_Starting
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Starting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -673,16 +650,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send start command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Start;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Start;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -809,11 +786,7 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="M_Stopping" Id="{b850a62e-c080-4fe2-bfc2-bbdfb38993b9}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Stopping'}
-METHOD M_Stopping
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Stopping]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -823,16 +796,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send stop command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Stop;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Stop;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Stopped);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -854,11 +827,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Suspending" Id="{9bd4e4e9-27b1-45dc-a32e-d60e4d2d284c}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Suspending'}
-METHOD M_Suspending
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Suspending]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -868,16 +837,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send suspend command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Suspend;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Suspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Suspended);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Suspended);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -899,11 +868,8 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Unholding" Id="{d2ff920f-b2b8-44a1-a393-a69ebe202c6f}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Unholding'}
-METHOD M_Unholding
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Unholding
+VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -913,16 +879,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unhold command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unhold;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Unhold;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
@@ -932,11 +898,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="M_Unsuspending" Id="{4c1e1471-15af-4f3d-8afa-3204208e7981}" FolderPath="02_ITF_UnitState\01_TransitionStates\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'M_Unsuspending'}
-METHOD M_Unsuspending
-VAR
-	nModuleNo							: UDINT;		//Generic iteration value
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD M_Unsuspending]]></Declaration>
       <Implementation>
         <ST><![CDATA[//*************************************************************************************************************************************************************************
 //If you are about to write application specific code, note that any such code should exist within the "Application" directory using a Function Block that 'EXTENDS' this base Function Block!
@@ -946,16 +908,16 @@ END_VAR]]></Declaration>
 
 //Perform State tasks here
 // Send unsuspend command to all sub modules
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	a_ITF_PackMLBase[nModuleNo].StateCommand:=ePMLCommand_Unsuspend;
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Unsuspend;
 END_FOR
 
 bStateTasksComplete := TRUE;		//Sending the command is all that is necessary by default, if more functionality is needed at this level, add it above and condition this value appropriately
 
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
-FOR nModuleNo := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nModuleNo].State = ePMLState_Execute);
+FOR nIndex := 1 TO nNumberOfSubModules DO
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
 END_FOR
 IF bSubModulesReady AND bStateTasksComplete THEN
 	bStateTasksComplete := FALSE;
