@@ -114,13 +114,31 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ClearSequence" Id="{dcba97bd-08c3-483f-adfa-ad522b2b09dd}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD ClearSequence : BOOL
+    <Method Name="BeginSequence" Id="{39f6151a-a937-4fc0-8b1e-dd2269ada972}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD BeginSequence : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Begin;
+stSequenceControl.bNewCommand := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockSequence" Id="{4347c5ec-4277-403c-a5e9-8ef55e169c4f}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD BlockSequence : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Clear;
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Block;
+stSequenceControl.bNewCommand := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CancelSequence" Id="{50b4bc96-fdc0-4391-922d-d491a3a297a0}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD CancelSequence : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Cancel;
 stSequenceControl.bNewCommand := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -191,14 +209,6 @@ fbExternalControl();
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="DisableSequence" Id="{444f5096-9aab-4bc2-b9f5-9531fe7c014a}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD DisableSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Disable;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="Enabled" Id="{a21599c5-6ae5-44f0-9223-afd1d8212c97}" FolderPath="01_ITF_PMLModuleBase\01_Properties\02_Control\">
       <Declaration><![CDATA[PROPERTY Enabled : BOOL]]></Declaration>
       <Get Name="Get" Id="{a6e327b1-41a2-4dd3-a0f8-24a28f9d1b3a}">
@@ -218,16 +228,6 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="EnableSequence" Id="{b53d18a6-d3b4-46e2-9541-da47e7fe0b97}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD EnableSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Enable;
-stSequenceControl.bNewCommand := TRUE;
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="HMICommunication" Id="{0f3b5e33-30dd-42a6-9468-c84dc53cce4a}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD HMICommunication : BOOL]]></Declaration>
       <Implementation>
@@ -1028,13 +1028,14 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ResetSequence" Id="{3698f9a0-68d8-4502-8866-8f470bd7cc8e}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD ResetSequence : BOOL
+    <Method Name="ReiterateSequence" Id="{6f466533-54e8-4315-827d-ec1d45dee989}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD ReiterateSequence : BOOL
+VAR_INPUT
+END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Reset;
-stSequenceControl.bNewCommand := TRUE;
-]]></ST>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Reiterate;
+stSequenceControl.bNewCommand := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ResumeSequence" Id="{76c80610-20fe-4670-9fe9-0966252cec48}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
@@ -1045,6 +1046,15 @@ END_VAR
       <Implementation>
         <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Resume;
 stSequenceControl.bNewCommand := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RevertSequence" Id="{3698f9a0-68d8-4502-8866-8f470bd7cc8e}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
+      <Declaration><![CDATA[METHOD RevertSequence : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Revert;
+stSequenceControl.bNewCommand := TRUE;
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="SequenceCommand" Id="{ff6a4431-2a46-4e98-9e1a-d26293008816}" FolderPath="03_ITF_ModuleSequenceControl\01_Properties\">
@@ -1079,14 +1089,6 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="StartSequence" Id="{39f6151a-a937-4fc0-8b1e-dd2269ada972}" FolderPath="03_ITF_ModuleSequenceControl\02_Methods\">
-      <Declaration><![CDATA[METHOD StartSequence : BOOL
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[stSequenceControl.eCommand := E_ModuleSequenceCommand.Start;
-stSequenceControl.bNewCommand := TRUE;]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="State" Id="{d1cab4fd-2e03-4869-8dbf-e461f1addf3b}" FolderPath="01_ITF_PMLModuleBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY State : Tc3_PackML_V2.E_PMLState
 ]]></Declaration>
@@ -1203,8 +1205,16 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.AncestorIDs.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.ClearSequence">
+    <LineIds Name="FB_PMLModuleBase.BeginSequence">
       <LineId Id="8" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.BlockSequence">
+      <LineId Id="9" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.CancelSequence">
+      <LineId Id="6" Count="0" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CreateEvents">
       <LineId Id="6" Count="0" />
@@ -1226,21 +1236,11 @@ END_IF]]></ST>
       <LineId Id="74" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.DisableSequence">
-      <LineId Id="7" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Set">
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_PMLModuleBase.EnableSequence">
-      <LineId Id="10" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.HMICommunication">
       <LineId Id="43" Count="2" />
@@ -1458,14 +1458,18 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.ModuleName.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PMLModuleBase.ResetSequence">
+    <LineIds Name="FB_PMLModuleBase.ReiterateSequence">
+      <LineId Id="6" Count="0" />
       <LineId Id="5" Count="0" />
-      <LineId Id="4" Count="0" />
-      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.ResumeSequence">
       <LineId Id="6" Count="0" />
       <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.RevertSequence">
+      <LineId Id="5" Count="0" />
+      <LineId Id="4" Count="0" />
+      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.SequenceCommand.Get">
       <LineId Id="2" Count="0" />
@@ -1475,9 +1479,6 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.SequenceStatus.Get">
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_PMLModuleBase.StartSequence">
-      <LineId Id="8" Count="1" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.State.Get">
       <LineId Id="2" Count="0" />

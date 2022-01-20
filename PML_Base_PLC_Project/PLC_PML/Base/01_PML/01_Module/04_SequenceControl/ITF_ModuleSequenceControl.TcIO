@@ -5,28 +5,36 @@
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{32cd75db-95e6-4e59-a337-d34f54cfaff6}" />
     <Folder Name="02_Methods" Id="{f5543132-710e-4d85-a828-6df720f8cd24}" />
-    <Method Name="ClearSequence" Id="{056019a7-2e4c-42d1-a163-e1caa0b45df2}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD ClearSequence : BOOL
+    <Method Name="BeginSequence" Id="{b110fc19-185b-4e21-93ff-0aef69c44f70}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD BeginSequence : BOOL
+]]></Declaration>
+    </Method>
+    <Method Name="BlockSequence" Id="{4ae2d9af-8163-4232-92ca-3b4f02f6712b}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD BlockSequence : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
-    <Method Name="DisableSequence" Id="{065e23ff-b747-413c-8d73-70bd3d6bf772}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD DisableSequence : BOOL
+    <Method Name="CancelSequence" Id="{8961b23b-409f-4ded-ab2f-f2239d9870fb}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD CancelSequence : BOOL
+VAR_INPUT
+END_VAR
 ]]></Declaration>
     </Method>
-    <Method Name="EnableSequence" Id="{f50796c5-0747-4cbf-a675-cfdcbdde6337}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD EnableSequence : BOOL
-]]></Declaration>
-    </Method>
-    <Method Name="ResetSequence" Id="{e7ff7a2f-11b6-4f0a-8c69-bc4d4a42a02b}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD ResetSequence : BOOL
+    <Method Name="ReiterateSequence" Id="{555f4a85-9faa-45e6-bcdf-e178bd2bc1f9}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD ReiterateSequence : BOOL
+VAR_INPUT
+END_VAR
 ]]></Declaration>
     </Method>
     <Method Name="ResumeSequence" Id="{f5b31e9a-e3be-450c-8d6c-d87e7c3eaab5}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD ResumeSequence : BOOL
 VAR_INPUT
 END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="RevertSequence" Id="{e7ff7a2f-11b6-4f0a-8c69-bc4d4a42a02b}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD RevertSequence : BOOL
 ]]></Declaration>
     </Method>
     <Property Name="SequenceCommand" Id="{0ebfd7d8-a88a-4f68-9367-23775a846165}" FolderPath="01_Properties\">
@@ -46,9 +54,5 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="StartSequence" Id="{b110fc19-185b-4e21-93ff-0aef69c44f70}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD StartSequence : BOOL
-]]></Declaration>
-    </Method>
   </Itf>
 </TcPlcObject>
