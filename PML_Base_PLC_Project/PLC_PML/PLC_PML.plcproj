@@ -178,6 +178,9 @@
     <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualSolenoid_DualSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\04_Utilities\FB_Enfield_LSV_PWM_SolenoidControl.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\02_Components\04_Sensors\01_Base\E_DebounceMode.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -267,6 +270,7 @@
     <Folder Include="Base\02_Components\03_Cylinders\01_Base" />
     <Folder Include="Base\02_Components\03_Cylinders\02_Feedback" />
     <Folder Include="Base\02_Components\03_Cylinders\03_Actuation" />
+    <Folder Include="Base\02_Components\03_Cylinders\04_Utilities" />
     <Folder Include="Base\02_Components\04_Sensors" />
     <Folder Include="Base\02_Components\04_Sensors\01_Base" />
     <Folder Include="Base\02_Components\04_Sensors\02_Sensor" />

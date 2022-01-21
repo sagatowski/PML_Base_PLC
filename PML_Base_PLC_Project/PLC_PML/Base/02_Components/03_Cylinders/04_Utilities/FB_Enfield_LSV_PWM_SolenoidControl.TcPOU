@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Enfield_LSV_PWM_SolenoidControl" Id="{4d3db539-b21d-4626-9305-53445169e987}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Enfield_LSV_PWM_SolenoidControl
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	bDigitalIn			AT %I*		: BOOL;
+	bReady				AT %I*		: BOOL;
+	bHWError			AT %I*		: BOOL;
+	bEnableDither		AT %Q*		: BOOL := TRUE;
+	bEnable				AT %Q*		: BOOL := TRUE;
+	bReset				AT %Q*		: BOOL;
+	nPWMOut				AT %Q*		: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//To use call the Enable method to enable the controller 
+//Then call the Actuate method to set a duty cycle percentage (100 = Full positive, -100 = Full reverse)]]></ST>
+    </Implementation>
+    <Method Name="Actuate" Id="{f7d4aa18-3394-496d-b41d-b6fd90e4462e}">
+      <Declaration><![CDATA[METHOD Actuate : BOOL
+VAR_INPUT
+	DutyCycle		:INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bEnable AND bReady THEN
+	nPWMOut := DutyCycle * 327;		//Quasi-scale the -100 to 100 percentage input to basic engineering units for the IO terminal doesn't need to be exact in this case
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Disable" Id="{526a1e03-e255-42d7-9104-15d6642f2fa6}">
+      <Declaration><![CDATA[METHOD Disable : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bEnable := FALSE;
+bEnableDither := FALSE;
+nPWMOut := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Enable" Id="{91806581-72ee-4587-b970-86928f1db6b1}">
+      <Declaration><![CDATA[METHOD Enable : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bEnable := TRUE;
+bEnableDither := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Ready" Id="{cc025c43-a51d-4a7a-a68a-b0c3a9d58fcb}">
+      <Declaration><![CDATA[PROPERTY Ready : BOOL]]></Declaration>
+      <Get Name="Get" Id="{43febbc4-5104-43cc-8469-3e2fe70979db}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Ready := bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Reset" Id="{58f73db4-6076-4aac-b4ca-18a00cf4695c}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Reset : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bHWError THEN
+	bReset := TRUE;
+END_IF
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl">
+      <LineId Id="9" Count="0" />
+      <LineId Id="24" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl.Actuate">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl.Disable">
+      <LineId Id="5" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl.Enable">
+      <LineId Id="5" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl.Ready.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Enfield_LSV_PWM_SolenoidControl.Reset">
+      <LineId Id="8" Count="0" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
