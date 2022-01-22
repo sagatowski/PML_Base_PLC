@@ -1,25 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_ApplicationModule_TEMPLATE" Id="{44c00981-3585-4538-bbce-d21beee256d9}" SpecialFunc="None">
-    <Declaration><![CDATA[(*
-	Use this module to copy to Application and use for a machine
-	
-	Remove the ABSTRACT from the definition and refactor(Rename) the FB
-*)
-
-FUNCTION_BLOCK ABSTRACT FB_ApplicationModule_TEMPLATE EXTENDS FB_PMLModuleBase
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ApplicationModule_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
 	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
-	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	
+	(*fbSubModule1			: FB_ApplicationModule_TEMPLATE := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
+																	Enabled 					:=  TRUE,
+																	ModuleName 					:=  'Test Module 1',
+																	ModuleID 					:=  1,
+																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
+	*)
+	(*fbSubModule2			: FB_ApplicationModule_TEMPLATE := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
+																	Enabled 					:=  TRUE,
+																	ModuleName 					:=  'Test Module 2',
+																	ModuleID 					:=  2,
+																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
+	*)
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
-	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase (*:= [fbSubModule1, fbSubModule2,*);
+	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
+																							 	fbSubModule2*)];
 
 	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-	//fbComponent1				: FB_ComponentBase (Extension);		// Component instantiation
-	//fbComponent2				: FB_ComponentBase (Extension);		// Component instantiation
-	
+(*	fbComponent1				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
+																	Simulate 			:= TRUE,
+																	Name 				:= 'Test Component 1');
+*)
+(*	fbComponent2				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
+																	Simulate 			:= TRUE,
+																	Name 				:= 'Test Component 2);
+*)	
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase (*:= [	fbComponent1,
 																											fbComponent2]*);

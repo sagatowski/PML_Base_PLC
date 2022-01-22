@@ -283,3 +283,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+PML_Base_PLC_Project/PLC_PML/Base/02_Components/99_EventDefinitions/BasicComponents_AlarmDefinitions_old.xlsx
