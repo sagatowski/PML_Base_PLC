@@ -21,12 +21,12 @@ VAR
 																							 	fbSubModule2*)];
 
 	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-(*	fbComponent1				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE;
-																	Simulate 			:= TRUE;
+(*	fbComponent1				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
+																	Simulate 			:= TRUE,
 																	Name 				:= 'Test Component 1');
 *)
-(*	fbComponent2				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE;
-																	Simulate 			:= TRUE;
+(*	fbComponent2				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
+																	Simulate 			:= TRUE,
 																	Name 				:= 'Test Component 2);
 *)	
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
