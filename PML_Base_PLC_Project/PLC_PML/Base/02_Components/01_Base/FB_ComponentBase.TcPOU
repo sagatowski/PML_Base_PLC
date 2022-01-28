@@ -28,7 +28,9 @@ VAR
 	
 	//Internal Variables
 	bInitialized	: BOOL;
-	
+	bResetHappenedThisScan	: BOOL;		//Used for catching reset loops where errors are set and cleared in the same scan, causing a spike in Disk and ADS usage
+	bResetHappenedLastScan	: BOOL;
+	sTemp					: STRING;	//Generic Temp string for messaging or wherever else it is needed	
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -209,7 +211,25 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Override/extend from extended FB with monitoring logic]]></ST>
+        <ST><![CDATA[//Override/extend from extended FB with monitoring logic
+
+//Used for catching reset loops where errors are set and cleared in the same scan, causing a spike in Disk and ADS usage
+//To implement, condition error setting with a check for bResetHappenedThisScan, raise the ResetLoopDetected event, and stop error detection for the component
+IF bResetHappenedThisScan AND NOT bResetHappenedLastScan THEN
+	bResetHappenedLastScan := TRUE;
+	bResetHappenedThisScan :=FALSE;
+ELSE
+	IF bError THEN
+		RaiseAlarmWithStrings(a_fbComponentBaseAlarms[E_ComponentBase.ResetLoopDetected], UDINT_TO_STRING(nErrorID), '');
+	END_IF
+	bResetHappenedLastScan := FALSE;
+END_IF
+
+IF NOT a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].bRaised AND bSimulate THEN
+	a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].Raise(0);
+ELSIF a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].bRaised AND NOT bSimulate THEN
+	a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].Clear(0,0);
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Property Name="Name" Id="{8d65d0ee-79e5-44fd-9af0-abf9b261fcfa}" FolderPath="01_ITF_ComponentBase\01_Properties\01_Config\">
@@ -231,12 +251,50 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="RaiseAlarm" Id="{2c95cd98-f45d-4c55-8c68-a145068d3a38}">
+      <Declaration><![CDATA[METHOD RaiseAlarm : BOOL
+VAR_IN_OUT
+	fbAlarm		: FB_TcAlarm;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[F_RaiseAlarmAndSetFlags(fbAlarm := fbAlarm,
+						bErrorFlag := bError,
+						nErrorID := nErrorID);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RaiseAlarmWithStrings" Id="{9b6b1366-567f-4c88-8d80-c1800b1766d5}">
+      <Declaration><![CDATA[METHOD RaiseAlarmWithStrings : BOOL
+VAR_IN_OUT
+	fbAlarm		: FB_TcAlarm;	//Alarm to be raised
+END_VAR
+VAR_INPUT
+	sString_1	: STRING;		//First String Parameter (The Name of this component will be applied first automatically)
+	sString_2	: STRING;		//Second String Parameter
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[F_RaiseAlarmWithStringsAndFlags( 	fbAlarm := fbAlarm,
+									bErrorFlag := bError,
+									nErrorID := nErrorID,
+									sString_1 := sName,
+									sString_2 := sString_1,
+									sString_3 := sString_2);]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Reset" Id="{fdbb4a8b-7401-4011-85e0-df5c0eb6b89d}" FolderPath="01_ITF_ComponentBase\02_Methods\">
       <Declaration><![CDATA[METHOD Reset : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bError := FALSE;
-nErrorID := 0;]]></ST>
+        <ST><![CDATA[IF bError (*AND NOT nErrorID = E_ComponentBase.ResetLoopDetected *)THEN
+	bError := FALSE;
+	nErrorID := 0;
+	
+	bResetHappenedThisScan := TRUE;
+//ELSIF bError AND NOT a_fbComponentBaseAlarms[E_ComponentBase.ResetNotPermitted].bRaised THEN
+//	a_fbComponentBaseAlarms[E_ComponentBase.ResetNotPermitted].Raise(0);
+ELSIF NOT bError THEN
+	;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Property Name="Simulate" Id="{ebb42854-1266-4f6c-84a1-4c0a912b758b}" FolderPath="01_ITF_ComponentBase\01_Properties\01_Config\">
@@ -266,14 +324,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Override from extended FB with simulated operation logic
-IF bEnabled THEN
-	//Do Stuff
-	;
-ELSE
-	//Don't Do Stuff
-	;
-END_IF]]></ST>
+        <ST><![CDATA[//Override from extended FB with simulated operation logic]]></ST>
       </Implementation>
     </Method>
     <Method Name="StandardOperation" Id="{39013a93-6488-4d2f-b227-6a329265cedd}">
@@ -283,13 +334,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Override from extended FB with normal operation logic
-IF bEnabled THEN
-	//Do Stuff
-	;
-ELSE
-	//Don't Do Stuff
-	;
-END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_ComponentBase">
@@ -350,6 +395,20 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_ComponentBase.Monitoring">
       <LineId Id="6" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="20" Count="2" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="28" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Name.Get">
       <LineId Id="2" Count="0" />
@@ -357,8 +416,24 @@ END_IF]]></ST>
     <LineIds Name="FB_ComponentBase.Name.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_ComponentBase.RaiseAlarm">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.RaiseAlarmWithStrings">
+      <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="3" />
+      <LineId Id="18" Count="0" />
+    </LineIds>
     <LineIds Name="FB_ComponentBase.Reset">
+      <LineId Id="9" Count="0" />
       <LineId Id="4" Count="1" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="11" Count="1" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Simulate.Get">
       <LineId Id="2" Count="0" />
@@ -367,15 +442,10 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.SimulateOperation">
-      <LineId Id="6" Count="6" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.StandardOperation">
       <LineId Id="20" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="2" />
-      <LineId Id="19" Count="0" />
       <LineId Id="12" Count="0" />
     </LineIds>
   </POU>
