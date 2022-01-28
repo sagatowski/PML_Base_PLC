@@ -51,11 +51,8 @@ IF fbWriteParameter.Done AND fbWriteParameter.ParameterNumber = MC_AxisParameter
 END_IF
 
 IF fbWriteParameter.Error AND NOT fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	bError := TRUE;
-	nErrorID := E_AxisBase.WriteParameterError;
-	sTemp := UDINT_TO_STRING(fbWriteParameter.ErrorID);
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].ipArguments.Clear().AddString(sName).AddString(sTemp);
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Raise(0);
+	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
+										
 ELSIF NOT fbAxisPower.Error AND fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
 	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
 END_IF]]></ST>
@@ -102,7 +99,10 @@ END_IF]]></ST>
       <LineId Id="18" Count="0" />
       <LineId Id="22" Count="0" />
       <LineId Id="21" Count="0" />
-      <LineId Id="9" Count="8" />
+      <LineId Id="9" Count="1" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="16" Count="1" />
       <LineId Id="8" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_Continuous_NoHoming.SetAxisModuloFactor">

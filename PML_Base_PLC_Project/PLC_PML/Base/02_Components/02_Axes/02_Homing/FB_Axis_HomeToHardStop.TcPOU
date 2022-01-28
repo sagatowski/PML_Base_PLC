@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Axis_HomeToHardStop" Id="{ee534ea3-5ccb-48b7-bdbb-c927a5a91b95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABSTRACT FB_Axis_HomeToHardStop EXTENDS FB_AxisBase
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	//Internal Property Variables
+	fHomePositionSetpoint		: LREAL := 0;
+	nTorqueLimit				: LREAL := 20;
+	nTorqueFeedback				: DINT;
+	eHomeDirection				: Tc2_MC2.MC_Direction := Tc2_MC2.MC_Direction.MC_Positive_Direction;
+	
+	//Misc
+	a_AverageForceArray			: ARRAY[0..9] OF LREAL;
+	i							: UINT;
+	fDriveForce					: LREAL;
+	fActualForce				: LREAL;
+	fAverageForce				: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{b619ec89-4554-4ed7-b36c-4ce55535be3c}" />
+    <Property Name="AverageForce" Id="{38a9cc8c-621e-4418-9ccc-b99aefecd122}">
+      <Declaration><![CDATA[PROPERTY AverageForce : LREAL]]></Declaration>
+      <Get Name="Get" Id="{332b6257-a84b-4c3b-87f0-d448929f2126}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AverageForce := fAverageForce;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="HomeDirection" Id="{144ce852-bcb6-4576-b7b7-9fadee241544}">
+      <Declaration><![CDATA[PROPERTY HomeDirection : Tc2_MC2.MC_Direction]]></Declaration>
+      <Get Name="Get" Id="{d602bcdc-ae47-4702-a64b-20f75afb79c8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomeDirection := eHomeDirection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{6c99cbed-0c0d-445b-b25a-0fb5db5b2b22}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[eHomeDirection := HomeDirection;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="HomePositionSetpoint" Id="{30a0d12c-1f70-4239-b2d6-57812229cc91}">
+      <Declaration><![CDATA[PROPERTY HomePositionSetpoint : LREAL]]></Declaration>
+      <Get Name="Get" Id="{8be4af57-74d6-43ab-9907-42896ce9dc25}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomePositionSetpoint := fHomePositionSetpoint;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{457b453e-ebf0-44ad-9637-f09f9fa81106}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fHomePositionSetpoint := HomePositionSetpoint;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="MotionControl" Id="{5202ea77-8ac8-41e4-aff3-c26d70b34fd9}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD MotionControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.MotionControl();
+
+//TODO: Set Torque Limit := LREAL_TO_INT(nTorqueLimit/0.051);
+
+fActualForce := DINT_TO_INT(nTorqueFeedback)/10.0;
+
+fAverageForce := fActualForce / 10;
+FOR i := 9 TO 1 BY -1 DO
+	a_AverageForceArray[i] := a_AverageForceArray[i-1];
+	fAverageForce := fAverageForce + a_AverageForceArray[i]/10;
+END_FOR
+a_AverageForceArray[0] := fActualForce;
+
+fbAxisHome.Options.SearchDirection := eHomeDirection;
+fbAxisHome.Options.SearchVelocity := 2;
+//Performs a simple home-to sensor sequence when commanded by a "Home" Method call
+fbAxisHome(
+	Axis:= SelectedAxis,
+	Position:= fHomePositionSetpoint, 
+	HomingMode:= MC_HomingMode.MC_DefaultHoming, 
+	BufferMode:= MC_BufferMode.MC_Aborting,
+	bCalibrationCam := ABS(fAverageForce) > ABS(nTorqueLimit));
+
+fbAxisHome.Execute := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="TorqueFeedback" Id="{c48650fe-6598-41e6-8e37-640e44978175}">
+      <Declaration><![CDATA[PROPERTY TorqueFeedback : DINT //1000 = 100%]]></Declaration>
+      <Get Name="Get" Id="{1de39173-b871-49eb-8cf6-cf69f98812b2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TorqueFeedback := nTorqueFeedback;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="TorqueLimit" Id="{3e887d3f-410c-4428-9059-52e5d771a8d2}">
+      <Declaration><![CDATA[PROPERTY TorqueLimit : LREAL //1000 = 100%]]></Declaration>
+      <Get Name="Get" Id="{6beca81e-5c94-4e9b-b1fd-38eafa9d6365}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TorqueLimit := nTorqueLimit;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1e4f6015-7fbf-490f-ba28-e5199afee31d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nTorqueLimit := TorqueLimit;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_Axis_HomeToHardStop">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.AverageForce.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.HomeDirection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.HomeDirection.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.HomePositionSetpoint.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.HomePositionSetpoint.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.MotionControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="55" Count="4" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="37" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.TorqueFeedback.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.TorqueLimit.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToHardStop.TorqueLimit.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

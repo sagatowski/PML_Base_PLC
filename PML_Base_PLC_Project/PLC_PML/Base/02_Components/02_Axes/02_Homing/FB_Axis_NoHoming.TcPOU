@@ -7,12 +7,43 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	fHomePositionSetpoint		: LREAL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Folder Name="01_SUPER_Overrides" Id="{cfe861f9-eb49-42ec-a7bf-5dfd11116946}" />
+    <Property Name="HomePositionSetpoint" Id="{f2145d70-a429-4112-b0eb-7f595b2a5dec}">
+      <Declaration><![CDATA[PROPERTY HomePositionSetpoint : LREAL]]></Declaration>
+      <Get Name="Get" Id="{43c4efd8-ef3f-4097-ac83-f65444d8fe77}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomePositionSetpoint := fHomePositionSetpoint;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4cfd3808-0391-476b-9dfd-8171a5903847}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fHomePositionSetpoint := HomePositionSetpoint;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Monitoring" Id="{1c486c59-a8a7-43d8-948e-f34ba8d56c92}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD Monitoring : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Monitoring();
+
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="MotionControl" Id="{b0ccc3c6-e35f-4a18-adeb-ab31021524ff}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD MotionControl : BOOL
 VAR_INPUT
@@ -21,34 +52,34 @@ END_VAR
       <Implementation>
         <ST><![CDATA[SUPER^.MotionControl();
 
-IF bDriveEnabled AND NOT SelectedAxis.Status.Homed THEN
-	//Since homing does not matter for this axis, just home it wherever it sits when enabled
-	fbAxisHome(
-				Axis:= SelectedAxis, 
-				Execute:= TRUE, 
-				Position:= 0, 
-				HomingMode:= MC_Direct, 
-				BufferMode:= , 
-				Options:= , 
-				bCalibrationCam:= TRUE, 
-				Done=> , 
-				Busy=> , 
-				Active=> , 
-				CommandAborted=> , 
-				Error=> , 
-				ErrorID=> );
-END_IF]]></ST>
+fbAxisHome(
+			Axis:= SelectedAxis,
+			Position:= fHomePositionSetpoint, 
+			HomingMode:= MC_Direct,
+			bCalibrationCam:= TRUE);
+]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_Axis_NoHoming">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_Axis_NoHoming.HomePositionSetpoint.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_NoHoming.HomePositionSetpoint.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_NoHoming.Monitoring">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
     <LineIds Name="FB_Axis_NoHoming.MotionControl">
       <LineId Id="19" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="20" Count="0" />
       <LineId Id="22" Count="0" />
-      <LineId Id="6" Count="12" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="12" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="23" Count="0" />
     </LineIds>
