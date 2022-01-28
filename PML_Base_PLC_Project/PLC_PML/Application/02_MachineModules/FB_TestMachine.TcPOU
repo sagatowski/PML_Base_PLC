@@ -7,7 +7,11 @@ VAR
 	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	
-	fbEquipmentModule1			: FB_TestEquipment;
+	fbEquipmentModule1			: FB_TestEquipment := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
+														Enabled 					:=  TRUE,
+														ModuleName 					:=  'Test Equipment 1',
+														ModuleID 					:=  1,
+														AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
 	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
