@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
-  <POU Name="FB_Axis_Discrete_HomeToSensor" Id="{3e374fce-396e-4de3-bcc7-507fed627fa3}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Axis_Discrete_HomeToSensor EXTENDS FB_Axis_HomeToSensor
+  <POU Name="FB_Axis_Discrete_HomeToExternalForce" Id="{2424e970-a6a9-41ec-8de7-dfd65a5be1e6}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Axis_Discrete_HomeToExternalForce EXTENDS FB_Axis_HomeToExternalForceFeedback
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -19,11 +19,11 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Folder Name="01_SUPER_Overrides" Id="{3ea6ee1d-ba63-47b3-a951-e65367709a9f}" />
-    <Folder Name="02_ITF_Axis_Discrete" Id="{580c5a79-abe5-4116-881d-e203b983c61b}" />
-    <Property Name="LowerTravelLimit" Id="{4f573850-1a51-4060-8d38-518d89ae2207}" FolderPath="02_ITF_Axis_Discrete\">
+    <Folder Name="01_SUPER_Overrides" Id="{8bd99d59-60b9-419d-8640-6eb28ef92ffd}" />
+    <Folder Name="02_ITF_Axis_Discrete" Id="{81a2e083-ae97-489c-adf0-0e60e4967c2c}" />
+    <Property Name="LowerTravelLimit" Id="{4a129ee9-0d1d-4140-bca5-cd14adc01819}" FolderPath="02_ITF_Axis_Discrete\">
       <Declaration><![CDATA[PROPERTY LowerTravelLimit : LREAL]]></Declaration>
-      <Get Name="Get" Id="{bb698683-0d8d-4279-8505-37daa8d6918b}">
+      <Get Name="Get" Id="{ec5d9a54-ce47-451e-957a-a0e8fe75e047}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -31,7 +31,7 @@ END_VAR
           <ST><![CDATA[LowerTravelLimit := fLowerTravelLimit;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{ddf70268-c6e6-4da8-a5ae-6970014cf946}">
+      <Set Name="Set" Id="{cdd2a299-f5a2-489a-aefa-7c2a25cb3356}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -40,7 +40,7 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="Monitoring" Id="{07c696a3-6fb4-4907-a3ca-f929e068e5ab}" FolderPath="01_SUPER_Overrides\">
+    <Method Name="Monitoring" Id="{48a54ca3-391a-480a-a2de-5038a1059daa}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD Monitoring : BOOL
 VAR_INPUT
 END_VAR
@@ -65,9 +65,9 @@ IF  fOverride = 0 AND fPositionSetpoint < fUpperTravelLimit AND fPositionSetpoin
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Position_1" Id="{aec3dbfc-792e-4040-96a2-eb32198f9e49}" FolderPath="02_ITF_Axis_Discrete\">
+    <Property Name="Position_1" Id="{a972d644-c7dd-43f3-9398-b67ece98d19c}" FolderPath="02_ITF_Axis_Discrete\">
       <Declaration><![CDATA[PROPERTY Position_1 : LREAL]]></Declaration>
-      <Get Name="Get" Id="{8a717788-0cc9-492a-80ea-7f243a66f87f}">
+      <Get Name="Get" Id="{64d8a513-a91e-45a8-a836-740617cbc3f8}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -75,7 +75,7 @@ END_VAR
           <ST><![CDATA[Position_1 := fPosition_1;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{35f9d106-b2ab-433a-ad71-7c74048d7a6f}">
+      <Set Name="Set" Id="{e09d3743-74fe-41dd-b702-b822650f5bc4}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -84,9 +84,9 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Property Name="Position_2" Id="{d248f5de-7d89-4974-a109-954988757ba8}" FolderPath="02_ITF_Axis_Discrete\">
+    <Property Name="Position_2" Id="{b23e4a70-d4ad-4067-b7ba-95261838e3af}" FolderPath="02_ITF_Axis_Discrete\">
       <Declaration><![CDATA[PROPERTY Position_2 : LREAL]]></Declaration>
-      <Get Name="Get" Id="{352238f5-a73a-4a38-9917-630ece61ea33}">
+      <Get Name="Get" Id="{9970c4da-fd15-44de-b4e2-1be335312192}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -94,7 +94,7 @@ END_VAR
           <ST><![CDATA[Position_2 := fPosition_2;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{f4a9bfe7-c61e-4a89-82ed-61229925271d}">
+      <Set Name="Set" Id="{48d2f6fe-972e-44a5-a7bb-06808c72e604}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -103,9 +103,9 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Property Name="Position_3" Id="{969c3bc0-102b-4f2b-b348-620f1a4ae401}" FolderPath="02_ITF_Axis_Discrete\">
+    <Property Name="Position_3" Id="{20e3cf89-d928-4cca-b21e-3ac246aa968e}" FolderPath="02_ITF_Axis_Discrete\">
       <Declaration><![CDATA[PROPERTY Position_3 : LREAL]]></Declaration>
-      <Get Name="Get" Id="{3e8e0bb7-d50f-4a15-afc9-3ce6b0bc838d}">
+      <Get Name="Get" Id="{aa1fad92-ab28-4d46-b759-448fe339c3d2}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -113,7 +113,7 @@ END_VAR
           <ST><![CDATA[Position_3 := fPosition_3;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{a4a6d36d-c20b-4d78-bffa-8374a5320571}">
+      <Set Name="Set" Id="{36bc4dbc-ed47-4e4d-8416-7eb214c6408b}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -122,9 +122,9 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Property Name="UpperTravelLimit" Id="{7df966b5-8c13-4c74-ae3b-931fac67dbae}" FolderPath="02_ITF_Axis_Discrete\">
+    <Property Name="UpperTravelLimit" Id="{6a86d957-5414-4aa2-b4c9-274e2e6810ab}" FolderPath="02_ITF_Axis_Discrete\">
       <Declaration><![CDATA[PROPERTY UpperTravelLimit : LREAL]]></Declaration>
-      <Get Name="Get" Id="{bc630b19-0666-44b4-b0c7-0a9e034aad63}">
+      <Get Name="Get" Id="{b56f1dbb-75ee-439c-8849-11f2702afaff}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -132,7 +132,7 @@ END_VAR
           <ST><![CDATA[UpperTravelLimit := fUpperTravelLimit;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{32992700-137a-45e6-b387-014961c6ac74}">
+      <Set Name="Set" Id="{237fa5a5-8049-44a0-a82d-5a94fe6eb0d4}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -141,16 +141,16 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.LowerTravelLimit.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.LowerTravelLimit.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.LowerTravelLimit.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.LowerTravelLimit.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Monitoring">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Monitoring">
       <LineId Id="5" Count="0" />
       <LineId Id="24" Count="0" />
       <LineId Id="9" Count="0" />
@@ -163,28 +163,28 @@ END_VAR
       <LineId Id="19" Count="3" />
       <LineId Id="18" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_1.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_1.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_1.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_1.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_2.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_2.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_2.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_2.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_3.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_3.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_3.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.Position_3.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.UpperTravelLimit.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.UpperTravelLimit.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.UpperTravelLimit.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToExternalForce.UpperTravelLimit.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

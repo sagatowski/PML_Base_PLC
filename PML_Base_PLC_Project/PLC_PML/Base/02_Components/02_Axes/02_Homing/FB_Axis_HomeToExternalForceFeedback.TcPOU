@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Axis_HomeToExternalForceFeedback" Id="{d4ce5353-7cf6-4f8e-9a3e-beaba89fb381}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Axis_HomeToExternalForceFeedback EXTENDS FB_Axis_HomeToHardStop
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	nExternalForceFeedback AT %I*		: INT;
+	fConversionFactor					: REAL := 0.1; //initialized for the LinMot load cell on TVA machine
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{da597d93-edf9-4eaa-9722-be72d510bd9c}" />
+    <Property Name="ConversionFactor" Id="{b84ef6d9-9036-4d32-9cb6-f5789bf47b49}">
+      <Declaration><![CDATA[PROPERTY ConversionFactor : REAL]]></Declaration>
+      <Get Name="Get" Id="{a3c79ef8-1f9b-4245-a57b-2404336ddd45}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ConversionFactor := fConversionFactor;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{31d23ce1-a266-4180-a655-a72c0a401b89}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fConversionFactor := ConversionFactor;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="HardwareUpdate" Id="{54558ea3-ac29-4be1-9561-520c95e4860a}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD HardwareUpdate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[nTorqueFeedback := REAL_TO_DINT(nExternalForceFeedback * fConversionFactor);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Axis_HomeToExternalForceFeedback">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToExternalForceFeedback.ConversionFactor.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToExternalForceFeedback.ConversionFactor.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToExternalForceFeedback.HardwareUpdate">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

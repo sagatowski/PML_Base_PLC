@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_PMLModuleBase" Id="{eca4a56b-850e-483e-b687-2de3b3950c24}">
-    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase EXTENDS ITF_UnitState
+    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{b9b76dff-8c1e-4a81-8fb8-90bae0384924}">
       <Folder Name="01_Config" Id="{c034098c-56e3-4732-a681-b27df2a6a3ee}" />
@@ -81,9 +81,9 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="State" Id="{b4219d5a-c372-49f7-9ab8-eeb66dadc5c9}" FolderPath="01_Properties\03_Status\">
+    <Property Name="State" Id="{43595dac-7213-416e-a39c-be01c96ab13c}" FolderPath="01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY State : E_PMLState]]></Declaration>
-      <Get Name="Get" Id="{54194ac0-e690-48c6-a0ad-f28c216e30b6}">
+      <Get Name="Get" Id="{21f6fac7-5f70-4bd9-8ec4-66822702fbf5}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>

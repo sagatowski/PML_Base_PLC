@@ -286,25 +286,22 @@ IF NOT bError THEN
 	IF 		(bExtending AND bRetracting)
 		OR 	(bExtendRequest AND bRetractRequest)
 		OR 	(bExtendCommand AND bRetractCommand) THEN 
-		nErrorID := E_CylinderBase.InvalidCommand;
+		RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.InvalidCommand]);									
 	END_IF
 	
 	//If both extended and retracted feedback are true at any point, throw an invalid position error
 	IF bExtended AND bRetracted THEN
-		bError := TRUE;
-		nErrorID := E_CylinderBase.InvalidPositionStatus;
+		RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.InvalidPositionStatus]);
 	END_IF
 	
 	//If the cylinder takes longer than expected to extend, throw a timeout error
 	IF fbExtensionTimeout_TON.Q THEN
-		bError := TRUE;
-		nErrorID := E_CylinderBase.ExtendTimeout;
+		RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout]);
 	END_IF
 	
 	//If the cylinder takes longer than expected to retract, throw a timeout error
 	IF fbRetractionTimeout_TON.Q THEN
-		bError := TRUE;
-		nErrorID := E_CylinderBase.RetractTimeout;
+		RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.RetractTimeout]);
 	END_IF
 END_IF
 
@@ -587,7 +584,15 @@ END_VAR
       <LineId Id="180" Count="0" />
       <LineId Id="129" Count="0" />
       <LineId Id="183" Count="0" />
-      <LineId Id="133" Count="31" />
+      <LineId Id="133" Count="3" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="138" Count="3" />
+      <LineId Id="228" Count="0" />
+      <LineId Id="144" Count="3" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="150" Count="3" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="156" Count="8" />
       <LineId Id="188" Count="0" />
       <LineId Id="187" Count="0" />
       <LineId Id="189" Count="0" />

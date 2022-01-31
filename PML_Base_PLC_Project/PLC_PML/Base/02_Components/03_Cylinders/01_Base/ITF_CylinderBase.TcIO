@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
-  <Itf Name="ITF_CylinderBase" Id="{731fdbd1-80c5-4c1e-9330-1cb0d20eabc9}">
+  <Itf Name="ITF_CylinderBase" Id="{341131b4-468e-42eb-a6b0-a67dca0a8688}">
     <Declaration><![CDATA[INTERFACE ITF_CylinderBase//cylinder no feedback spring return solonoid
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{b6a350b3-87a9-4d94-952f-1d746bcd503d}">

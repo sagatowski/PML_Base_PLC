@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
-  <POU Name="FB_Cylinder_DualPWM_DualTimer" Id="{bd0765f9-d5b5-41eb-b703-2e3258d3ef4c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualPWM_DualTimer EXTENDS FB_Cylinder_NoSensor
+  <POU Name="FB_Cylinder_DualPWM_SingleSensor" Id="{318db1bc-0a06-4ffb-9012-89daaeb9bc1a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_DualPWM_SingleSensor EXTENDS FB_Cylinder_SingleSensor
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -17,10 +17,10 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Folder Name="01_SUPER_Overrides" Id="{86bd10f2-4685-4f68-bfaf-180b998b454c}" />
-    <Property Name="DutyCycle" Id="{2746359f-fb36-4e69-8211-8f6a3620eaf5}">
+    <Folder Name="01_SUPER_Overrides" Id="{4e9aac27-b4d0-45e9-a8ea-d8d2774b9a5b}" />
+    <Property Name="DutyCycle" Id="{c6923355-0b5c-46d9-9040-4816adac8472}">
       <Declaration><![CDATA[PROPERTY DutyCycle : INT]]></Declaration>
-      <Get Name="Get" Id="{e4bc2f3b-cdd0-4d18-8858-256c10af0d95}">
+      <Get Name="Get" Id="{f3b32ca2-9196-4022-8cf5-d9cef53d120e}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -28,7 +28,7 @@ END_VAR
           <ST><![CDATA[DutyCycle := nDutyCycle;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{d94aded6-354e-4ec6-afa1-1d48406a77c9}">
+      <Set Name="Set" Id="{3773468b-66dc-46d2-8138-4fdc549dff54}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -37,17 +37,13 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="HardwareUpdate" Id="{d7d74fec-42f1-4a65-95cb-b8d380a432fa}" FolderPath="01_SUPER_Overrides\">
+    <Method Name="HardwareUpdate" Id="{1ffcfdb0-8ea4-4d67-a206-52db57326b17}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD HardwareUpdate : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.HardwareUpdate();
-
-IF bEnabled AND NOT fbPWMControl.Ready THEN
-	fbPWMControl.Enable();
-END_IF
 
 IF bExtendCommand THEN
 	fbPWMControl.Actuate(nDutyCycle);
@@ -60,21 +56,18 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_Cylinder_DualPWM_DualTimer">
+    <LineIds Name="FB_Cylinder_DualPWM_SingleSensor">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.DutyCycle.Get">
+    <LineIds Name="FB_Cylinder_DualPWM_SingleSensor.DutyCycle.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.DutyCycle.Set">
+    <LineIds Name="FB_Cylinder_DualPWM_SingleSensor.DutyCycle.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Cylinder_DualPWM_DualTimer.HardwareUpdate">
+    <LineIds Name="FB_Cylinder_DualPWM_SingleSensor.HardwareUpdate">
       <LineId Id="11" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="28" Count="2" />
-      <LineId Id="18" Count="1" />
+      <LineId Id="17" Count="2" />
       <LineId Id="21" Count="3" />
       <LineId Id="20" Count="0" />
       <LineId Id="12" Count="1" />
