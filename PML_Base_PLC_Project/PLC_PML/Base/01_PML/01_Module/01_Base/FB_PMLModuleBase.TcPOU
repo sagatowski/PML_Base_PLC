@@ -91,6 +91,7 @@ END_VAR
       <Folder Name="01_TransitionStates" Id="{2813ee04-f5e3-4130-bb47-4373fa697726}" />
       <Folder Name="02_PrimaryStates" Id="{fdb26b20-d68a-43a5-9170-8c0cae9f966b}" />
       <Folder Name="03_Monitoring" Id="{0990b033-a812-4275-8ada-e06b2ca591b8}" />
+      <Folder Name="04_HMI" Id="{0a574e76-6dab-426e-9c46-435414520792}" />
     </Folder>
     <Method Name="Aborted" Id="{f4c80f4a-1f00-40f6-a791-318ec4b3278d}" FolderPath="Methods\02_PrimaryStates\">
       <Declaration><![CDATA[METHOD Aborted
