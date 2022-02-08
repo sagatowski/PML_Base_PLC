@@ -1437,7 +1437,7 @@ External Setpoint Generation:
 			</Tasks>
 			<TypeSystem>
 				<AdditionalTmcFile Name="PMLBase_TMC" File="PLC_PML\Base\01_PML\98_EventDefinitions\PMLBase_TMC.tmc"/>
-				<AdditionalTmcFile Name="BasicComponents_Events" File="PLC_PML\Base\02_Components\99_EventDefinitions\BasicComponents_Events.tmc"/>
+				<AdditionalTmcFile Name="BasicComponents_AlarmDefinitions" File="PLC_PML\Base\02_Components\99_EventDefinitions\BasicComponents_AlarmDefinitions.tmc"/>
 			</TypeSystem>
 		</System>
 		<Motion>
