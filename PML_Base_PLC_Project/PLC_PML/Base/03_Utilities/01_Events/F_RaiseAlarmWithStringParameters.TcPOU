@@ -13,19 +13,29 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[fbAlarm.ipArguments.Clear();
 
-fbAlarm.ipArguments.AddString(sString_1);
-fbAlarm.ipArguments.AddString(sString_2);
-fbAlarm.ipArguments.AddString(sString_3);
+IF sString_1 <> '' THEN
+	fbAlarm.ipArguments.AddString(sString_1);
+END_IF
+IF sString_2 <> '' THEN
+	fbAlarm.ipArguments.AddString(sString_2);
+END_IF
+IF sString_3 <> '' THEN
+	fbAlarm.ipArguments.AddString(sString_3);
+END_IF
 
 fbAlarm.Raise(0);]]></ST>
     </Implementation>
     <LineIds Name="F_RaiseAlarmWithStringParameters">
       <LineId Id="22" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="17" Count="0" />
       <LineId Id="48" Count="0" />
+      <LineId Id="66" Count="1" />
       <LineId Id="54" Count="0" />
+      <LineId Id="68" Count="1" />
       <LineId Id="56" Count="0" />
       <LineId Id="19" Count="0" />
+      <LineId Id="70" Count="0" />
       <LineId Id="7" Count="0" />
     </LineIds>
   </POU>
