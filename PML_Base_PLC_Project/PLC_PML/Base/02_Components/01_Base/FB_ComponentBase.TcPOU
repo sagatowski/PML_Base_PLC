@@ -19,6 +19,7 @@ VAR
 	bSimulate		: BOOL;			//TRUE disables all hardware I/O and simulates input and output behavior
 	sName			: STRING;		//String name of the component
 	bActive			: BOOL;			//TRUE when the component is in its energized state, motion or detection
+	bReady			: BOOL;			//TRUE when the component is ready for operation - (Should be set in extended component based on specific hardware and operation of the given component)
 	
 	//Alarming
 	a_fbComponentBaseAlarms : ARRAY[1..COMPONENT_BASE_ALARM_COUNT] OF FB_TcAlarm;
@@ -55,6 +56,24 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Method Name="AllowHMIControl" Id="{ea5b1cbc-fba4-4a06-93f5-52bf62fd6968}" FolderPath="01_ITF_ComponentBase\02_Methods\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stComponentBaseHMI.bHMIControlAvailable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockHMIControl" Id="{c5acfaad-2e13-4de2-829a-75ce5beb31b8}" FolderPath="01_ITF_ComponentBase\02_Methods\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stComponentBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CyclicLogic" Id="{afd9b957-a135-4679-8622-fc5b52009de2}" FolderPath="01_ITF_ComponentBase\02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL		//Should be called Externally akin to the PML Modules
 ]]></Declaration>
@@ -211,7 +230,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Override/extend from extended FB with monitoring logic
+        <ST><![CDATA[//Extend from extended FB with monitoring logic
 
 //Used for catching reset loops where errors are set and cleared in the same scan, causing a spike in Disk and ADS usage
 //To implement, condition error setting with a check for bResetHappenedThisScan, raise the ResetLoopDetected event, and stop error detection for the component
@@ -281,6 +300,17 @@ END_VAR]]></Declaration>
 									sString_3 := sString_2);]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Ready" Id="{16550771-a7fe-4296-8e3b-6ef681152a80}" FolderPath="01_ITF_ComponentBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY Ready : BOOL]]></Declaration>
+      <Get Name="Get" Id="{91192a27-e72b-49cf-a266-eaa5b556b659}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Ready := bReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Reset" Id="{fdbb4a8b-7401-4011-85e0-df5c0eb6b89d}" FolderPath="01_ITF_ComponentBase\02_Methods\">
       <Declaration><![CDATA[METHOD Reset : BOOL
 ]]></Declaration>
@@ -342,6 +372,12 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_ComponentBase.Active.Get">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.AllowHMIControl">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.BlockHMIControl">
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.CyclicLogic">
       <LineId Id="57" Count="14" />
@@ -425,6 +461,9 @@ END_VAR
       <LineId Id="5" Count="0" />
       <LineId Id="13" Count="3" />
       <LineId Id="18" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.Ready.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Reset">
       <LineId Id="9" Count="0" />
