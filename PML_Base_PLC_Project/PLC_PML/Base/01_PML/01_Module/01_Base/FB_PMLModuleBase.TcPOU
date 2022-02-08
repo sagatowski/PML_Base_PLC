@@ -92,6 +92,7 @@ END_VAR
     <Folder Name="Methods" Id="{2374c43a-8b69-4250-ac37-650855e4142c}">
       <Folder Name="01_TransitionStates" Id="{2813ee04-f5e3-4130-bb47-4373fa697726}" />
       <Folder Name="02_PrimaryStates" Id="{fdb26b20-d68a-43a5-9170-8c0cae9f966b}" />
+      <Folder Name="03_Monitoring" Id="{0990b033-a812-4275-8ada-e06b2ca591b8}" />
     </Folder>
     <Method Name="Aborted" Id="{f4c80f4a-1f00-40f6-a791-318ec4b3278d}" FolderPath="Methods\02_PrimaryStates\">
       <Declaration><![CDATA[METHOD Aborted
@@ -145,6 +146,26 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="AllowHMIControl" Id="{8101f876-b4c9-49ea-be68-caa3d7179c06}" FolderPath="Methods\04_HMI\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+	bModuleOnly		: BOOL;	//If TRUE, only the PML module itself is controllable, If FALSE, all components become controllable as well
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stPMLModuleBaseHMI.bHMIControlAvailable := TRUE;
+
+IF bModuleOnly THEN
+	FOR i := 1 TO nNumberOfComponents DO
+		a_ITF_Components[i].BlockHMIControl();
+	END_FOR
+ELSE
+	FOR i := 1 TO nNumberOfComponents DO
+		a_ITF_Components[i].AllowHMIControl();
+	END_FOR
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="AncestorIDs" Id="{e9e1bc49-319c-49cf-ab24-edd60fccd3be}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
       <Declaration><![CDATA[PROPERTY AncestorIDs : STRING]]></Declaration>
       <Get Name="Get" Id="{0d53a6f0-66af-4585-b735-0971eb97a602}">
@@ -164,6 +185,18 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="BlockHMIControl" Id="{6644c279-6fd0-47e2-a8e9-51778ec50ccd}" FolderPath="Methods\04_HMI\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stPMLModuleBaseHMI.bHMIControlAvailable := FALSE;
+
+FOR i := 1 TO nNumberOfComponents DO
+	a_ITF_Components[i].BlockHMIControl();
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Clearing" Id="{6112c2e2-beb3-4b32-8c5f-7d289837fbce}" FolderPath="Methods\01_TransitionStates\">
       <Declaration><![CDATA[METHOD Clearing]]></Declaration>
       <Implementation>
@@ -242,6 +275,41 @@ IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ComponentMonitor" Id="{8175b5fe-f316-43ef-bef8-f03aa4ce0b3d}" FolderPath="Methods\03_Monitoring\">
+      <Declaration><![CDATA[METHOD ComponentMonitor : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+FOR i:=1 TO nNumberOfComponents DO
+	IF bSimulateAllChildren THEN
+		a_ITF_Components[i].Simulate := TRUE;
+	END_IF
+	
+	IF eMode = E_PMLUnitMode.ePMLUnitMode_Production THEN
+		IF 		eState <> E_PMLState.ePMLState_Aborted
+			AND eState <> E_PMLState.ePMLState_Aborting
+			AND eState <> E_PMLState.ePMLState_Clearing
+			AND eState <> E_PMLState.ePMLState_Stopped
+			AND eState <> E_PMLState.ePMLState_Stopping
+			AND	a_ITF_Components[i].Error THEN
+				IF NOT a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
+					F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.ComponentError],sModuleName,a_ITF_Components[i].Name,'');
+				END_IF
+				IF eState = E_PMLState.ePMLState_Execute THEN
+					eStateCommand :=  E_PMLCommand.ePMLCommand_Hold;
+				ELSE
+					eStateCommand := E_PMLCommand.ePMLCommand_Abort;
+				END_IF
+				
+		ELSIF a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
+			a_fbBaseAlarms[E_BaseAlarms.ComponentError].Clear(0,0);
+		END_IF
+	END_IF		
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CreateEvents" Id="{6bbb8cab-407d-45ac-8da1-6eb5ce7199bf}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD CreateEvents : BOOL
 VAR_INPUT
@@ -301,6 +369,9 @@ StateControl();
 HMICommunication();
 VISUCommunication();
 fbExternalControl();
+SubModuleMonitor();
+ComponentMonitor();
+HMIPermissions();
 
 IF bGlobalSafetyStatus THEN
 	IF a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].bRaised THEN
@@ -309,7 +380,9 @@ IF bGlobalSafetyStatus THEN
 ELSIF NOT a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].bRaised THEN
 		a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].Raise(0);
 		eStateCommand := E_PMLCommand.ePMLCommand_Abort;
-END_IF]]></ST>
+END_IF
+*)
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="Enabled" Id="{a21599c5-6ae5-44f0-9223-afd1d8212c97}" FolderPath="01_ITF_PMLModuleBase\01_Properties\02_Control\">
@@ -355,13 +428,14 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="HMICommunication" Id="{0f3b5e33-30dd-42a6-9468-c84dc53cce4a}" FolderPath="Methods\">
+    <Method Name="HMICommunication" Id="{0f3b5e33-30dd-42a6-9468-c84dc53cce4a}" FolderPath="Methods\04_HMI\">
       <Declaration><![CDATA[METHOD HMICommunication : BOOL]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Extend this method in extended FBs to communicate specific implementation data
 
 //Process HMI requests
 IF stPMLModuleBaseHMI.bIncomingHMIRequest AND NOT stPMLModuleBaseHMI.bHMICommandConfirmation THEN		//If a request has been issued by the HMI, and a previous request has not just E_SequenceState.Finished being processed
+	
 	IF stPMLModuleBaseHMI.bHMIControlAvailable THEN		//If the current conditions permit HMI control (Should be determined by the extended application components)
 		IF stPMLModuleBaseHMI.bEnableHMIRequest THEN
 			bEnabled := TRUE;
@@ -412,6 +486,61 @@ stPMLModuleBaseHMI.eState := fbExternalControl.ExternalControlHMI.State;	//KAB e
 stPMLModuleBaseHMI.bLogStateChanges := bLogStateChanges;
 stPMLModuleBaseHMI.bLogModeChanges := bLogModeChanges;]]></ST>
 stPMLModuleBaseHMI.a_sModeNames := a_sModeNames;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HMIControlAvailable" Id="{52f6c443-837f-4981-bfb9-75a309035060}" FolderPath="01_ITF_PMLModuleBase\01_Properties\02_Control\">
+      <Declaration><![CDATA[PROPERTY HMIControlAvailable : BOOL]]></Declaration>
+      <Get Name="Get" Id="{d77cfdae-241d-47d6-9a7d-0a2f337596b6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HMIControlAvailable := stPMLModuleBaseHMI.bHMIControlAvailable;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a4b129d9-36a6-4e6e-a4e9-6de05e71bc5b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[stPMLModuleBaseHMI.bHMIControlAvailable := HMIControlAvailable;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="HMIPermissions" Id="{5b677aa7-4ac1-443a-a993-772808975d8a}" FolderPath="Methods\04_HMI\">
+      <Declaration><![CDATA[METHOD HMIPermissions : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//General Mode Based Monitoring and handling of HMI control
+CASE eMode OF
+//	====================================================================================================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			//=================================PRODUCTION MODE==================================
+		CASE eState OF
+			E_PMLState.ePMLState_Stopped:
+				AllowHMIControl(bModuleOnly := TRUE);		//Allow control for recovery
+			E_PMLState.ePMLState_Idle:
+				BlockHMIControl();
+			E_PMLState.ePMLState_Suspended:
+				BlockHMIControl();
+			E_PMLState.ePMLState_Execute:
+				BlockHMIControl();
+			E_PMLState.ePMLState_Aborted:
+				AllowHMIControl(bModuleOnly := TRUE);		//Allow control for recovery
+			E_PMLState.ePMLState_Held:
+				AllowHMIControl(bModuleOnly := TRUE);		//Allow control for recovery
+			E_PMLState.ePMLState_Complete:
+				BlockHMIControl();
+		END_CASE
+		
+//	====================================================================================================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				//=================================MANUAL MODE======================================
+		AllowHMIControl(bModuleOnly := FALSE);
+//	====================================================================================================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			//=================================MAINTENANCE MODE=================================
+		AllowHMIControl(bModuleOnly := FALSE);	
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Holding" Id="{4c4a9600-833f-4e2c-8c49-79d528d4d25d}" FolderPath="Methods\01_TransitionStates\">
@@ -636,7 +765,7 @@ END_IF ]]></ST>
       </Implementation>
     </Method>
     <Property Name="ModuleID" Id="{09c9c517-9d6d-4453-9051-a5bffda96bf8}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY ModuleID : DINT]]></Declaration>
+      <Declaration><![CDATA[PROPERTY ModuleID : UDINT]]></Declaration>
       <Get Name="Get" Id="{98b97e95-2030-4cdf-9c6a-02fd26d24c96}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -920,6 +1049,48 @@ IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 	StateComplete();
 END_IF
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SubModuleMonitor" Id="{fe040716-db60-48a3-be9e-6ef7732045a6}" FolderPath="Methods\03_Monitoring\">
+      <Declaration><![CDATA[METHOD SubModuleMonitor : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+FOR i := 1 TO nNumberOfSubModules DO
+	
+	IF bSimulateAllChildren THEN
+		a_ITF_PackMLBase[i].SimulateAllChildren := TRUE;
+	ELSE
+		a_ITF_PackMLBase[i].SimulateAllChildren := FALSE;
+	END_IF
+	
+	IF eMode = E_PMLUnitMode.ePMLUnitMode_Production THEN		
+		IF 		eState <> E_PMLState.ePMLState_Aborted
+			AND eState <> E_PMLState.ePMLState_Aborting
+			AND eState <> E_PMLState.ePMLState_Clearing
+			AND eState <> E_PMLState.ePMLState_Stopped
+			AND eState <> E_PMLState.ePMLState_Stopping
+			AND	(a_ITF_PackMLBase[i].State = E_PMLState.ePMLState_Aborted OR a_ITF_PackMLBase[i].State = E_PMLState.ePMLState_Aborting) THEN
+				IF NOT a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].bRaised THEN
+					F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted],sModuleName,a_ITF_PackMLBase[i].ModuleName,'');
+				END_IF
+				IF eState = E_PMLState.ePMLState_Execute THEN
+					eStateCommand :=  E_PMLCommand.ePMLCommand_Hold;
+				ELSE
+					eStateCommand := E_PMLCommand.ePMLCommand_Stop;
+				END_IF
+				
+		ELSIF a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].bRaised THEN
+			a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].Clear(0,0);
+		END_IF	
+		
+		IF fbProductionDataHMI.NewProductionRate THEN
+			a_ITF_PackMLBase[i].TargetProductionRate := fbProductionDataHMI.TargetProductionRate;
+		END_IF
+	END_IF
+END_FOR]]></ST>
       </Implementation>
     </Method>
     <Method Name="Suspended" Id="{15a0521e-d09e-48c7-a5fb-e09a5fcfb990}" FolderPath="Methods\02_PrimaryStates\">
