@@ -2,9 +2,6 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_PMLModuleBase" Id="{b51128fe-fac6-441f-bd13-bfcb90049779}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK ABSTRACT FB_PMLModuleBase IMPLEMENTS ITF_PMLModuleBase
-VAR_INPUT
-	iMasterDataStructure_Adder		: ITF_Tree_IndexBased;			//Interface for adding new children to the master machine tree data representation
-END_VAR
 VAR
 	//ITF_PMLModuleBase internal property variables
 	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
