@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
@@ -226,7 +226,19 @@
     <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\ST_Tree_IndexBased_Node.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\03_Utilities\02_DataStructures\02_FIFO\FB_FIFO_ULINT_Array.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\03_Utilities\03_HMI_Connections\FB_MainHMI_Connection.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\04_Statistics\FB_ProductionData.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\04_Statistics\ST_ProductionDataHMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\05_Math\01_LREAL\F_LREAL_RoundToPlace.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GlobalTextList.TcGTLO">
@@ -295,7 +307,11 @@
     <Folder Include="Base\03_Utilities\02_DataStructures" />
     <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree" />
     <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased" />
+    <Folder Include="Base\03_Utilities\02_DataStructures\02_FIFO" />
     <Folder Include="Base\03_Utilities\03_HMI_Connections" />
+    <Folder Include="Base\03_Utilities\04_Statistics" />
+    <Folder Include="Base\03_Utilities\05_Math" />
+    <Folder Include="Base\03_Utilities\05_Math\01_LREAL" />
   </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="System_VisuElemMeter">
@@ -339,6 +355,10 @@
       <Namespace>VisuNativeControl</Namespace>
       <SystemLibrary>true</SystemLibrary>
       <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Math">
+      <DefaultResolution>Tc2_Math, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Math</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_MC2">
       <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
