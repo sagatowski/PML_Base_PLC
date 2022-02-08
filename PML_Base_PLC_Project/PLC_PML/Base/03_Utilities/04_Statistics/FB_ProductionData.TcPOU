@@ -1,0 +1,589 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_ProductionData" Id="{1f0aedca-a455-4873-9e9c-f87758d18347}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ProductionData
+VAR PERSISTENT
+	tShiftLength: TIME := T#10M;
+	nShiftProductionTarget	: DINT := 1000;
+	fAcceptableMargin		: LREAL := 5;
+	fWarningMargin			: LREAL := 10;
+	fTargetProductionRate	: LREAL := 30;
+	nRateAveragingCount		: DINT := 10;
+END_VAR
+VAR
+	bSimulateProduction: BOOL;
+	bShiftComplete: BOOL;
+	bProductComplete: BOOL;
+	nCurrentShiftProductionCount: INT;
+	nCurrentShiftTarget: DINT;
+	tCurrentShiftTime: TIME;
+	tRemainingShiftTime: TIME;
+	fRateRequiredForTarget : LREAL;
+	nCurrentWarningProductionCount	: DINT;
+	nCurrentAcceptableProductionCount	: DINT;
+	
+	fActualProductionRate	: LREAL;
+	
+	a_nLastProductTimestamps : ARRAY[1..100] OF ULINT;	//Array of ULINT values (1 unit = 1ns) for the relative time of each of the last 100 completed products
+	fbShiftTimer: TON;
+	fbProductComplete_RT: R_TRIG;
+	bNewProductionRate					: BOOL;
+	fLastTargetProductionRate			: LREAL;
+	
+	bResetMaxProductionCount: BOOL;
+	bResetTotalProductionCount: BOOL;
+	
+	nMaxProductionCount : DINT;
+	nTotalProductionCount : DINT;
+	
+	stProductionDataHMI	: ST_ProductionDataHMI;
+	fbFIFO							: FB_FIFO_ULINT_Array;
+	fTemp : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_Properties" Id="{49edaae3-0520-4175-854a-70c3b232b53b}">
+      <Folder Name="01_Config" Id="{d4922f84-23a6-40eb-a90b-ca044f3c3d01}" />
+      <Folder Name="02_Control" Id="{d9ce53ad-c75c-464c-a26a-c294b4d0c9d0}" />
+      <Folder Name="03_Status" Id="{385f1d90-8abe-4f2e-a480-a8dc61f2f795}" />
+    </Folder>
+    <Property Name="AcceptableMargin" Id="{afa5dc58-246e-4105-bd0c-33c51f7ab5a2}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY AcceptableMargin : LREAL //0 to 100, interpreted as a percentage difference between the current rate and the required rate to meet the production target, decimal values permitted]]></Declaration>
+      <Get Name="Get" Id="{3d9bb4c1-b717-4446-b2ff-05ea643f1014}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AcceptableMargin := fAcceptableMargin;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8e8ccf2d-f0a2-43cf-a633-632b8d5098f9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fAcceptableMargin := AcceptableMargin;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ActualProductionRate" Id="{22ae78d5-dad7-487d-890d-53ab74e2fe2c}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ActualProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{6ccf5734-11c7-4c7f-8c0a-d74b74ac19d8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualProductionRate := fActualProductionRate;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftAcceptableProduction" Id="{4f88bde5-63ac-43e5-bbf2-a4692b1a42f0}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftAcceptableProduction : DINT]]></Declaration>
+      <Get Name="Get" Id="{283653e8-36f1-4753-9b5d-c14274f64723}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{bef79df7-2ec8-4137-bf83-c0b8574f514a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CurrentShiftProductionCount" Id="{ec45cb96-f818-48a7-9192-1e6883e88b0d}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftProductionCount : DINT]]></Declaration>
+      <Get Name="Get" Id="{f7291167-b9bf-47c0-ae32-ed5ea8932289}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentShiftProductionCount := nCurrentShiftProductionCount;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftTarget" Id="{7c98517e-03ee-423d-9c2f-f70ed099d4ed}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftTarget : DINT]]></Declaration>
+      <Get Name="Get" Id="{97d992c8-e150-4446-9e36-40a6ea8346d4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentShiftTarget := nCurrentShiftTarget;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftTime" Id="{584a9701-3877-4ac4-834e-957ff74925f2}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftTime : TIME]]></Declaration>
+      <Get Name="Get" Id="{b230bb71-dfb0-4317-8940-4d371899ffdb}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentShiftTime := tCurrentShiftTime;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftWarningProduction" Id="{6e8a31e6-5585-44fa-a279-3dc008fa8d8a}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftWarningProduction : DINT]]></Declaration>
+      <Get Name="Get" Id="{087af1b2-762f-4c62-9629-7afbae592892}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a958f544-14c4-42a1-9ca4-7357192ee3dc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="CyclicLogic" Id="{7bc78be0-6c60-4f3a-900a-10e74e662f7a}">
+      <Declaration><![CDATA[METHOD CyclicLogic : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbFIFO(a_FIFO := a_nLastProductTimestamps);
+
+fbShiftTimer(IN := NOT bShiftComplete, PT := tShiftLength, Q => bShiftComplete, ET => tCurrentShiftTime);
+tRemainingShiftTime := tShiftLength - tCurrentShiftTime;
+IF TIME_TO_DINT(tRemainingShiftTime) > 0 THEN
+	fRateRequiredForTarget := DINT_TO_LREAL(nShiftProductionTarget - nCurrentShiftProductionCount) / (TIME_TO_LREAL(tRemainingShiftTime)/1000/60);
+	
+	nCurrentAcceptableProductionCount := nShiftProductionTarget - (LREAL_TO_DINT((fTargetProductionRate - (fTargetProductionRate * fAcceptableMargin/100)) * (TIME_TO_LREAL(tRemainingShiftTime)/1000/60)));
+	IF nCurrentAcceptableProductionCount < 1 THEN
+		nCurrentAcceptableProductionCount := 1;
+	END_IF
+	nCurrentWarningProductionCount := nShiftProductionTarget - (LREAL_TO_DINT((fTargetProductionRate - (fTargetProductionRate * fWarningMargin/100)) * (TIME_TO_LREAL(tRemainingShiftTime)/1000/60)));
+	IF nCurrentWarningProductionCount < 0 THEN
+		nCurrentWarningProductionCount := 0;
+	END_IF
+END_IF
+
+fbProductComplete_RT(CLK:= bProductComplete);
+
+IF fbProductComplete_RT.Q THEN
+	nCurrentShiftProductionCount := nCurrentShiftProductionCount + 1;
+	nTotalProductionCount := nTotalProductionCount + 1;
+	IF nCurrentShiftProductionCount > nMaxProductionCount THEN
+		nMaxProductionCount := nCurrentShiftProductionCount;
+	END_IF
+	fbFIFO.AddEntry(nEntry := F_GetSystemTime());
+END_IF
+
+IF (fbFIFO.EntryCount > nRateAveragingCount) THEN
+	fbFIFO.RemoveEntry();
+END_IF
+
+fTemp := (TIME_TO_LREAL(ULINT_TO_TIME(fbFIFO.LastInValue - fbFIFO.NextOutValue))/10000/1000/60);
+IF fTemp > 0 AND fbFIFO.EntryCount > 1 THEN
+	fActualProductionRate := F_LREAL_RoundToPlace(DINT_TO_LREAL(fbFIFO.EntryCount - 1) / fTemp, 2);
+END_IF
+
+IF TIME_TO_DINT(tShiftLength) > 0 THEN
+	nCurrentShiftTarget := LREAL_TO_DINT((TIME_TO_LREAL(tCurrentShiftTime) / TIME_TO_LREAL(tShiftLength)) * DINT_TO_LREAL(nShiftProductionTarget));
+END_IF
+
+
+IF bShiftComplete THEN
+	nCurrentShiftProductionCount := 0;
+END_IF
+
+IF bResetMaxProductionCount THEN
+	nMaxProductionCount := nCurrentShiftProductionCount;
+END_IF
+
+IF bResetTotalProductionCount THEN
+	nTotalProductionCount := 0;
+END_IF
+IF fTargetProductionRate <> fLastTargetProductionRate THEN
+	bNewProductionRate := TRUE;
+ELSE
+	bNewProductionRate := FALSE;
+END_IF
+
+fLastTargetProductionRate := fTargetProductionRate;
+
+HMICommunication();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMICommunication" Id="{3d6296f7-c387-48c4-a605-fef8feb358af}">
+      <Declaration><![CDATA[METHOD HMICommunication : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Extend this method in extended FBs to communicate specific implementation data
+
+//Process HMI requests
+IF stProductionDataHMI.bIncomingHMIRequest AND NOT stProductionDataHMI.bHMICommandConfirmation THEN		//If a request has been issued by the HMI, and a previous request has not just E_SequenceState.Finished being processed
+	IF stProductionDataHMI.bShiftProductionTargetHMISetRequest THEN
+		nShiftProductionTarget := stProductionDataHMI.nShiftProductionTargetHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bAcceptableMarginHMISetRequest THEN
+		fAcceptableMargin := stProductionDataHMI.fAcceptableMarginHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bWarningMarginHMISetRequest THEN
+		fWarningMargin := stProductionDataHMI.fWarningMarginHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bShiftLengthHMISetRequest THEN
+		tShiftLength := stProductionDataHMI.tShiftLengthHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bProductionRateHMISetRequest THEN
+		fTargetProductionRate := stProductionDataHMI.fProductionRateHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+END_IF
+
+
+
+//Update HMI Status Info
+stProductionDataHMI.tShiftLength := tShiftLength;
+stProductionDataHMI.nShiftProductionTarget := nShiftProductionTarget;
+stProductionDataHMI.nCurrentShiftProductionCount := nCurrentShiftProductionCount;
+stProductionDataHMI.nCurrentShiftTarget := nCurrentShiftTarget;
+stProductionDataHMI.nCurrentAcceptableProductionCount := nCurrentAcceptableProductionCount;
+stProductionDataHMI.nCurrentWarningProductionCount := nCurrentWarningProductionCount;
+stProductionDataHMI.tCurrentShiftTime := tCurrentShiftTime;
+stProductionDataHMI.tRemainingShiftTime := tRemainingShiftTime;
+stProductionDataHMI.fTargetProductionRate := fTargetProductionRate;
+stProductionDataHMI.fActualProductionRate := fActualProductionRate;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NewProductionRate" Id="{7bfcf07a-1088-40c6-afd3-fa869aefa5ea}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY NewProductionRate : BOOL]]></Declaration>
+      <Get Name="Get" Id="{4c690222-9c96-4682-b566-8b6ff04d7ff6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NewProductionRate := bNewProductionRate;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ProductComplete" Id="{cadd568e-0f14-438f-9258-cfa200b7500d}" FolderPath="01_Properties\02_Control\">
+      <Declaration><![CDATA[PROPERTY ProductComplete : BOOL		//Pulse TRUE when a product is completed]]></Declaration>
+      <Get Name="Get" Id="{c3b3a88c-301b-4452-8568-414a87c1ac04}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ProductComplete := bProductComplete;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{699da92f-7160-4e17-9c66-8d706748b451}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bProductComplete := ProductComplete;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RateAveragingCount" Id="{77ebf52e-7228-4306-a59d-f235faab731d}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY RateAveragingCount : DINT]]></Declaration>
+      <Get Name="Get" Id="{ca98f25c-175d-4f61-9039-8448e7881097}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RateAveragingCount := nRateAveragingCount;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{24e84d3d-d276-4a99-a855-11300afcbd1d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nRateAveragingCount := RateAveragingCount;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RateRequiredForTarget" Id="{61c4d99a-60c2-486a-aa9c-642d9f0b0d5b}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY RateRequiredForTarget : LREAL]]></Declaration>
+      <Get Name="Get" Id="{ae6750b5-ffd6-4feb-8f7d-83ca6a0c6491}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{14f1b3f6-9532-4f8e-a42b-f47a4a044c08}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RemainingShiftTime" Id="{bb6660de-2df2-4510-89b2-a425501197a8}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY RemainingShiftTime : TIME]]></Declaration>
+      <Get Name="Get" Id="{30b4f826-a446-419c-86a2-1bf1dde13624}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{97067809-5f84-4608-9fd1-acba41036c1c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ShiftComplete" Id="{d4d759e9-93fe-495d-a365-b9d5151cb360}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ShiftComplete : BOOL]]></Declaration>
+      <Get Name="Get" Id="{3f85468c-1f31-411e-b7de-391f1315a45e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ShiftComplete := bShiftComplete;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ShiftLength" Id="{b128f54c-7e6f-4f33-bb2a-cbed4d32d203}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ShiftLength : TIME]]></Declaration>
+      <Get Name="Get" Id="{6e5e77f9-957b-45d4-a0e0-8d96989e1116}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ShiftLength := tShiftLength;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8e70aa62-5ad4-4230-acc8-309fee385b74}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[tShiftLength := ShiftLength;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ShiftProductionTarget" Id="{1410a62b-c3d8-424e-a095-ce4c555068b5}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ShiftProductionTarget : DINT]]></Declaration>
+      <Get Name="Get" Id="{096ee76d-ef0c-4d67-a787-aa3bc40434db}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ShiftProductionTarget := nShiftProductionTarget;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{34aeb174-cdcb-40de-b31a-10a7ec8d64a7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nShiftProductionTarget := ShiftProductionTarget;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="TargetProductionRate" Id="{b48267bd-9344-44e4-901e-754412d2c111}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY TargetProductionRate : LREAL	//Default interpretation: Products Per Minute (PPM)]]></Declaration>
+      <Get Name="Get" Id="{35230f45-f578-4ffb-abc3-b283d6a84242}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TargetProductionRate := fTargetProductionRate;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f83f34af-b426-4fb9-9c18-0a5adc6b72d1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fTargetProductionRate := TargetProductionRate;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="WarningMargin" Id="{cf68aaf1-ffdf-45b0-ac09-924df172a91e}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY WarningMargin : LREAL	//0 to 100, interpreted as a percentage difference between the current rate and the required rate to meet the production target, decimal values permitted]]></Declaration>
+      <Get Name="Get" Id="{1a795103-01ac-41f4-a0ac-55d09fab11ed}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[WarningMargin := fWarningMargin;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1c710f1d-11fe-47b4-a40b-f106043d256b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fWarningMargin := WarningMargin;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_ProductionData">
+      <LineId Id="161" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.AcceptableMargin.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.AcceptableMargin.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ActualProductionRate.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftAcceptableProduction.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftAcceptableProduction.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftProductionCount.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftTarget.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftTime.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftWarningProduction.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CurrentShiftWarningProduction.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.CyclicLogic">
+      <LineId Id="50" Count="1" />
+      <LineId Id="6" Count="3" />
+      <LineId Id="40" Count="2" />
+      <LineId Id="60" Count="1" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="62" Count="2" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="11" Count="7" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="52" Count="4" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="22" Count="11" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="72" Count="1" />
+      <LineId Id="75" Count="1" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.HMICommunication">
+      <LineId Id="17" Count="5" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="79" Count="2" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="83" Count="2" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="29" Count="2" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="90" Count="2" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="14" Count="2" />
+      <LineId Id="73" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="86" Count="1" />
+      <LineId Id="8" Count="1" />
+      <LineId Id="96" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.NewProductionRate.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ProductComplete.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ProductComplete.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RateAveragingCount.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RateAveragingCount.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RateRequiredForTarget.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RateRequiredForTarget.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RemainingShiftTime.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.RemainingShiftTime.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ShiftComplete.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ShiftLength.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ShiftLength.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ShiftProductionTarget.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.ShiftProductionTarget.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.TargetProductionRate.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.TargetProductionRate.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.WarningMargin.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductionData.WarningMargin.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
