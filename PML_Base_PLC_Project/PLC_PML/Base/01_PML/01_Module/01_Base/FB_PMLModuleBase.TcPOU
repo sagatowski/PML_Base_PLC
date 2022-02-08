@@ -121,8 +121,19 @@ FOR nIndex := 1 TO nNumberOfSubModules DO
 	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 END_FOR
 
+FOR nIndex:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[nIndex].Enabled THEN
+		a_ITF_Components[nIndex].Enabled := FALSE;
+	END_IF
+END_FOR
+
 // All subunits in requested state?
 bSubModulesReady := TRUE;
+
+FOR nIndex:=1 TO nNumberOfComponents DO		
+	bSubModulesReady := bSubModulesReady AND NOT (a_ITF_Components[nIndex].Ready OR a_ITF_Components[nIndex].Enabled);
+END_FOR
+
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Aborted);
 END_FOR
@@ -168,8 +179,19 @@ FOR nIndex := 1 TO nNumberOfSubModules DO
 	a_ITF_PackMLBase[nIndex].StateCommand	:=	ePMLCommand_Clear;
 END_FOR
 
+
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
+FOR nIndex:=1 TO nNumberOfComponents DO
+	IF a_ITF_Components[nIndex].Error THEN
+		a_ITF_Components[nIndex].Reset();
+	END_IF
+END_FOR
+
+FOR nIndex:=1 TO nNumberOfComponents DO		
+		bSubModulesReady := bSubModulesReady AND NOT a_ITF_Components[nIndex].Error;
+END_FOR
+
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
 END_FOR
@@ -676,8 +698,20 @@ FOR nIndex := 1 TO nNumberOfSubModules DO
 	END_IF
 END_FOR
 
+FOR nIndex:=1 TO nNumberOfComponents DO
+	IF NOT a_ITF_Components[nIndex].Enabled THEN
+		a_ITF_Components[nIndex].Enabled := TRUE;
+	END_IF
+END_FOR
+
+
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
+
+FOR nIndex:=1 TO nNumberOfComponents DO		
+	bSubModulesReady := bSubModulesReady AND a_ITF_Components[nIndex].Ready;
+END_FOR
+
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Idle);
 END_FOR
