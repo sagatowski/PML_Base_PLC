@@ -66,7 +66,7 @@ VAR
 	nNumberOfComponents				: UDINT := 0;	//calculated number of instantiated components
 	
 	//Miscellaneous Variables
-	nIndex				: UDINT;		//Generic iteration value
+	fbProductionDataHMI		: FB_ProductionData;		//Used for production quantity tracking and in-shift forecasting, set ProductComplete property TRUE whenever a product is completed in the application code
 	nIndex					: UDINT;		//Generic iteration value
 	bSimulateAllChildren	: BOOL;
 	a_sModeNames					: ARRAY[0..31] OF STRING;
@@ -145,6 +145,17 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ActualProductionRate" Id="{04f84974-c56c-4397-9326-5055e8c253df}" FolderPath="01_ITF_PMLModuleBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ActualProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{44ca2e18-af31-4f04-9682-293c654b666a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualProductionRate := fbProductionDataHMI.ActualProductionRate;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="AllowHMIControl" Id="{8101f876-b4c9-49ea-be68-caa3d7179c06}" FolderPath="Methods\04_HMI\">
       <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
 VAR_INPUT
@@ -371,7 +382,9 @@ fbExternalControl();
 SubModuleMonitor();
 ComponentMonitor();
 HMIPermissions();
+fbProductionDataHMI.CyclicLogic();
 
+(*
 IF bGlobalSafetyStatus THEN
 	IF a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].bRaised THEN
 		a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].Clear(0,0);
@@ -1150,6 +1163,25 @@ IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="TargetProductionRate" Id="{b514bd56-7d2e-4139-b530-8a3715ebc3bb}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY TargetProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{4bb69779-00b1-4880-914d-9920d90f543a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TargetProductionRate := fbProductionDataHMI.TargetProductionRate;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d78ceec9-4918-43fe-8cb1-bc0dc7830d6c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fbProductionDataHMI.TargetProductionRate := TargetProductionRate;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Undefined" Id="{e1721cba-4da3-43ce-991b-54764c6d098b}" FolderPath="Methods\02_PrimaryStates\">
       <Declaration><![CDATA[METHOD Undefined ]]></Declaration>
       <Implementation>
