@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_PMLModuleBase" Id="{eca4a56b-850e-483e-b687-2de3b3950c24}">
     <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase
@@ -9,6 +9,12 @@
       <Folder Name="03_Status" Id="{681bf848-54e8-410c-a596-7e58d3fea268}" />
     </Folder>
     <Folder Name="02_Methods" Id="{fbb15efd-8a92-4fbb-a79e-6108b9c86638}" />
+    <Property Name="ActualProductionRate" Id="{7ed2842f-7cd7-4694-89fa-c274118f161d}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ActualProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{d58d319d-6658-4d0d-a426-5afa6e67b86d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="AncestorIDs" Id="{ddc4ec9f-03b5-4a9a-9708-c7ae158f5b04}" FolderPath="01_Properties\01_Config\">
       <Declaration><![CDATA[PROPERTY AncestorIDs : STRING]]></Declaration>
       <Get Name="Get" Id="{f334f915-3beb-484a-b889-7d0a10f7ff80}">
@@ -105,6 +111,15 @@
     <Property Name="StateCommand" Id="{1c454ada-e18d-4933-8772-ef90079bfec6}" FolderPath="01_Properties\02_Control\">
       <Declaration><![CDATA[PROPERTY StateCommand : E_PMLCommand]]></Declaration>
       <Set Name="Set" Id="{3495e55a-b4ad-4161-a7ba-1793fe13d390}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="TargetProductionRate" Id="{40ff0130-155a-47ee-8753-64a2da899a2d}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY TargetProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{7999c80a-1e65-4223-a767-fe3d703ca7f7}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{e468dc00-076e-4592-bf4e-e79c036a39bf}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
