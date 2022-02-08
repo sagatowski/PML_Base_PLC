@@ -71,6 +71,7 @@ VAR
 	//Miscellaneous Variables
 	nIndex				: UDINT;		//Generic iteration value
 	nIndex					: UDINT;		//Generic iteration value
+	bSimulateAllChildren	: BOOL;
 	a_sModeNames					: ARRAY[0..31] OF STRING;
 	i: UDINT;
 END_VAR
@@ -851,6 +852,25 @@ IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="SimulateAllChildren" Id="{72dbc14c-7f4d-4f80-ac39-f560bdd6cdee}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY SimulateAllChildren : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9993acbb-b83f-41c7-a0ae-e863eb1bca61}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SimulateAllChildren := bSimulateAllChildren;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{bbe57f06-302f-47bb-9f85-5cdcdfb0f46c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bSimulateAllChildren := SimulateAllChildren;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Starting" Id="{ebd7ebd1-f8aa-4a46-a1fd-eef86be59683}" FolderPath="Methods\01_TransitionStates\">
       <Declaration><![CDATA[METHOD Starting]]></Declaration>
       <Implementation>
