@@ -9,7 +9,7 @@ VAR
 	//ITF_PMLModuleBase internal property variables
 	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
 	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
-	bLogStateChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
+	bLogStateChanges 	: BOOL := FALSE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
 	nModuleID			: DINT;					//Unique identifying number for the module
 	sModuleName			: STRING;				//Human-readable module name for user-side messaging
 	bEnabled			: BOOL;					//Enables or disables the packml Machine of the module (prevents the module from going past idle)
