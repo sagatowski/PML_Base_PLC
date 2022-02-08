@@ -700,6 +700,25 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Property Name="MasterDataStructure_Adder" Id="{df8bfb91-605f-4717-a7ce-9c6f277783e2}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY MasterDataStructure_Adder :  ITF_Tree_IndexBased]]></Declaration>
+      <Get Name="Get" Id="{3f3aa2d9-680a-40a0-8573-571382f13def}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MasterDataStructure_Adder := iMasterDataStructure_Adder;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{53ffe855-67b4-4cc8-89ce-cf214fc8217c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[iMasterDataStructure_Adder := MasterDataStructure_Adder;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="Mode" Id="{bc2b045c-1313-4030-8d9b-1e43964fed78}" FolderPath="01_ITF_PMLModuleBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY Mode : E_PMLUnitMode
 ]]></Declaration>
