@@ -6,59 +6,63 @@ VAR_IN_OUT
 	a_fbPMLAlarms			: ARRAY[1..48] OF FB_TcAlarm;		//Array of alarms for Core PackML events that exist in any PackML enabled module
 END_VAR
 VAR_INPUT
-	sModulePrefix : STRING;	//Prefix String for any
-	eState	: E_PMLState;
-	///Mode : DINT;
+	sModulePrefix : STRING;	//Prefix String for all state change events (Typically the ID and Name of the module in some concatenated form)
+	eState	: E_PMLState;	//Current PML state of the module
+	bLogAllChanges	: BOOL := TRUE; //If TRUE, all state change events will be logged, regardless of severity, otherwise info alarms are ignored
 END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	eLastState : E_PMLState := E_PMLState.ePMLState_Aborted;
-END_VAR
-]]></Declaration>
+	eLastState : E_PMLState := E_PMLState.ePMLState_Undefined;		//Saves the previous state each time the block is run
+	refTempAlarm : REFERENCE TO FB_TcAlarm;		//Temporary reference that makes severity checking simpler vs individually checking each change alarm within the case statement
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF eState <> eLastState THEN
-	CASE eState OF
+      <ST><![CDATA[IF eState <> eLastState THEN		//If state has changed
+	CASE eState OF		//Get the stored alarm that corresponds to the newly entered state and save its reference temporarily
 		E_PMLState.ePMLState_Starting:
-			a_fbPMLAlarms[E_PMLAlarms.StateStartingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateStartingEnter];
 		E_PMLState.ePMLState_Execute:
-			a_fbPMLAlarms[E_PMLAlarms.StateExecuteEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateExecuteEnter];
 		E_PMLState.ePMLState_Completing:
-			a_fbPMLAlarms[E_PMLAlarms.StateCompletingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateCompletingEnter];
 		E_PMLState.ePMLState_Complete:
-			a_fbPMLAlarms[E_PMLAlarms.StateCompleteEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateCompleteEnter];
 		E_PMLState.ePMLState_Resetting:
-			a_fbPMLAlarms[E_PMLAlarms.StateResettingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateResettingEnter];
 		E_PMLState.ePMLState_Idle:
-			a_fbPMLAlarms[E_PMLAlarms.StateIdleEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateIdleEnter];
 		E_PMLState.ePMLState_Holding:
-			a_fbPMLAlarms[E_PMLAlarms.StateHoldingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateHoldingEnter];
 		E_PMLState.ePMLState_Held:
-			a_fbPMLAlarms[E_PMLAlarms.StateHeldEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateHeldEnter];
 		E_PMLState.ePMLState_Unholding:
-			a_fbPMLAlarms[E_PMLAlarms.StateUnholdingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateUnholdingEnter];
 		E_PMLState.ePMLState_Suspending:
-			a_fbPMLAlarms[E_PMLAlarms.StateSuspendingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateSuspendingEnter];
 		E_PMLState.ePMLState_Suspended:
-			a_fbPMLAlarms[E_PMLAlarms.StateSuspendedEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateSuspendedEnter];
 		E_PMLState.ePMLState_Unsuspending:
-			a_fbPMLAlarms[E_PMLAlarms.StateUnsuspendingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateUnsuspendingEnter];
 		E_PMLState.ePMLState_Stopping:
-			a_fbPMLAlarms[E_PMLAlarms.StateStoppingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateStoppingEnter];
 		E_PMLState.ePMLState_Stopped:
-			a_fbPMLAlarms[E_PMLAlarms.StateStoppedEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateStoppedEnter];
 		E_PMLState.ePMLState_Aborting:
-			a_fbPMLAlarms[E_PMLAlarms.StateAbortingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateAbortingEnter];
 		E_PMLState.ePMLState_Aborted:
-			a_fbPMLAlarms[E_PMLAlarms.StateAbortedEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateAbortedEnter];
 		E_PMLState.ePMLState_Clearing:
-			a_fbPMLAlarms[E_PMLAlarms.StateClearingEnter].Raise(0);
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateClearingEnter];
 		E_PMLState.ePMLState_Undefined:
-			a_fbPMLAlarms[E_PMLAlarms.StateUndefinedEnter].Raise(0);
-
+			refTempAlarm REF= a_fbPMLAlarms[E_PMLAlarms.StateUndefinedEnter];
 	END_CASE
 	
-	CASE eLastState OF
+	//If the FB is set to log all changes, log the change, otherwise check the severity of the alarm and log it if it exceeds 'info' severity
+	IF bLogAllChanges OR (refTempAlarm.eSeverity <> TcEventSeverity.Info AND refTempAlarm.eSeverity <> TcEventSeverity.Verbose) THEN
+		refTempAlarm.Raise(0);
+	END_IF
+	
+	CASE eLastState OF	//Clear the previous state's event (Events will remain 'Raised' as long as the module remains in that state)
 		E_PMLState.ePMLState_Starting:
 			a_fbPMLAlarms[E_PMLAlarms.StateStartingEnter].Clear(0,0);
 		E_PMLState.ePMLState_Execute:
@@ -97,18 +101,16 @@ END_VAR
 			a_fbPMLAlarms[E_PMLAlarms.StateUndefinedEnter].Clear(0,0);
 
 	END_CASE
-	eLastState := eState;
+	eLastState := eState;	//Store previous state
 END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="FB_PMLStateLogger">
-      <LineId Id="302" Count="35" />
-      <LineId Id="399" Count="0" />
-      <LineId Id="398" Count="0" />
-      <LineId Id="339" Count="37" />
-      <LineId Id="401" Count="0" />
-      <LineId Id="400" Count="0" />
-      <LineId Id="378" Count="3" />
+      <LineId Id="531" Count="39" />
+      <LineId Id="616" Count="0" />
+      <LineId Id="571" Count="1" />
+      <LineId Id="614" Count="1" />
+      <LineId Id="573" Count="40" />
       <LineId Id="52" Count="0" />
     </LineIds>
   </POU>
