@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_AxisBase" Id="{4200ac4d-0aab-43d3-b255-b3f92bfb2a64}">
-    <Declaration><![CDATA[INTERFACE ITF_AxisBase
+    <Declaration><![CDATA[INTERFACE ITF_AxisBase EXTENDS ITF_ComponentBase
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{4379f2d7-2e78-4fd1-85df-ac9969b7ba41}">
       <Folder Name="01_Config" Id="{7a49e870-0b3e-4285-9485-834876991aa9}" />
@@ -109,6 +109,13 @@ END_VAR]]></Declaration>
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
+    <Method Name="SetOverridePercent" Id="{217148bf-e8a6-48d2-b3ba-143a7a3cd5d2}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD SetOverridePercent : BOOL
+VAR_INPUT
+	fOverrideInput : LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
     <Method Name="Stop" Id="{cbfb92c0-e2eb-4835-9fcb-477370fc4744}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD Stop : BOOL]]></Declaration>
     </Method>

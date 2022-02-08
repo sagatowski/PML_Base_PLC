@@ -13,25 +13,32 @@ VAR
 	//Internal Property Variables
 	fHomePositionSetpoint		: LREAL := 0;
 	bHomeSensorStatus			: BOOL;
+	eHomeDirection				: Tc2_MC2.MC_Direction := MC_Direction.MC_Positive_Direction;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Folder Name="01_SUPER_Overrides" Id="{b7e810e7-7286-4afa-9522-69b155784007}" />
-    <Method Name="Home" Id="{62fb52c0-a114-4189-a183-d55826f92029}" FolderPath="01_SUPER_Overrides\">
-      <Declaration><![CDATA[METHOD Home : BOOL
-VAR_INPUT
+    <Property Name="HomeDirection" Id="{1aff4467-f9ab-4068-941b-487907ef4965}">
+      <Declaration><![CDATA[PROPERTY HomeDirection : Tc2_MC2.MC_Direction]]></Declaration>
+      <Get Name="Get" Id="{74f8559e-28a0-4e31-8221-c2462f8d5c72}">
+        <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[SUPER^.Home();
-
-IF NOT bActive THEN
-	fbAxisHome.Execute := TRUE;
-END_IF]]></ST>
-      </Implementation>
-    </Method>
+        <Implementation>
+          <ST><![CDATA[HomeDirection := eHomeDirection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{02befec7-f19b-42f4-baba-10bb72535548}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[eHomeDirection := HomeDirection;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="HomePositionSetpoint" Id="{db3ab09f-698b-4e2a-8d13-406e53711f63}">
       <Declaration><![CDATA[PROPERTY HomePositionSetpoint : LREAL]]></Declaration>
       <Get Name="Get" Id="{33168fc0-5488-42e5-8ef0-3ae2f8d701dc}">
@@ -66,9 +73,9 @@ END_VAR
       <Declaration><![CDATA[METHOD Monitoring : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.Monitoring();
+        <ST><![CDATA[bHomeSensorStatus := fbHomeSensor.Active;
 
-bHomeSensorStatus := fbHomeSensor.Active;]]></ST>
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{0febfd92-be0d-4356-a3fd-12ac6da81bf1}" FolderPath="01_SUPER_Overrides\">
@@ -79,6 +86,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[SUPER^.MotionControl();
 
+fbAxisHome.Options.SearchDirection := eHomeDirection;
 //Performs a simple home-to sensor sequence when commanded by a "Home" Method call
 fbAxisHome(
 	Axis:= SelectedAxis,
@@ -93,9 +101,11 @@ fbAxisHome.Execute := FALSE;]]></ST>
     <LineIds Name="FB_Axis_HomeToSensor">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_HomeToSensor.Home">
-      <LineId Id="8" Count="1" />
-      <LineId Id="5" Count="2" />
+    <LineIds Name="FB_Axis_HomeToSensor.HomeDirection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_HomeToSensor.HomeDirection.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_HomeToSensor.HomePositionSetpoint.Get">
       <LineId Id="2" Count="0" />
@@ -107,13 +117,15 @@ fbAxisHome.Execute := FALSE;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_HomeToSensor.Monitoring">
-      <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_HomeToSensor.MotionControl">
       <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="8" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="8" Count="7" />
       <LineId Id="6" Count="0" />
     </LineIds>
   </POU>

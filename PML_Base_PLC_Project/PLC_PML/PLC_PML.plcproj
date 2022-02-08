@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
@@ -19,7 +19,10 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\E_PMLUnitMode.TcDUT">
+    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_PMLUnitMode.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_SequenceState.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS\T_PackMLTags.TcDUT">
@@ -80,21 +83,6 @@
     <Compile Include="Base\01_PML\01_Module\03_PMLControl\ITF_PackML_ExternalControl_Simplified_old.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\01_PML\01_Module\04_SequenceControl\E_ModuleSequenceCommand.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\04_SequenceControl\E_ModuleSequenceStatus.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\04_SequenceControl\F_CommandAllSequences.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\04_SequenceControl\ITF_ModuleSequenceControl.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\04_SequenceControl\ST_ModuleSequenceControl.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Base\01_PML\01_Module\05_Visualizations\V_Module.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
@@ -127,6 +115,15 @@
     <Compile Include="Base\02_Components\02_Axes\01_Base\ST_AxisBase_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToExternalForceFeedback.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToHardStop.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToMotorToque.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -137,6 +134,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Continuous_NoHoming.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Discrete_HomeToExternalForce.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Discrete_HomeToSensor.TcPOU">
@@ -160,19 +160,25 @@
     <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_DualSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_ExtendedSensor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_NoSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_RetractedSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_ExtendedSensor.TcPOU">
+    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_SingleSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualTimer.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_SingleSensor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualSolenoid_DualSensor.TcPOU">
@@ -202,6 +208,15 @@
     <Compile Include="Base\03_Utilities\01_Events\F_CreateAllEventsInClass.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmAndSetFlags.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmWithStringParameters.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmWithStringsAndFlags.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\FB_Tree_IndexBased.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -211,7 +226,19 @@
     <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\ST_Tree_IndexBased_Node.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\03_Utilities\02_DataStructures\02_FIFO\FB_FIFO_ULINT_Array.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\03_Utilities\03_HMI_Connections\FB_MainHMI_Connection.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\04_Statistics\FB_ProductionData.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\04_Statistics\ST_ProductionDataHMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\05_Math\01_LREAL\F_LREAL_RoundToPlace.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GlobalTextList.TcGTLO">
@@ -226,6 +253,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\01_Application_Level_Items\02_DUT\01_ENUM" />
+    <Folder Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM" />
     <Folder Include="Application\01_Application_Level_Items\02_DUT\02_STRUCT" />
     <Folder Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS" />
     <Folder Include="Application\01_Application_Level_Items\01_GVL" />
@@ -252,7 +280,6 @@
     <Folder Include="Base\01_PML\01_Module\03_PMLControl\01_GVL" />
     <Folder Include="Base\01_PML\01_Module\03_PMLControl\02_DUT" />
     <Folder Include="Base\01_PML\01_Module\03_PMLControl\03_ITFs" />
-    <Folder Include="Base\01_PML\01_Module\04_SequenceControl" />
     <Folder Include="Base\01_PML\01_Module\05_Visualizations" />
     <Folder Include="Base\01_PML\02_GVL" />
     <Folder Include="Base\01_PML\03_Visualizations" />
@@ -275,13 +302,16 @@
     <Folder Include="Base\02_Components\04_Sensors\01_Base" />
     <Folder Include="Base\02_Components\04_Sensors\02_Sensor" />
     <Folder Include="Base\02_Components\99_EventDefinitions" />
-    <Folder Include="Base\02_Components\README_REFERENCES" />
     <Folder Include="Base\03_Utilities" />
     <Folder Include="Base\03_Utilities\01_Events" />
     <Folder Include="Base\03_Utilities\02_DataStructures" />
     <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree" />
     <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased" />
+    <Folder Include="Base\03_Utilities\02_DataStructures\02_FIFO" />
     <Folder Include="Base\03_Utilities\03_HMI_Connections" />
+    <Folder Include="Base\03_Utilities\04_Statistics" />
+    <Folder Include="Base\03_Utilities\05_Math" />
+    <Folder Include="Base\03_Utilities\05_Math\01_LREAL" />
   </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="System_VisuElemMeter">
@@ -325,6 +355,10 @@
       <Namespace>VisuNativeControl</Namespace>
       <SystemLibrary>true</SystemLibrary>
       <ResolverGuid>2717eb6a-dd07-4c66-8d8d-cacebd7b18ae</ResolverGuid>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Math">
+      <DefaultResolution>Tc2_Math, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Math</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_MC2">
       <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -374,15 +408,6 @@
       <SubType>Content</SubType>
     </Content>
     <Content Include="Base\01_PML\README_REFERENCES\03_PML_Mode_Description.txt">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Base\02_Components\99_EventDefinitions\BasicComponents_AlarmDefinitions.xlsx">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Base\02_Components\99_EventDefinitions\BasicComponents_Events.tmc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Base\02_Components\README_REFERENCES\01_Component_GettingStarted.txt">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

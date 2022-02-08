@@ -15,6 +15,18 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
+    <Method Name="AllowHMIControl" Id="{ae6decc3-fa9e-42b8-94a0-5208928802f5}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="BlockHMIControl" Id="{50ed9e8c-3414-4c5e-96e7-2149b6e9b3aa}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
     <Method Name="CyclicLogic" Id="{d91518f0-effa-46ac-9b5e-2c5c4de214c9}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL		//Should be called Externally akin to the PML Modules
 ]]></Declaration>
@@ -53,6 +65,12 @@
       <Set Name="Set" Id="{509096af-893b-4407-b670-7197bcb594c8}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
+    </Property>
+    <Property Name="Ready" Id="{50f9c971-0b15-4c6e-8f53-173701d4170c}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY Ready : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7613f07b-8dd2-4036-a751-1a972f5ae7d4}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
     </Property>
     <Method Name="Reset" Id="{31775d7d-728c-4e84-8e04-2a11e4275600}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD Reset : BOOL

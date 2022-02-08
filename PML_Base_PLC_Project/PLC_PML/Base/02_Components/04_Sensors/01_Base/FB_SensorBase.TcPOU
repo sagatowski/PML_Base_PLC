@@ -42,6 +42,28 @@ END_VAR
       <Folder Name="02_Control" Id="{99bb89b4-7ef7-4e6c-a15a-ddc979964362}" />
       <Folder Name="03_Status" Id="{55afb2a4-e155-44af-929d-dc4f3bf3f63d}" />
     </Folder>
+    <Method Name="AllowHMIControl" Id="{51b89c85-e042-4086-9824-b639fc70c9c1}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.AllowHMIControl();
+
+stSensorBaseHMI.bHMIControlAvailable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockHMIControl" Id="{2c9cb8be-d719-4f27-b1f2-2b99f495ee6b}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.BlockHMIControl();
+
+stSensorBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="DebounceMode" Id="{688142c7-1a92-4905-8c78-b67bd59b9a63}" FolderPath="02_ITF_SensorBase\01_Config\">
       <Declaration><![CDATA[PROPERTY DebounceMode : E_DebounceMode
 ]]></Declaration>
@@ -194,7 +216,7 @@ END_VAR
 fbActiveTimer_TON(IN := bActive, PT := T#71582M47S295MS, ET => tTimeActive);
 fbInactiveTimer_TON(IN := NOT bActive, PT := T#71582M47S295MS, ET => tTimeInactive);
 
-]]></ST>
+bReady := bEnabled AND NOT bError;]]></ST>
       </Implementation>
     </Method>
     <Method Name="ProcessInput" Id="{783c8a65-1177-48f0-8d25-4521a297ef5e}">
@@ -345,6 +367,15 @@ END_VAR
     </Property>
     <LineIds Name="FB_SensorBase">
       <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SensorBase.AllowHMIControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_SensorBase.BlockHMIControl">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_SensorBase.DebounceMode.Get">
       <LineId Id="2" Count="0" />

@@ -15,6 +15,19 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
+    <Property Name="ModuloSetpoint" Id="{b7498bb4-9bb6-42fc-9ef0-a33be3795c74}">
+      <Declaration><![CDATA[PROPERTY ModuloSetpoint : LREAL]]></Declaration>
+      <Get Name="Get" Id="{29d8bbfe-51d0-4b9a-a060-e719898541a3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="MoveModulo" Id="{e3e2b302-36cb-4dfd-b3a9-3a976f5afb5b}">
+      <Declaration><![CDATA[METHOD MoveModulo : BOOL
+VAR_INPUT
+	override 	: BOOL := FALSE;		//Allows this instruction to override another ongoing operation(This parameter is initialized so that once default parameter value functionality is added to TwinCAT, this input will not need to be set explicitly in the Method call)
+	position	: LREAL;				//Desired position to which the axis should move
+END_VAR]]></Declaration>
+    </Method>
     <Method Name="SetAxisModuloFactor" Id="{dae37737-eac4-472a-8957-11e0b8617ed4}">
       <Declaration><![CDATA[METHOD SetAxisModuloFactor : BOOL
 VAR_INPUT

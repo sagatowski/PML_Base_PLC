@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_PMLModuleBase" Id="{eca4a56b-850e-483e-b687-2de3b3950c24}">
-    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase EXTENDS ITF_UnitState
+    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{b9b76dff-8c1e-4a81-8fb8-90bae0384924}">
       <Folder Name="01_Config" Id="{c034098c-56e3-4732-a681-b27df2a6a3ee}" />
@@ -9,6 +9,12 @@
       <Folder Name="03_Status" Id="{681bf848-54e8-410c-a596-7e58d3fea268}" />
     </Folder>
     <Folder Name="02_Methods" Id="{fbb15efd-8a92-4fbb-a79e-6108b9c86638}" />
+    <Property Name="ActualProductionRate" Id="{7ed2842f-7cd7-4694-89fa-c274118f161d}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ActualProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{d58d319d-6658-4d0d-a426-5afa6e67b86d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="AncestorIDs" Id="{ddc4ec9f-03b5-4a9a-9708-c7ae158f5b04}" FolderPath="01_Properties\01_Config\">
       <Declaration><![CDATA[PROPERTY AncestorIDs : STRING]]></Declaration>
       <Get Name="Get" Id="{f334f915-3beb-484a-b889-7d0a10f7ff80}">
@@ -19,10 +25,7 @@
       </Set>
     </Property>
     <Method Name="CyclicLogic" Id="{93d2f113-3cbc-4b7f-a56f-610da986a3d8}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD CyclicLogic
-VAR_INPUT
-END_VAR
-]]></Declaration>
+      <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
     </Method>
     <Property Name="Enabled" Id="{d2ef8559-89f7-4b1a-8a7a-48174a953874}" FolderPath="01_Properties\02_Control\">
       <Declaration><![CDATA[PROPERTY Enabled : BOOL]]></Declaration>
@@ -51,6 +54,15 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="MasterDataStructure_Adder" Id="{e8e1f737-2d53-4f7e-85f8-3eda713a980e}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY MasterDataStructure_Adder :  ITF_Tree_IndexBased]]></Declaration>
+      <Get Name="Get" Id="{9a79581e-ec99-41c5-b4c5-b12242225d5c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{64ba5fdd-6f11-47c3-b21d-50cd6159df0d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Mode" Id="{68aa19f0-a027-4849-bb10-f5584ab8d043}" FolderPath="01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY Mode : E_PMLUnitMode]]></Declaration>
       <Get Name="Get" Id="{e4c0be11-49fb-4f99-95fb-f87a759ebdeb}">
@@ -64,7 +76,7 @@ END_VAR
       </Set>
     </Property>
     <Property Name="ModuleID" Id="{b15ae476-29f6-49b3-bc0b-8d8de1f9a2ad}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY ModuleID : DINT]]></Declaration>
+      <Declaration><![CDATA[PROPERTY ModuleID : UDINT]]></Declaration>
       <Get Name="Get" Id="{15915578-ed14-421a-b902-68fca348c24a}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
@@ -81,15 +93,33 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="State" Id="{b4219d5a-c372-49f7-9ab8-eeb66dadc5c9}" FolderPath="01_Properties\03_Status\">
+    <Property Name="SimulateAllChildren" Id="{372d62d1-e10f-492d-bcb6-f6da619c14bf}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY SimulateAllChildren : BOOL]]></Declaration>
+      <Get Name="Get" Id="{84230418-3f62-4b95-99de-b381b48139b5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{c531c7fa-5d73-4c05-905b-cee2a27a5492}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="State" Id="{43595dac-7213-416e-a39c-be01c96ab13c}" FolderPath="01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY State : E_PMLState]]></Declaration>
-      <Get Name="Get" Id="{54194ac0-e690-48c6-a0ad-f28c216e30b6}">
+      <Get Name="Get" Id="{21f6fac7-5f70-4bd9-8ec4-66822702fbf5}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
     <Property Name="StateCommand" Id="{1c454ada-e18d-4933-8772-ef90079bfec6}" FolderPath="01_Properties\02_Control\">
       <Declaration><![CDATA[PROPERTY StateCommand : E_PMLCommand]]></Declaration>
       <Set Name="Set" Id="{3495e55a-b4ad-4161-a7ba-1793fe13d390}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="TargetProductionRate" Id="{40ff0130-155a-47ee-8753-64a2da899a2d}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY TargetProductionRate : LREAL]]></Declaration>
+      <Get Name="Get" Id="{7999c80a-1e65-4223-a767-fe3d703ca7f7}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{e468dc00-076e-4592-bf4e-e79c036a39bf}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>

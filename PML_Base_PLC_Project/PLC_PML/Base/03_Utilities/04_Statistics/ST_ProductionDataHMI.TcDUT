@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <DUT Name="ST_ProductionDataHMI" Id="{bc82133b-7334-4077-94d6-923513c1c9b1}">
+    <Declaration><![CDATA[TYPE ST_ProductionDataHMI :
+STRUCT
+	bHMIControlAvailable	: BOOL;		//Set TRUE *FROM PLC* when HMI requests can be processed
+	bIncomingHMIRequest 	: BOOL;		//Pulses TRUE when an HMI request is issued
+	bHMICommandConfirmation	: BOOL;		//Confirms receipt and subsequent processing of the command sent by the HMI
+	
+	bShiftLengthHMISetRequest : BOOL;
+	tShiftLengthHMISetValue	: TIME;
+	
+	bShiftProductionTargetHMISetRequest : BOOL;
+	nShiftProductionTargetHMISetValue	: DINT;
+
+	bAcceptableMarginHMISetRequest 	: BOOL;
+	fAcceptableMarginHMISetValue	: LREAL;
+	
+	bWarningMarginHMISetRequest		: BOOL;
+	fWarningMarginHMISetValue		: LREAL;
+	
+	bProductionRateHMISetRequest	: BOOL;
+	fProductionRateHMISetValue		: LREAL;
+	
+	tShiftLength			: TIME;		//Specify the time duration of a shift
+	nShiftProductionTarget	: DINT;		//Specify the desired production count by end of shift
+	
+	nCurrentAcceptableProductionCount	: DINT;
+	nCurrentWarningProductionCount		: DINT;
+	nCurrentShiftProductionCount	: DINT;		//Number of products completed so far on the current shift
+	nCurrentShiftTarget				: DINT;		//Expected number of completed products at the current time in the shift
+	tCurrentShiftTime				: TIME;		//Time elapsed since the start of the shift
+	tRemainingShiftTime				: TIME;		//Time remaining in the current shift
+	fTargetProductionRate			: LREAL;
+	fActualProductionRate			: LREAL;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

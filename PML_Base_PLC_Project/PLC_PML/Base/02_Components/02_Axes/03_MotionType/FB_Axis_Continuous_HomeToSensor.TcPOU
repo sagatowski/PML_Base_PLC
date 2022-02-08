@@ -10,6 +10,8 @@ VAR
 	//Internal Property Variables
 	fModuloPosition		: LREAL;
 	fModuloFactor		: LREAL;
+	fModuloSetpoint		: LREAL;
+	fbMoveModulo		: MC_MoveModulo;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -39,25 +41,69 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="ModuloSetpoint" Id="{9088cd56-14db-4f44-8e02-50285ccc9897}" FolderPath="02_ITF_Axis_Continuous\">
+      <Declaration><![CDATA[PROPERTY ModuloSetpoint : LREAL]]></Declaration>
+      <Get Name="Get" Id="{39ea4f27-d5d8-4a54-b28b-3f78e5e451d3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ModuloSetpoint := fModuloSetpoint;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Monitoring" Id="{a8ec1f3d-a675-4e0e-86be-94c439cdb928}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD Monitoring : BOOL]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.Monitoring();
+        <ST><![CDATA[IF fbMoveModulo.Busy THEN
+	bActive := TRUE;
+END_IF
 
 fModuloPosition := SelectedAxis.NcToPlc.ModuloActPos;
+fModuloSetpoint := SelectedAxis.NcToPlc.ModuloSetPos;
 
 IF fbWriteParameter.Done AND fbWriteParameter.ParameterNumber = MC_AxisParameter.AxisEncoderModuloValue THEN
 	fModuloFactor := fbWriteParameter.Value;
 END_IF
 
 IF fbWriteParameter.Error AND NOT fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	bError := TRUE;
-	nErrorID := E_AxisBase.WriteParameterError;
-	sTemp := UDINT_TO_STRING(fbWriteParameter.ErrorID);
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].ipArguments.Clear().AddString(sName).AddString(sTemp);
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Raise(0);
+	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
+										
 ELSIF NOT fbAxisPower.Error AND fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
 	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
+END_IF
+
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MotionControl" Id="{5ed14d51-d145-4b12-b9b6-42755a0e8a41}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD MotionControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.MotionControl();
+
+fbMoveModulo(
+	Axis:= SelectedAxis,
+	Velocity:= fTargetVelocity, 
+	Direction:= MC_Direction.MC_Positive_Direction);
+	
+fbMoveModulo.Execute := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveModulo" Id="{93fcfbfa-3e20-494f-9bfa-e9c0ba2c3d7c}" FolderPath="02_ITF_Axis_Continuous\">
+      <Declaration><![CDATA[METHOD MoveModulo : BOOL
+VAR_INPUT
+	override 	: BOOL := FALSE;		//Allows this instruction to override another ongoing operation(This parameter is initialized so that once default parameter value functionality is added to TwinCAT, this input will not need to be set explicitly in the Method call)
+	position	: LREAL;				//Desired position to which the axis should move
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF override OR NOT bActive AND NOT bError THEN
+	
+	fbMoveModulo.Position := position;
+	fbMoveModulo.Execute := TRUE;
+	
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -94,16 +140,37 @@ END_IF]]></ST>
     <LineIds Name="FB_Axis_Continuous_HomeToSensor.ModuloPosition.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_Axis_Continuous_HomeToSensor.ModuloSetpoint.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_Axis_Continuous_HomeToSensor.Monitoring">
-      <LineId Id="5" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="28" Count="1" />
       <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
+      <LineId Id="30" Count="0" />
       <LineId Id="19" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="22" Count="0" />
       <LineId Id="21" Count="0" />
-      <LineId Id="9" Count="8" />
+      <LineId Id="9" Count="1" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="16" Count="1" />
       <LineId Id="8" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="31" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Continuous_HomeToSensor.MotionControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="2" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="16" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Continuous_HomeToSensor.MoveModulo">
+      <LineId Id="10" Count="4" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_Continuous_HomeToSensor.SetAxisModuloFactor">
       <LineId Id="5" Count="0" />
