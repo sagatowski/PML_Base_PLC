@@ -457,14 +457,16 @@ IF stPMLModuleBaseHMI.bIncomingHMIRequest AND NOT stPMLModuleBaseHMI.bHMICommand
 			bEnabled := FALSE;
 			stPMLModuleBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
 		END_IF
-		IF stPMLModuleBaseHMI.bModeCommandHMIRequest THEN
-			//KAB eModeCommand := stPMLModuleBaseHMI.eModeCommandHMIValue;
-			fbExternalControl.ExternalControlHMI.ModeCommand := stPMLModuleBaseHMI.eModeCommandHMIValue;
+		IF stPMLModuleBaseHMI.bStateCommandHMIRequest THEN
+			eStateCommand := stPMLModuleBaseHMI.eStateCommandHMIValue;
+			//fbExternalControl.ExternalControlHMI.StateCommand := stPMLModuleBaseHMI.eStateCommandHMIValue;
+			//fbExternalControl.ExternalControlHMI.StateCommandPulse := TRUE;
 			stPMLModuleBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
 		END_IF
-		IF stPMLModuleBaseHMI.bStateCommandHMIRequest THEN
-			//KAB eStateCommand := stPMLModuleBaseHMI.eStateCommandHMIValue;
-			fbExternalControl.ExternalControlHMI.StateCommand := stPMLModuleBaseHMI.eStateCommandHMIValue;
+		IF stPMLModuleBaseHMI.bModeCommandHMIRequest THEN
+			eModeCommand := stPMLModuleBaseHMI.eModeCommandHMIValue;
+			//fbExternalControl.ExternalControlHMI.ModeCommand := stPMLModuleBaseHMI.eModeCommandHMIValue;
+			//fbExternalControl.ExternalControlHMI.ModeCommandPulse := TRUE;
 			stPMLModuleBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
 		END_IF
 	END_IF
@@ -491,12 +493,12 @@ END_IF
 
 //Update HMI status info
 stPMLModuleBaseHMI.bEnabled := bEnabled;
-stPMLModuleBaseHMI.eMode := fbExternalControl.ExternalControlHMI.Mode;		//KAB eMode;
+stPMLModuleBaseHMI.eMode := eMode;		//KAB eMode;
 stPMLModuleBaseHMI.nModuleID := nModuleID;
 stPMLModuleBaseHMI.sModuleName := sModuleName;
-stPMLModuleBaseHMI.eState := fbExternalControl.ExternalControlHMI.State;	//KAB eState;
+stPMLModuleBaseHMI.eState := eState;	//KAB eState;
 stPMLModuleBaseHMI.bLogStateChanges := bLogStateChanges;
-stPMLModuleBaseHMI.bLogModeChanges := bLogModeChanges;]]></ST>
+stPMLModuleBaseHMI.bLogModeChanges := bLogModeChanges;
 stPMLModuleBaseHMI.a_sModeNames := a_sModeNames;]]></ST>
       </Implementation>
     </Method>
@@ -772,6 +774,12 @@ fbModeManager(
 	bError					=> , 
 	nErrorId				=> 
 	);
+	
+IF fbModeManager.bError THEN
+	IF NOT a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].bRaised THEN
+		a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].Raise(0);
+	END_IF
+END_IF
 
 // Reset mode control command
 eModeCommand := E_PMLUnitMode.ePMLUnitMode_Invalid;
@@ -781,7 +789,7 @@ fbModeManager.bExecute 		:= FALSE;
 IF fbModeManager.eModeStatus <> eLastMode  THEN 
 	eLastMode := fbModeManager.eModeStatus; 
 	//If state change logging is not suppressed
- 	IF bLogStateChanges THEN 
+ 	IF bLogModeChanges THEN 
 		fbPMLModeLogger(
 			a_fbPMLAlarms := a_fbPMLAlarms,
 			sModulePrefix := sID_Name,
@@ -846,7 +854,7 @@ END_VAR
 // Send clear/reset command to all sub modules
 //As long as this module is in the "Resetting" state, it will attempt to get all modules to Idle by sending abort, clear, and reset commands as appropriate to its children until they do
 FOR nIndex := 1 TO nNumberOfSubModules DO
-	IF a_ITF_PackMLBase[nIndex].State=ePMLState_Stopped THEN
+	IF a_ITF_PackMLBase[nIndex].State=ePMLState_Stopped OR a_ITF_PackMLBase[nIndex].State=ePMLState_Complete THEN
 		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Reset;
 	ELSIF a_ITF_PackMLBase[nIndex].State=ePMLState_Aborted THEN
 		a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Clear;
@@ -980,18 +988,6 @@ IF eState = E_PMLState.ePMLState_Undefined 				AND
 	eStateCommand 	:= ePMLSTATEDEFAULT; 
 END_IF
 
-//If mode is valid and the command has changed, attempt to change modes
-IF eStateCommand <> eLastModeCommand 							AND 
-	eMode <> E_PMLUnitMode.ePMLUnitMode_Invalid 	THEN
-	IF bLogStateChanges THEN 
-		//DONKEY : logging to be implemented
-		//Simple string insertion, if event class based implementation is desired, follow FB_PMLStateLogger as a template for FB_PMLCommandLogger
-		//Logger.logMessage(msg:= CONCAT(ConCAT(deviceIDMessage,' PLC Requests  '), F_CommandStateToString(eStateCommand)));   
-		;
-	END_IF		
-	eLastStateCommand 			:= eStateCommand;
-END_IF
-
 //Call PackML state machine	
 fbStateMachine(
 	eMode				:= eMode, 
@@ -1006,18 +1002,14 @@ fbStateMachine(
 //If PackML state has changed
 IF eState <> eLastState  THEN 
 	eLastState := eState; 
-	//If state change logging is not suppressed
- 	IF bLogStateChanges THEN 
-		fbPMLStateLogger(
-			a_fbPMLAlarms := a_fbPMLAlarms, 
-			sModulePrefix := SID_Name, 
-			eState := eState);	
-	END_IF	
 END_IF 
 	
-//*********************************************************
-//If you are about to write actual machine implementation code, note that implementation code should exist within an implementation equipment module block that extends this equipment module base!
-//*********************************************************
+//Log appropriate state changes
+fbPMLStateLogger(
+	a_fbPMLAlarms := a_fbPMLAlarms, 
+	sModulePrefix := SID_Name, 
+	eState := eState,
+	bLogAllChanges := bLogStateChanges);	
 
 // Call appropriate method depending on current PackML state
 CASE eState OF
