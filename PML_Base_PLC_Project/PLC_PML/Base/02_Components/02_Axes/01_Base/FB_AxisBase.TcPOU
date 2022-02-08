@@ -34,6 +34,7 @@ VAR
 	fbAxisStop: MC_Stop;
 	fbAxisHome: MC_Home;
 	fbGearIn: MC_GearIn;
+	fbGearOut: MC_GearOut;
 	fbResetDrv: FB_SoEReset;
 	fbWriteParameter : MC_WriteParameter;
 	
@@ -42,7 +43,7 @@ VAR
 	
 	//Internal Variables
 	fOverride		: LREAL := 100;		//Velocity Override
-	SelectedAxis	: REFERENCE TO AXIS_REF REF= SimulationAxis;	//TODO: Make a better simulation system
+	SelectedAxis	: REFERENCE TO AXIS_REF REF= HardwareAxis;	//TODO: Make a better simulation system
 	SimulationAxis: AXIS_REF;
 	HardwareAxis: AXIS_REF;
 	
@@ -72,6 +73,17 @@ END_VAR
       <Folder Name="02_Methods" Id="{8631449c-e13c-4da9-806d-359d178766b3}" />
     </Folder>
     <Folder Name="Methods" Id="{6091336e-f7a5-49a6-b5ea-b3aa6c2147ea}" />
+    <Method Name="AllowHMIControl" Id="{78c45a43-0235-4935-af7a-19df5967a18c}" FolderPath="01_SUPER_Overrides\02_Methods\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.AllowHMIControl();
+
+stAxisBaseHMI.bHMIControlAvailable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="AxisError" Id="{29d86f1c-d305-4dde-b9e6-e3f53421d7b6}" FolderPath="02_ITF_AxisBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY AxisError : BOOL]]></Declaration>
       <Get Name="Get" Id="{954c1278-0224-499b-9f37-c39fdbd99a43}">
@@ -94,6 +106,17 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Method Name="BlockHMIControl" Id="{98120c1e-ae37-4bf9-bbf0-5c02f729c84f}" FolderPath="01_SUPER_Overrides\02_Methods\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.BlockHMIControl();
+
+stAxisBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="DriveEnabled" Id="{c7f1ee17-db34-4e43-a694-91ab73ce00fc}" FolderPath="02_ITF_AxisBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY DriveEnabled : BOOL]]></Declaration>
       <Get Name="Get" Id="{b47da978-5009-44fe-a777-97158ddd8c0e}">
@@ -125,6 +148,10 @@ END_VAR
         <ST><![CDATA[SUPER^.ErrorOperation();
 
 bEnabled := FALSE;
+
+IF bInGear THEN
+	GearOut();
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -135,11 +162,23 @@ VAR_IN_OUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF NOT bActive AND NOT bError THEN
+        <ST><![CDATA[IF NOT bActive AND NOT bError AND NOT SelectedAxis.Status.Coupled THEN
 	
-	MasterAxis := master;		//"Master" must be specified in the FB call, so this particular variable is declared in the main FB and assigned from here
-	fbGearIn.Execute := TRUE;
-	
+	IF __ISVALIDREF(master) THEN
+		MasterAxis REF= master;		//"Master" must be specified in the FB call, so this particular variable is declared in the main FB and assigned from here
+		fbGearIn.Execute := TRUE;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GearOut" Id="{c70ab336-6838-490c-9784-7c2b850ef36d}" FolderPath="02_ITF_AxisBase\02_Methods\">
+      <Declaration><![CDATA[METHOD GearOut : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF  bStopped AND NOT bActive THEN
+	fbGearOut.Execute := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -325,7 +364,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[JogSlowVelocity : fJogSlowVelocity;]]></ST>
+          <ST><![CDATA[JogSlowVelocity := fJogSlowVelocity;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{320a0644-77d6-4836-8f13-12e9c54aea00}">
@@ -333,7 +372,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[fJogSlowVelocity : JogSlowVelocity;]]></ST>
+          <ST><![CDATA[fJogSlowVelocity := JogSlowVelocity;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -448,7 +487,7 @@ END_IF
 
 
 IF fbResetDrv.Error AND NOT fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised THEN
-	//RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbResetDrv.AdsErrId), '');
+	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbResetDrv.AdsErrId), '');
 ELSIF NOT fbResetDrv.Error AND fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
 	fbAxisBaseAlarms[E_AxisBase.ResetError].Clear(0,0);
 END_IF
@@ -462,17 +501,19 @@ END_IF
 
 
 IF bDriveError AND NOT fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised THEN
-	//RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
+	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
 ELSIF NOT bAxisError AND fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
 	fbAxisBaseAlarms[E_AxisBase.DriveError].Clear(0,0);
 END_IF
 
 
 IF bAxisError AND NOT fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised THEN
-	//RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
+	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
 ELSIF NOT bAxisError AND fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
 	fbAxisBaseAlarms[E_AxisBase.AxisError].Clear(0,0);
-END_IF]]></ST>
+END_IF
+
+bReady := bEnabled AND bDriveEnabled AND NOT bError;]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{24aa628f-77c9-4939-b88a-d6572a4e5a53}" FolderPath="Methods\">
@@ -484,7 +525,7 @@ END_VAR
         <ST><![CDATA[//Enables the Axis for movement when commanded by an "Enable" Method call
 fbAxisPower(
 	Axis:= SelectedAxis,
-	Enable:= bEnabled AND (bParamCopyComplete OR NOT bSimulate),
+	Enable:= bEnabled (*AND (bParamCopyComplete OR NOT bSimulate)*),
 	Enable_Positive:= TRUE, 
 	Enable_Negative:= TRUE, 
 	Override:= fOverride, 
@@ -528,6 +569,15 @@ IF __ISVALIDREF(MasterAxis) THEN
 		
 	fbGearIn.Execute := FALSE;
 END_IF
+
+IF bInGear AND NOT bEnabled OR NOT bDriveEnabled THEN
+	GearOut();
+END_IF
+
+fbGearOut(Slave := SelectedAxis);
+
+fbGearOut.Execute := FALSE;
+
 //Halts the axis without disabling future commands when commanded by the "Stop" Method call
 fbAxisHalt(
 	Axis:= SelectedAxis,  
@@ -622,7 +672,10 @@ END_VAR
       <Declaration><![CDATA[METHOD Reset : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[IF bInGear THEN
+	GearOut();
+END_IF
+
 IF bDriveError THEN
 	ResetDrive();
 END_IF
@@ -660,25 +713,6 @@ END_VAR
         <ST><![CDATA[fOverride := fOverrideInput;]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Simulate" Id="{0efad7c3-dfea-405c-94fb-a00cc1a2a266}" FolderPath="01_SUPER_Overrides\01_Properties\">
-      <Declaration><![CDATA[PROPERTY Simulate : BOOL]]></Declaration>
-      <Get Name="Get" Id="{b8f83469-562b-4225-a7d1-ccd4df07420a}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{34f3db18-fa78-4adc-b908-d8398e3253ee}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="SimulateOperation" Id="{d1ff29c4-9c3d-4f08-b25b-d926ccfd1f38}" FolderPath="01_SUPER_Overrides\02_Methods\">
       <Declaration><![CDATA[METHOD SimulateOperation : BOOL
 VAR_INPUT
@@ -695,7 +729,7 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// the need is to insure that the simulation axis always has the same dynamics and speed setpoints as the hardware axis
 //copy sequence using MC2 Function Blocks
-
+(*
 CASE nAxisCopy OF
 	0:	// hold state waiting to start
 		FOR i := 1 TO 8 DO
@@ -827,8 +861,8 @@ CASE nAxisCopy OF
 	40: //reset FB's execute and retry
 		nAxisCopy :=0;
 END_CASE
-
-//SelectedAxis REF= SimulationAxis;
+*)
+SelectedAxis REF= HardwareAxis;
 //MotionControl();]]></ST>
       </Implementation>
     </Method>
@@ -866,7 +900,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[TargetVelocity : fTargetVelocity;]]></ST>
+          <ST><![CDATA[TargetVelocity := fTargetVelocity;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{78fcc4c5-e7f9-4e26-ba73-aac4631ae881}">
@@ -874,7 +908,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[fTargetVelocity : TargetVelocity;]]></ST>
+          <ST><![CDATA[fTargetVelocity := TargetVelocity;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -890,11 +924,20 @@ END_VAR
     <LineIds Name="FB_AxisBase">
       <LineId Id="55" Count="0" />
     </LineIds>
+    <LineIds Name="FB_AxisBase.AllowHMIControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
     <LineIds Name="FB_AxisBase.AxisError.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.AxisRef.Get">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AxisBase.BlockHMIControl">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.DriveEnabled.Get">
       <LineId Id="2" Count="0" />
@@ -906,14 +949,21 @@ END_VAR
       <LineId Id="10" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="11" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="16" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.GearInBasic">
       <LineId Id="24" Count="0" />
       <LineId Id="34" Count="0" />
+      <LineId Id="40" Count="0" />
       <LineId Id="32" Count="1" />
       <LineId Id="35" Count="0" />
       <LineId Id="30" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_AxisBase.GearOut">
+      <LineId Id="5" Count="0" />
+      <LineId Id="9" Count="1" />
     </LineIds>
     <LineIds Name="FB_AxisBase.HardwareUpdate">
       <LineId Id="13" Count="0" />
@@ -992,8 +1042,9 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.Monitoring">
-      <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="1" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="265" Count="0" />
       <LineId Id="6" Count="0" />
       <LineId Id="10" Count="9" />
       <LineId Id="9" Count="0" />
@@ -1054,22 +1105,32 @@ END_VAR
       <LineId Id="186" Count="0" />
       <LineId Id="253" Count="0" />
       <LineId Id="179" Count="0" />
+      <LineId Id="264" Count="0" />
+      <LineId Id="263" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.MotionControl">
-      <LineId Id="7" Count="35" />
+      <LineId Id="7" Count="17" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="26" Count="16" />
       <LineId Id="85" Count="0" />
       <LineId Id="43" Count="8" />
-      <LineId Id="62" Count="13" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="63" Count="12" />
       <LineId Id="5" Count="0" />
       <LineId Id="77" Count="4" />
       <LineId Id="76" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.MovePosition">
-      <LineId Id="31" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="43" Count="0" />
+      <LineId Id="58" Count="4" />
       <LineId Id="33" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.MoveRelative">
@@ -1096,6 +1157,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.Reset">
+      <LineId Id="21" Count="2" />
       <LineId Id="13" Count="0" />
       <LineId Id="4" Count="0" />
       <LineId Id="6" Count="1" />
@@ -1113,12 +1175,6 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_AxisBase.SetOverridePercent">
       <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_AxisBase.Simulate.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_AxisBase.Simulate.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.SimulateOperation">
       <LineId Id="13" Count="1" />
