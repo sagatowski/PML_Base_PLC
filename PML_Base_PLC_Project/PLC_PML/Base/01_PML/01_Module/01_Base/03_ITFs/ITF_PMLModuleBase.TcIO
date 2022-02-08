@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_PMLModuleBase" Id="{eca4a56b-850e-483e-b687-2de3b3950c24}">
     <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase
@@ -19,10 +19,7 @@
       </Set>
     </Property>
     <Method Name="CyclicLogic" Id="{93d2f113-3cbc-4b7f-a56f-610da986a3d8}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD CyclicLogic
-VAR_INPUT
-END_VAR
-]]></Declaration>
+      <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
     </Method>
     <Property Name="Enabled" Id="{d2ef8559-89f7-4b1a-8a7a-48174a953874}" FolderPath="01_Properties\02_Control\">
       <Declaration><![CDATA[PROPERTY Enabled : BOOL]]></Declaration>
@@ -51,6 +48,15 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="MasterDataStructure_Adder" Id="{e8e1f737-2d53-4f7e-85f8-3eda713a980e}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY MasterDataStructure_Adder :  ITF_Tree_IndexBased]]></Declaration>
+      <Get Name="Get" Id="{9a79581e-ec99-41c5-b4c5-b12242225d5c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{64ba5fdd-6f11-47c3-b21d-50cd6159df0d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Mode" Id="{68aa19f0-a027-4849-bb10-f5584ab8d043}" FolderPath="01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY Mode : E_PMLUnitMode]]></Declaration>
       <Get Name="Get" Id="{e4c0be11-49fb-4f99-95fb-f87a759ebdeb}">
@@ -64,7 +70,7 @@ END_VAR
       </Set>
     </Property>
     <Property Name="ModuleID" Id="{b15ae476-29f6-49b3-bc0b-8d8de1f9a2ad}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY ModuleID : DINT]]></Declaration>
+      <Declaration><![CDATA[PROPERTY ModuleID : UDINT]]></Declaration>
       <Get Name="Get" Id="{15915578-ed14-421a-b902-68fca348c24a}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
@@ -78,6 +84,15 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{0e6ed32b-5954-42fd-b96a-59359710d227}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="SimulateAllChildren" Id="{372d62d1-e10f-492d-bcb6-f6da619c14bf}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY SimulateAllChildren : BOOL]]></Declaration>
+      <Get Name="Get" Id="{84230418-3f62-4b95-99de-b381b48139b5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{c531c7fa-5d73-4c05-905b-cee2a27a5492}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
