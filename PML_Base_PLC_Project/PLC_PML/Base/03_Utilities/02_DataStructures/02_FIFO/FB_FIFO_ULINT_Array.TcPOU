@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_FIFO_ULINT_Array" Id="{4f4ef72e-1eb2-4af8-9b93-244cd89afa08}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FIFO_ULINT_Array
+VAR_IN_OUT
+	a_FIFO		: ARRAY [*] OF ULINT;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	nEntryCount		: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_Properties" Id="{04c9ba61-7798-4e4b-9e9c-0cf66549ac83}" />
+    <Folder Name="02_Methods" Id="{ea47a859-99ea-4659-bcc8-211e82817563}" />
+    <Method Name="AddEntry" Id="{72b1a6e6-e200-4a64-8774-4cabb80216f9}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD AddEntry : BOOL
+VAR_INPUT
+	nEntry		: ULINT;
+END_VAR
+VAR
+	i : DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (LOWER_BOUND(a_FIFO, 1) + nEntryCount - 1) > UPPER_BOUND(a_FIFO, 1) THEN
+	AddEntry := FALSE;		//FIFO is full
+ELSE
+	FOR i := UPPER_BOUND(a_FIFO,1) - 1 TO LOWER_BOUND(a_FIFO,1) BY -1 DO
+		a_FIFO[i+1] := a_FIFO[i];
+	END_FOR
+	
+	a_FIFO[LOWER_BOUND(a_FIFO,1)] := nEntry;
+	
+	nEntryCount := nEntryCount + 1;
+	AddEntry := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="EntryCount" Id="{0db0dfc1-6d40-4c1e-976f-e47f07d3373a}" FolderPath="01_Properties\">
+      <Declaration><![CDATA[PROPERTY EntryCount : DINT]]></Declaration>
+      <Get Name="Get" Id="{4ebdcc23-4f52-4b54-9c01-6dc9d7c4bdcc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EntryCount := nEntryCount;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="LastInValue" Id="{a42b4702-8e0b-4c25-83bd-8dedd4958155}" FolderPath="01_Properties\">
+      <Declaration><![CDATA[PROPERTY LastInValue : ULINT]]></Declaration>
+      <Get Name="Get" Id="{742fb16d-6ac5-4a5f-9dfd-0f8c4c1f0fbc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF nEntryCount = 0 THEN
+	LastInValue := 0;
+ELSE
+	LastInValue := a_FIFO[LOWER_BOUND(a_FIFO,1)];
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="NextOutValue" Id="{5ddcee6a-f44f-4319-b718-5438e8996316}" FolderPath="01_Properties\">
+      <Declaration><![CDATA[PROPERTY NextOutValue : ULINT]]></Declaration>
+      <Get Name="Get" Id="{d7eda0fb-1361-47bf-8a55-99148a192f24}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF nEntryCount = 0 THEN
+	NextOutValue := 0;
+ELSE
+	NextOutValue := a_FIFO[LOWER_BOUND(a_FIFO,1) + nEntryCount - 1];
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="RemoveEntry" Id="{264b1497-e44f-4cb6-9f30-9865215b78c5}" FolderPath="02_Methods\">
+      <Declaration><![CDATA[METHOD RemoveEntry : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF nEntryCount = 0 THEN
+	RemoveEntry := FALSE;
+ELSE
+	IF (LOWER_BOUND(a_FIFO,1) + nEntryCount - 1) <= UPPER_BOUND(a_FIFO,1) THEN
+		a_FIFO[LOWER_BOUND(a_FIFO,1) + nEntryCount - 1] := 0;
+		nEntryCount := nEntryCount - 1; 
+		RemoveEntry := TRUE;
+	END_IF
+END_IF
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FIFO_ULINT_Array">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FIFO_ULINT_Array.AddEntry">
+      <LineId Id="15" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="22" Count="5" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="18" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FIFO_ULINT_Array.EntryCount.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FIFO_ULINT_Array.LastInValue.Get">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FIFO_ULINT_Array.NextOutValue.Get">
+      <LineId Id="5" Count="1" />
+      <LineId Id="8" Count="1" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FIFO_ULINT_Array.RemoveEntry">
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="21" Count="1" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
