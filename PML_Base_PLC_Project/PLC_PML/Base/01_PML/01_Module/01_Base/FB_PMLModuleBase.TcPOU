@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_PMLModuleBase" Id="{b51128fe-fac6-441f-bd13-bfcb90049779}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK ABSTRACT FB_PMLModuleBase IMPLEMENTS ITF_PMLModuleBase
@@ -70,6 +70,7 @@ VAR
 	nIndex					: UDINT;		//Generic iteration value
 	bSimulateAllChildren	: BOOL;
 	a_sModeNames					: ARRAY[0..31] OF STRING;
+	varInfo					: __SYSTEM.VAR_INFO;
 	i: UDINT;
 END_VAR
 ]]></Declaration>
@@ -1083,7 +1084,7 @@ END_FOR
 // All subunits in requested state?
 bSubModulesReady	:= TRUE;
 FOR nIndex := 1 TO nNumberOfSubModules DO
-	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped);
+	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Stopped OR a_ITF_PackMLBase[nIndex].State = ePMLState_Aborted);
 END_FOR
 IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 	bNoStateTasksToComplete := TRUE;
@@ -1353,11 +1354,30 @@ END_IF]]></ST>
       <LineId Id="111" Count="0" />
       <LineId Id="108" Count="0" />
       <LineId Id="86" Count="4" />
-      <LineId Id="93" Count="6" />
+      <LineId Id="116" Count="5" />
+      <LineId Id="93" Count="2" />
+      <LineId Id="124" Count="2" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="96" Count="3" />
       <LineId Id="114" Count="0" />
       <LineId Id="106" Count="0" />
       <LineId Id="100" Count="1" />
       <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ActualProductionRate.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.AllowHMIControl">
+      <LineId Id="27" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.AncestorIDs.Get">
       <LineId Id="2" Count="0" />
@@ -1365,13 +1385,25 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.AncestorIDs.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.BlockHMIControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="17" Count="1" />
+      <LineId Id="12" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Clearing">
       <LineId Id="130" Count="4" />
       <LineId Id="139" Count="0" />
       <LineId Id="105" Count="2" />
       <LineId Id="109" Count="0" />
       <LineId Id="111" Count="0" />
-      <LineId Id="114" Count="5" />
+      <LineId Id="158" Count="2" />
+      <LineId Id="147" Count="1" />
+      <LineId Id="161" Count="2" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="167" Count="2" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="116" Count="3" />
       <LineId Id="135" Count="3" />
       <LineId Id="16" Count="0" />
       <LineId Id="145" Count="0" />
@@ -1387,6 +1419,12 @@ END_IF]]></ST>
       <LineId Id="48" Count="3" />
       <LineId Id="4" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ComponentMonitor">
+      <LineId Id="6" Count="3" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="20" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.CreateEvents">
       <LineId Id="6" Count="0" />
       <LineId Id="5" Count="0" />
@@ -1395,12 +1433,23 @@ END_IF]]></ST>
       <LineId Id="16" Count="3" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CyclicLogic">
-      <LineId Id="152" Count="31" />
+      <LineId Id="152" Count="15" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="251" Count="2" />
+      <LineId Id="172" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="173" Count="9" />
+      <LineId Id="254" Count="1" />
+      <LineId Id="259" Count="1" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="183" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="199" Count="1" />
       <LineId Id="195" Count="2" />
       <LineId Id="201" Count="0" />
       <LineId Id="198" Count="0" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="269" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Get">
       <LineId Id="2" Count="0" />
@@ -1419,17 +1468,20 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.HMICommunication">
       <LineId Id="43" Count="2" />
       <LineId Id="47" Count="0" />
-      <LineId Id="132" Count="2" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="133" Count="1" />
       <LineId Id="170" Count="0" />
       <LineId Id="135" Count="2" />
       <LineId Id="169" Count="0" />
-      <LineId Id="138" Count="2" />
-      <LineId Id="171" Count="0" />
-      <LineId Id="168" Count="0" />
-      <LineId Id="141" Count="2" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="142" Count="1" />
       <LineId Id="172" Count="0" />
+      <LineId Id="174" Count="0" />
       <LineId Id="167" Count="0" />
       <LineId Id="144" Count="0" />
+      <LineId Id="216" Count="4" />
+      <LineId Id="215" Count="0" />
       <LineId Id="89" Count="0" />
       <LineId Id="145" Count="0" />
       <LineId Id="148" Count="2" />
@@ -1448,6 +1500,18 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
       <LineId Id="106" Count="0" />
       <LineId Id="105" Count="0" />
+      <LineId Id="175" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.HMIControlAvailable.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.HMIControlAvailable.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.HMIPermissions">
+      <LineId Id="6" Count="3" />
+      <LineId Id="12" Count="22" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Holding">
       <LineId Id="124" Count="5" />
@@ -1462,16 +1526,32 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.initialize">
       <LineId Id="9" Count="0" />
-      <LineId Id="17" Count="7" />
-      <LineId Id="48" Count="5" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="18" Count="3" />
+      <LineId Id="88" Count="4" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="71" Count="2" />
+      <LineId Id="23" Count="1" />
+      <LineId Id="48" Count="3" />
+      <LineId Id="76" Count="1" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="52" Count="1" />
       <LineId Id="47" Count="0" />
       <LineId Id="43" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="25" Count="13" />
       <LineId Id="55" Count="4" />
       <LineId Id="54" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="7" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.LogModeChanges.Get">
       <LineId Id="2" Count="0" />
@@ -1483,6 +1563,12 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.LogStateChanges.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.MasterDataStructure_Adder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.MasterDataStructure_Adder.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Mode.Get">
@@ -1497,7 +1583,13 @@ END_IF]]></ST>
       <LineId Id="91" Count="1" />
       <LineId Id="110" Count="0" />
       <LineId Id="93" Count="11" />
-      <LineId Id="108" Count="1" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="140" Count="1" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="143" Count="0" />
+      <LineId Id="109" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="136" Count="0" />
       <LineId Id="106" Count="0" />
@@ -1528,9 +1620,24 @@ END_IF]]></ST>
       <LineId Id="124" Count="1" />
       <LineId Id="154" Count="0" />
       <LineId Id="126" Count="11" />
-      <LineId Id="140" Count="5" />
+      <LineId Id="178" Count="1" />
+      <LineId Id="181" Count="1" />
+      <LineId Id="187" Count="1" />
+      <LineId Id="177" Count="0" />
+      <LineId Id="140" Count="2" />
+      <LineId Id="167" Count="1" />
+      <LineId Id="174" Count="0" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="143" Count="2" />
       <LineId Id="161" Count="3" />
       <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.SimulateAllChildren.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.SimulateAllChildren.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Starting">
       <LineId Id="160" Count="5" />
@@ -1556,9 +1663,12 @@ END_IF]]></ST>
       <LineId Id="5" Count="1" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.StateControl">
-      <LineId Id="179" Count="33" />
-      <LineId Id="265" Count="2" />
-      <LineId Id="216" Count="46" />
+      <LineId Id="179" Count="4" />
+      <LineId Id="196" Count="14" />
+      <LineId Id="218" Count="1" />
+      <LineId Id="278" Count="0" />
+      <LineId Id="273" Count="4" />
+      <LineId Id="223" Count="39" />
       <LineId Id="62" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Stopped">
@@ -1573,6 +1683,34 @@ END_IF]]></ST>
       <LineId Id="45" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.SubModuleMonitor">
+      <LineId Id="13" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="10" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="41" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="32" Count="1" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="55" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="15" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Suspended">
       <LineId Id="6" Count="5" />
       <LineId Id="5" Count="0" />
@@ -1583,6 +1721,12 @@ END_IF]]></ST>
       <LineId Id="172" Count="5" />
       <LineId Id="192" Count="3" />
       <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.TargetProductionRate.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.TargetProductionRate.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Undefined">
       <LineId Id="6" Count="5" />
