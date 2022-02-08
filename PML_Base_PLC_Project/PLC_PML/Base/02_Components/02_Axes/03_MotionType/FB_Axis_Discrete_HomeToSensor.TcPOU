@@ -46,9 +46,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.Monitoring();
-
-//Monitor soft travel limits
+        <ST><![CDATA[//Monitor soft travel limits
 IF fPosition >= fUpperTravelLimit AND fPositionSetpoint > fUpperTravelLimit THEN
 	Inhibit();
 	//TODO: log specific message for soft limit reached
@@ -62,17 +60,19 @@ END_IF
 IF  fOverride = 0 AND fPositionSetpoint < fUpperTravelLimit AND fPositionSetpoint > fLowerTravelLimit THEN
 	Uninhibit();
 	//TODO: log specific message for soft limit reached
-END_IF]]></ST>
+END_IF
+
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Position_1" Id="{aec3dbfc-792e-4040-96a2-eb32198f9e49}" FolderPath="02_ITF_Axis_Discrete\">
-      <Declaration><![CDATA[PROPERTY Position_1 : LREAL]]></Declaration>
+    <Property Name="TargetPosition_1" Id="{aec3dbfc-792e-4040-96a2-eb32198f9e49}" FolderPath="02_ITF_Axis_Discrete\">
+      <Declaration><![CDATA[PROPERTY TargetPosition_1 : LREAL]]></Declaration>
       <Get Name="Get" Id="{8a717788-0cc9-492a-80ea-7f243a66f87f}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Position_1 := fPosition_1;]]></ST>
+          <ST><![CDATA[TargetPosition_1 := fPosition_1;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{35f9d106-b2ab-433a-ad71-7c74048d7a6f}">
@@ -80,18 +80,18 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[fPosition_1 := Position_1;]]></ST>
+          <ST><![CDATA[fPosition_1 := TargetPosition_1;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="Position_2" Id="{d248f5de-7d89-4974-a109-954988757ba8}" FolderPath="02_ITF_Axis_Discrete\">
-      <Declaration><![CDATA[PROPERTY Position_2 : LREAL]]></Declaration>
+    <Property Name="TargetPosition_2" Id="{d248f5de-7d89-4974-a109-954988757ba8}" FolderPath="02_ITF_Axis_Discrete\">
+      <Declaration><![CDATA[PROPERTY TargetPosition_2 : LREAL]]></Declaration>
       <Get Name="Get" Id="{352238f5-a73a-4a38-9917-630ece61ea33}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Position_2 := fPosition_2;]]></ST>
+          <ST><![CDATA[TargetPosition_2 := fPosition_2;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{f4a9bfe7-c61e-4a89-82ed-61229925271d}">
@@ -99,18 +99,18 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[fPosition_2 := Position_2;]]></ST>
+          <ST><![CDATA[fPosition_2 := TargetPosition_2;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="Position_3" Id="{969c3bc0-102b-4f2b-b348-620f1a4ae401}" FolderPath="02_ITF_Axis_Discrete\">
-      <Declaration><![CDATA[PROPERTY Position_3 : LREAL]]></Declaration>
+    <Property Name="TargetPosition_3" Id="{969c3bc0-102b-4f2b-b348-620f1a4ae401}" FolderPath="02_ITF_Axis_Discrete\">
+      <Declaration><![CDATA[PROPERTY TargetPosition_3 : LREAL]]></Declaration>
       <Get Name="Get" Id="{3e8e0bb7-d50f-4a15-afc9-3ce6b0bc838d}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Position_3 := fPosition_3;]]></ST>
+          <ST><![CDATA[TargetPosition_3 := fPosition_3;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{a4a6d36d-c20b-4d78-bffa-8374a5320571}">
@@ -118,7 +118,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[fPosition_3 := Position_3;]]></ST>
+          <ST><![CDATA[fPosition_3 := TargetPosition_3;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -151,8 +151,6 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_Discrete_HomeToSensor.Monitoring">
-      <LineId Id="5" Count="0" />
-      <LineId Id="24" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="10" Count="0" />
@@ -162,23 +160,25 @@ END_VAR
       <LineId Id="13" Count="0" />
       <LineId Id="19" Count="3" />
       <LineId Id="18" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="28" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_1.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_1.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_1.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_1.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_2.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_2.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_2.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_2.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_3.Get">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_3.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Axis_Discrete_HomeToSensor.Position_3.Set">
+    <LineIds Name="FB_Axis_Discrete_HomeToSensor.TargetPosition_3.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_Discrete_HomeToSensor.UpperTravelLimit.Get">

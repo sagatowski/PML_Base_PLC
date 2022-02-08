@@ -61,6 +61,28 @@ END_VAR
       </Folder>
       <Folder Name="02_Methods" Id="{134e066b-1864-45a9-b950-def6585b175a}" />
     </Folder>
+    <Method Name="AllowHMIControl" Id="{a5ee5410-0fd9-4d95-a297-dca265be3c39}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.AllowHMIControl();
+
+stCylinderBaseHMI.bHMIControlAvailable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockHMIControl" Id="{d150aa07-7c23-430a-8c55-ce8d4a658287}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.BlockHMIControl();
+
+stCylinderBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ErrorOperation" Id="{8d55c932-b7f7-4c17-b6cb-b28020145d63}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD ErrorOperation : BOOL
 VAR_INPUT
@@ -153,7 +175,7 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 IF bExtend AND NOT bLastExtend THEN					//Whenever a new extend request comes in, check to see if we are still currently timing a retract action
-	IF fbSimRetract_TON.IN THEN			//If a retract action is still in progress, appropriately scale the extend time to account for the distance traveled during the in-process retraction
+	IF fbSimRetract_TON.IN AND NOT bRetracted_Generated THEN			//If a retract action is still in progress, appropriately scale the extend time to account for the distance traveled during the in-process retraction
 		fbSimExtend_TON.PT := tExtendTime * (TIME_TO_UDINT(fbSimRetract_TON.ET) / TIME_TO_UDINT(tRetractTime));		//partial extend time = (full distance extend time) * (proportional distance covered during retraction)
 		fbSimRetract_TON.IN := FALSE;	//Disable retract timer
 	ELSIF NOT fbSimExtend_TON.IN THEN
@@ -162,7 +184,7 @@ IF bExtend AND NOT bLastExtend THEN					//Whenever a new extend request comes in
 	bRetractedTemp := FALSE;
 	fbSimExtend_TON.IN := TRUE;				//Activate the extension timer
 ELSIF bRetract AND NOT bLastRetract THEN					//Same as above, but reversed
-	IF fbSimExtend_TON.IN THEN
+	IF fbSimExtend_TON.IN AND NOT bExtended_Generated THEN
 		fbSimRetract_TON.PT := tRetractTime * (TIME_TO_UDINT(fbSimExtend_TON.ET) / TIME_TO_UDINT(tRetractTime));
 		fbSimExtend_TON.IN := FALSE;
 	ELSIF NOT fbSimRetract_TON.IN THEN
@@ -334,7 +356,9 @@ IF bExtendOutput AND NOT bExtended THEN
 	bExtending := TRUE;
 ELSE
 	bExtending := FALSE;
-END_IF]]></ST>
+END_IF
+
+bReady := bEnabled AND NOT bError;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Reset" Id="{2939002c-4b5f-4b1b-957e-dc41265429f6}" FolderPath="01_SUPER_Overrides\">
@@ -487,6 +511,15 @@ END_VAR
     <LineIds Name="FB_CylinderBase">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_CylinderBase.AllowHMIControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.BlockHMIControl">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_CylinderBase.ErrorOperation">
       <LineId Id="5" Count="1" />
     </LineIds>
@@ -575,8 +608,9 @@ END_VAR
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderBase.Monitoring">
-      <LineId Id="179" Count="0" />
-      <LineId Id="206" Count="1" />
+      <LineId Id="207" Count="0" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="236" Count="0" />
       <LineId Id="205" Count="0" />
       <LineId Id="208" Count="0" />
       <LineId Id="203" Count="1" />
@@ -607,6 +641,8 @@ END_VAR
       <LineId Id="212" Count="0" />
       <LineId Id="216" Count="4" />
       <LineId Id="215" Count="0" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="234" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderBase.Reset">
       <LineId Id="3" Count="0" />

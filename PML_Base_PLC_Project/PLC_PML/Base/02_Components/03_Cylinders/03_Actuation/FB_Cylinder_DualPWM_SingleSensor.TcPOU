@@ -56,6 +56,17 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Monitoring" Id="{eb888dc5-8060-405e-9727-c4602ba1f168}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD Monitoring : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Monitoring();
+
+bReady := bEnabled AND fbPWMControl.Ready AND NOT bError;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_Cylinder_DualPWM_SingleSensor">
       <LineId Id="9" Count="0" />
     </LineIds>
@@ -71,6 +82,11 @@ END_IF
       <LineId Id="21" Count="3" />
       <LineId Id="20" Count="0" />
       <LineId Id="12" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_DualPWM_SingleSensor.Monitoring">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
