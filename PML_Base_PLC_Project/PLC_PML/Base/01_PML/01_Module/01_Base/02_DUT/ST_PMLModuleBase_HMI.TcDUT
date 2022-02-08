@@ -26,6 +26,7 @@ STRUCT
 	bDeactivateModeLogHMIRequest 		: BOOL;		//HMI requests to disable the module
 	eModeCommandHMIValue			: E_PMLUnitMode;
 	eStateCommandHMIValue			: Tc3_PackML_V2.E_PMLCommand;
+	a_sModeNames					: ARRAY[0..31] OF STRING;
 	
 END_STRUCT
 END_TYPE

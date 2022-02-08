@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_PMLModuleBase" Id="{b51128fe-fac6-441f-bd13-bfcb90049779}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK ABSTRACT FB_PMLModuleBase IMPLEMENTS ITF_PMLModuleBase
@@ -69,6 +69,7 @@ VAR
 	
 	//Miscellaneous Variables
 	nIndex				: UDINT;		//Generic iteration value
+	a_sModeNames					: ARRAY[0..31] OF STRING;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -389,6 +390,7 @@ stPMLModuleBaseHMI.sModuleName := sModuleName;
 stPMLModuleBaseHMI.eState := fbExternalControl.ExternalControlHMI.State;	//KAB eState;
 stPMLModuleBaseHMI.bLogStateChanges := bLogStateChanges;
 stPMLModuleBaseHMI.bLogModeChanges := bLogModeChanges;]]></ST>
+stPMLModuleBaseHMI.a_sModeNames := a_sModeNames;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Holding" Id="{4c4a9600-833f-4e2c-8c49-79d528d4d25d}" FolderPath="Methods\01_TransitionStates\">
