@@ -7,7 +7,7 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	ipModulePackMLBase		: ITF_PMLModuleBase;
+	ipModulePackMLBase			: ITF_PMLModuleBase;
 	
 	fbHMIControl				: FB_PackML_ExternalControl;
 	fbVISUControl				: FB_PackML_ExternalControl;
