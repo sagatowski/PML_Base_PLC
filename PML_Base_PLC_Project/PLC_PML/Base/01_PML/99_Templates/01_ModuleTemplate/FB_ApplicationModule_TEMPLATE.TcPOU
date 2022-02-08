@@ -4,30 +4,18 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ApplicationModule_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
 	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
-	(*fbSubModule1			: FB_ApplicationModule_TEMPLATE := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
-																	Enabled 					:=  TRUE,
-																	ModuleName 					:=  'Test Module 1',
-																	ModuleID 					:=  1,
-																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
+	(*fbSubModule1			: FB_ApplicationModule_TEMPLATE := (	ModuleName 					:=  'Test Module 1');
 	*)
-	(*fbSubModule2			: FB_ApplicationModule_TEMPLATE := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
-																	Enabled 					:=  TRUE,
-																	ModuleName 					:=  'Test Module 2',
-																	ModuleID 					:=  2,
-																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
+	(*fbSubModule2			: FB_ApplicationModule_TEMPLATE := (	ModuleName 					:=  'Test Module 2');
 	*)
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
 																							 	fbSubModule2*)];
 
 	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-(*	fbComponent1				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
-																	Simulate 			:= TRUE,
-																	Name 				:= 'Test Component 1');
+(*	fbComponent1				: FB_ComponentBase (Extension):= (	Name := 'Test Component 1');
 *)
-(*	fbComponent2				: FB_ComponentBase (Extension):= (	Enabled 			:= TRUE,
-																	Simulate 			:= TRUE,
-																	Name 				:= 'Test Component 2);
+(*	fbComponent2				: FB_ComponentBase (Extension):= (	Name := 'Test Component 2);
 *)	
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [(*	fbComponent1,
@@ -37,17 +25,12 @@ VAR
 	// Other machine specific variables here
 	bSequenceStateChange			: BOOL;
 END_VAR
-VAR_OUTPUT
-	NonOperationSequenceState		: E_SequenceState;			//Sequence state variable for Non-Operational states (Aborting, Aborted, Clearing, Stopped, Stopping)
-	OperationSequenceState			: E_SequenceState;			//Sequence States for Operational states (Resetting, Idle, Starting, Execute, Completing, Complete, Holdingm Held, Unholding, Suspending, Suspended, Unsuspending)	
-END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[//*********************************************************
 //Body of block is not called by base code, only implement application
 //code in CyclicUpdate or in methods called by it or its subcalls
-//*********************************************************
-]]></ST>
+//*********************************************************]]></ST>
     </Implementation>
     <Folder Name="01_SUPER_Overrides" Id="{f8d8b220-72f9-48a9-9ea0-e208740f789c}">
       <Folder Name="01_Properties" Id="{057d9d1a-ee49-4f19-8a8e-42e6aa4c339e}">
@@ -342,7 +325,7 @@ SUPER^.CyclicLogic();
 CASE eMode OF
 //	====================================================================================================================================	
 	E_PMLUnitMode.ePMLUnitMode_Production:			//=================================PRODUCTION MODE==================================
-		CASE OperationSequenceState OF
+		(*CASE OperationSequenceState OF
 			E_SequenceState.Begin:															//--------E_SequenceState.Begin--------//
 				//`````On Entry``````//
 				IF bSequenceStateChange THEN
@@ -394,7 +377,7 @@ CASE eMode OF
 					StateComplete();
 					bSequenceStateChange := TRUE;				
 				END_IF																	
-		END_CASE
+		END_CASE *)
 //	====================================================================================================================================	
 	E_PMLUnitMode.ePMLUnitMode_Manual:				//=================================MANUAL MODE======================================
 		;
@@ -553,9 +536,6 @@ SUPER^.Initialize();
       <Declaration><![CDATA[METHOD Resetting]]></Declaration>
       <Implementation>
         <ST><![CDATA[//bNoStateTasksToComplete := FALSE;			//Uncomment if this state needs to perform its own additional other than commanding its children into the state. 
-
-OperationSequenceState := E_SequenceState.Begin;
-
 
 //Implement state Tasks here
 
@@ -1061,7 +1041,6 @@ END_CASE
       <LineId Id="89" Count="1" />
       <LineId Id="136" Count="0" />
       <LineId Id="91" Count="0" />
-      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ApplicationModule_TEMPLATE.Aborted">
       <LineId Id="16" Count="2" />
@@ -1165,7 +1144,8 @@ END_CASE
       <LineId Id="112" Count="0" />
     </LineIds>
     <LineIds Name="FB_ApplicationModule_TEMPLATE.Resetting">
-      <LineId Id="161" Count="63" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="165" Count="59" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_ApplicationModule_TEMPLATE.SequenceState.Get">
