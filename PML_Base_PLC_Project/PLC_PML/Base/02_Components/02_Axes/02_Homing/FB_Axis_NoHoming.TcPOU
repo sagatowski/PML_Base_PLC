@@ -39,9 +39,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.Monitoring();
+        <ST><![CDATA[
 
-]]></ST>
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{b0ccc3c6-e35f-4a18-adeb-ab31021524ff}" FolderPath="01_SUPER_Overrides\">
@@ -70,7 +70,7 @@ fbAxisHome(
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_NoHoming.Monitoring">
-      <LineId Id="5" Count="0" />
+      <LineId Id="11" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
     </LineIds>

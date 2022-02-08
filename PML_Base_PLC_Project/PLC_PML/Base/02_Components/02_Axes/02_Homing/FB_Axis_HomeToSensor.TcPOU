@@ -73,9 +73,9 @@ END_VAR
       <Declaration><![CDATA[METHOD Monitoring : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.Monitoring();
+        <ST><![CDATA[bHomeSensorStatus := fbHomeSensor.Active;
 
-bHomeSensorStatus := fbHomeSensor.Active;]]></ST>
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{0febfd92-be0d-4356-a3fd-12ac6da81bf1}" FolderPath="01_SUPER_Overrides\">
@@ -117,9 +117,9 @@ fbAxisHome.Execute := FALSE;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_HomeToSensor.Monitoring">
-      <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_HomeToSensor.MotionControl">
       <LineId Id="5" Count="0" />
