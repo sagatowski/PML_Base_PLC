@@ -35,9 +35,6 @@
     <Compile Include="Application\03_EquipmentModules\FB_TestEquipment.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Application\04_ControlModules\FB_TestControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Application\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -278,11 +275,10 @@
     <Folder Include="Application\01_Application_Level_Items\02_DUT" />
     <Folder Include="Application\01_Application_Level_Items\99_VISU" />
     <Folder Include="Application\02_MachineModules" />
-    <Folder Include="Application\04_ControlModules" />
     <Folder Include="Application\03_EquipmentModules" />
     <Folder Include="Application\01_Application_Level_Items" />
     <Folder Include="Application" />
-    <Folder Include="Application\05_Components" />
+    <Folder Include="Application\04_Components" />
     <Folder Include="Base" />
     <Folder Include="Base\01_PML" />
     <Folder Include="Base\01_PML\01_Module" />

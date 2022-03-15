@@ -4,12 +4,18 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TestEquipment EXTENDS FB_PMLModuleBase
 VAR
 	//Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
-	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	fb_EM1_ControlModule1		: FB_TestControl;
+	
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fb_EM1_ControlModule1](*, fbSubModule2,*);
+	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [];
+
+	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+	*)
+	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)	
+	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [];
 
 	// Other machine specific variables here
 END_VAR
@@ -62,14 +68,6 @@ FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
 	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
-fb_EM1_ControlModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
-fb_EM1_ControlModule1.Enabled 						:=  TRUE;
-fb_EM1_ControlModule1.ModuleName 					:=  'Test Control 1';
-fb_EM1_ControlModule1.ModuleID 						:=  1;
-fb_EM1_ControlModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_');
-
-iMasterDataStructure_Adder.AddNodeAsChildByName(fb_EM1_ControlModule1.ModuleName, sModuleName);
-
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
 SUPER^.Initialize();
 ]]></ST>
@@ -88,8 +86,7 @@ SUPER^.Initialize();
       <LineId Id="108" Count="0" />
       <LineId Id="100" Count="1" />
       <LineId Id="106" Count="1" />
-      <LineId Id="113" Count="6" />
-      <LineId Id="98" Count="1" />
+      <LineId Id="113" Count="0" />
       <LineId Id="29" Count="1" />
       <LineId Id="112" Count="0" />
     </LineIds>

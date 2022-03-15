@@ -16,6 +16,15 @@ VAR
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
 	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
 
+	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+	*)
+	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)	
+
+	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [(*fbComponent1,fbComponent2*)];
+
 	// Other machine specific variables here
 END_VAR
 ]]></Declaration>
