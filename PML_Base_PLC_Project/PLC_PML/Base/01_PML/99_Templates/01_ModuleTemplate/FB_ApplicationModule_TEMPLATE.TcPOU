@@ -22,8 +22,6 @@ VAR
 																											fbComponent2*)];
 	
 																											
-	// Other machine specific variables here
-	bSequenceStateChange			: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>

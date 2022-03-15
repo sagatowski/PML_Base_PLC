@@ -24,6 +24,12 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="CurrentAlarmSeverity" Id="{6330edd2-66f0-4e35-86ff-3d09385aa422}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentAlarmSeverity :  TcEventSeverity]]></Declaration>
+      <Get Name="Get" Id="{2352a7a5-1a04-4154-bd74-fbb96f906eec}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="CyclicLogic" Id="{93d2f113-3cbc-4b7f-a56f-610da986a3d8}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
     </Method>
@@ -90,6 +96,42 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{0e6ed32b-5954-42fd-b96a-59359710d227}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ParentResponse_Critical" Id="{4873a01e-adab-4879-a83e-82768fb3ef89}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Critical : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{8075755f-dd8a-4db5-8561-c255c0e16d42}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{ac3469d8-20ae-4c27-804f-bd0929b484a1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ParentResponse_Error" Id="{1658ebb6-b168-40b1-9046-cd592d6d2a82}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Error : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{3b4f4bca-aa83-4133-ab39-6445194122f6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{a1219d2a-a710-47eb-9a88-5ee93017a9c3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ParentResponse_Warning" Id="{5155097b-2f5c-4389-946f-b095071deef4}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Warning : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{07fbd406-df38-4764-baee-c6e4ce3c4e5a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{822b97ea-7f46-441c-8e12-08ba847f5082}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ParentResponseDef" Id="{e3645d3e-2142-4d00-bb59-0dedc9223132}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponseDef : ARRAY[0..4] OF E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{20c65c99-40c2-4b98-8141-816006beb6ed}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{ae399fa5-e93f-4526-82f5-2b92335ced38}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>

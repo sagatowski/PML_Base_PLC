@@ -44,13 +44,16 @@
     <Compile Include="Application\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\ST_PMLModuleBase_HMI.TcDUT">
+    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\01_ENUM\E_AlarmResponse.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\ST_PMLModuleBase_VISU.TcDUT">
+    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLModuleBase_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\ST_PMLSubUnitInfoExt.TcDUT">
+    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLModuleBase_VISU.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLSubUnitInfoExt.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_PMLModuleBase.TcIO">
@@ -208,6 +211,9 @@
     <Compile Include="Base\03_Utilities\01_Events\F_CreateAllEventsInClass.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\03_Utilities\01_Events\F_GetMaxSeverityRaised.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmAndSetFlags.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -271,6 +277,8 @@
     <Folder Include="Base\01_PML\01_Module\01_Base" />
     <Folder Include="Base\01_PML\01_Module\01_Base\01_GVL" />
     <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT" />
+    <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT\01_ENUM" />
+    <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT" />
     <Folder Include="Base\01_PML\01_Module\01_Base\03_ITFs" />
     <Folder Include="Base\01_PML\01_Module\02_Events" />
     <Folder Include="Base\01_PML\01_Module\02_Events\01_GVL" />

@@ -27,6 +27,12 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
+    <Property Name="CurrentAlarmSeverity" Id="{8639be37-cb4c-46ca-a2e9-f2a06f84f962}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentAlarmSeverity : TcEventSeverity]]></Declaration>
+      <Get Name="Get" Id="{98df4fdf-a6a7-442a-88af-4d7b03349a32}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="CyclicLogic" Id="{d91518f0-effa-46ac-9b5e-2c5c4de214c9}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL		//Should be called Externally akin to the PML Modules
 ]]></Declaration>
@@ -63,6 +69,15 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{509096af-893b-4407-b670-7197bcb594c8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ParentResponseDefinitions" Id="{8ad1749f-85a0-4e85-ae14-cbbdaa413143}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponseDefinitions : ARRAY[0..4] OF E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{b7aff9ba-d83c-41f2-a704-e46dc25318ea}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{2b63b191-88ef-485a-8b19-d8e8beb2899b}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
