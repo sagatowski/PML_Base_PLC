@@ -4,7 +4,8 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	// Define the top level Machine as defined in the Application/01_MachineModules folder here
-	fbMyMachine				: FB_TestMachine;	
+	fbMyMachine				: FB_TestMachine := (ModuleName := 'Test Machine');
+	
 	fbMainHMIConnection		: FB_MainHMI_Connection;
 
 	bInitialized			: BOOL;

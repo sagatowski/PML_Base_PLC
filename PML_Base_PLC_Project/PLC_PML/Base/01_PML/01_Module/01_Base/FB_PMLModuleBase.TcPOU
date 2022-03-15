@@ -16,7 +16,7 @@ VAR PERSISTENT
 END_VAR
 VAR
 	//ITF_PMLModuleBase internal property variables
-	sAncestorIDs					: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
+	sAncestorIDs		: STRING;				//String concatenation of preceding parent IDs to prefix this module's ID
 	bLogModeChanges 	: BOOL := TRUE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
 	bLogStateChanges 	: BOOL := FALSE; 		//Toggle to permit or suppress state change logging (Should be tied to HMI setting to optionally reduce event logger clutter)
 	nModuleID			: UDINT;					//Unique identifying number for the module
@@ -1593,6 +1593,7 @@ fbStateMachine(
 //If PackML state has changed
 IF eState <> eLastState  THEN 
 	eLastState := eState; 
+	bNoStateTasksToComplete := TRUE;
 END_IF 
 	
 IF bReachedInitialDefaultStateAndMode THEN
@@ -2455,6 +2456,7 @@ END_VAR
     <LineIds Name="FB_PMLModuleBase.StateControl">
       <LineId Id="179" Count="4" />
       <LineId Id="196" Count="14" />
+      <LineId Id="291" Count="0" />
       <LineId Id="218" Count="1" />
       <LineId Id="281" Count="7" />
       <LineId Id="223" Count="39" />

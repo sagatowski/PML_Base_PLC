@@ -4,17 +4,9 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Module_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
 	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
-	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1'iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
-																	Enabled 					:=  TRUE,
-																	ModuleName 					:=  'Test Equipment 1',
-																	ModuleID 					:=  1,
-																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
+	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1');
 	*)
 	(*fbSubModule2				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 2');
-																	Enabled 					:=  TRUE,
-																	ModuleName 					:=  'Test Equipment 1',
-																	ModuleID 					:=  1,
-																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
 	*)
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
@@ -80,7 +72,7 @@ END_CASE
     <Method Name="Aborting" Id="{f8525f20-f595-4df6-a37f-5015b53b7fec}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Aborting]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -118,7 +110,7 @@ END_CASE
     <Method Name="Clearing" Id="{ff990ee6-ab5b-4b58-a115-900e05af0a3f}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Clearing]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -178,7 +170,7 @@ END_CASE
     <Method Name="Completing" Id="{b10641f1-5701-4ac0-9217-732c3b77e29d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Completing]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -276,7 +268,7 @@ END_CASE
     <Method Name="Holding" Id="{13997f8d-82e7-42dd-a219-e0992db665ee}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Holding]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -358,7 +350,7 @@ SUPER^.Initialize();
     <Method Name="Resetting" Id="{7565530e-bb29-4323-9478-8b5cf80eeec5}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Resetting]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -396,7 +388,7 @@ END_CASE
     <Method Name="Starting" Id="{d7fb0679-54a8-4166-bc3f-65cfbf96a41a}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Starting]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -457,7 +449,7 @@ END_CASE
     <Method Name="Stopping" Id="{a2353e86-b48b-4844-8cfa-38fb6356963a}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Stopping]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -518,7 +510,7 @@ END_CASE
     <Method Name="Suspending" Id="{4a96f516-2ab2-4259-856f-ce4b47b47f7d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Suspending]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -579,7 +571,7 @@ END_CASE
     <Method Name="Unholding" Id="{3c1714cd-0eb3-473b-b55c-c60b1d11d33e}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Unholding]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
@@ -617,7 +609,7 @@ END_CASE
     <Method Name="Unsuspending" Id="{922b0ce4-9914-4a7f-862d-70e53c049c14}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
       <Declaration><![CDATA[METHOD Unsuspending]]></Declaration>
       <Implementation>
-        <ST><![CDATA[bNoStateTasksToComplete := TRUE;		// Change to False if not used
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
 
 //Implement state Tasks here
 (*
