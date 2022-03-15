@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="F_GetMaxSeverityRaised" Id="{14ed6521-4494-40ca-9fc4-7f04f2860c0d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_GetMaxSeverityRaised : TcEventSeverity
+VAR_IN_OUT
+	a_fbAlarms			: ARRAY[*] OF FB_TcAlarm;
+END_VAR
+VAR_INPUT
+	eCurrentSeverity	: TcEventSeverity;
+END_VAR
+VAR
+	i					: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+FOR i := LOWER_BOUND(a_fbAlarms, 1) TO UPPER_BOUND(a_fbAlarms, 1) DO
+	IF a_fbAlarms[i].bRaised AND (a_fbAlarms[i].eSeverity > eCurrentSeverity) THEN
+		eCurrentSeverity := a_fbAlarms[i].eSeverity;
+	END_IF
+END_FOR
+
+F_GetMaxSeverityRaised := eCurrentSeverity;]]></ST>
+    </Implementation>
+    <LineIds Name="F_GetMaxSeverityRaised">
+      <LineId Id="17" Count="6" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

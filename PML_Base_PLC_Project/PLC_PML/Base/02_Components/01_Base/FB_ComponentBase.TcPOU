@@ -20,6 +20,12 @@ VAR
 	sName			: STRING;		//String name of the component
 	bActive			: BOOL;			//TRUE when the component is in its energized state, motion or detection
 	bReady			: BOOL;			//TRUE when the component is ready for operation - (Should be set in extended component based on specific hardware and operation of the given component)
+	eCurrentAlarmSeverity	: TcEventSeverity;
+	a_eParentFaultResponseDefinitions		: ARRAY[0..4] OF E_AlarmResponse := [	E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.Abort_ImmediateError,
+																					E_AlarmResponse.Abort_ImmediateError];
 	
 	//Alarming
 	a_fbComponentBaseAlarms : ARRAY[1..COMPONENT_BASE_ALARM_COUNT] OF FB_TcAlarm;
@@ -74,6 +80,17 @@ END_VAR
         <ST><![CDATA[stComponentBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CurrentAlarmSeverity" Id="{4c1ed095-36f6-4772-b073-d37fe8b8ece6}" FolderPath="01_ITF_ComponentBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentAlarmSeverity : TcEventSeverity]]></Declaration>
+      <Get Name="Get" Id="{56cbfb47-bce3-46c2-a3a7-623cff7e3583}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentAlarmSeverity := eCurrentAlarmSeverity;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="CyclicLogic" Id="{afd9b957-a135-4679-8622-fc5b52009de2}" FolderPath="01_ITF_ComponentBase\02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL		//Should be called Externally akin to the PML Modules
 ]]></Declaration>
@@ -270,6 +287,33 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Property Name="ParentResponseDefinitions" Id="{5e478b72-2e85-494a-a87e-ba24710c8f22}" FolderPath="01_ITF_ComponentBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponseDefinitions : ARRAY[0..4] OF E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{d3f1cd92-9778-489c-9fbe-45479865a0e2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentResponseDefinitions[TcEventSeverity.Verbose] := a_eParentFaultResponseDefinitions[TcEventSeverity.Verbose];
+ParentResponseDefinitions[TcEventSeverity.Info] := a_eParentFaultResponseDefinitions[TcEventSeverity.Info];
+ParentResponseDefinitions[TcEventSeverity.Warning] := a_eParentFaultResponseDefinitions[TcEventSeverity.Warning];
+ParentResponseDefinitions[TcEventSeverity.Error] := a_eParentFaultResponseDefinitions[TcEventSeverity.Error];
+ParentResponseDefinitions[TcEventSeverity.Critical] := a_eParentFaultResponseDefinitions[TcEventSeverity.Critical];]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{20a304a7-760f-41cb-be63-cdd367d0ff02}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[a_eParentFaultResponseDefinitions[TcEventSeverity.Verbose] := ParentResponseDefinitions[TcEventSeverity.Verbose];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Info] := ParentResponseDefinitions[TcEventSeverity.Info];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Warning] := ParentResponseDefinitions[TcEventSeverity.Warning];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Error] := ParentResponseDefinitions[TcEventSeverity.Error];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Critical] := ParentResponseDefinitions[TcEventSeverity.Critical];]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="RaiseAlarm" Id="{2c95cd98-f45d-4c55-8c68-a145068d3a38}">
       <Declaration><![CDATA[METHOD RaiseAlarm : BOOL
 VAR_IN_OUT
@@ -379,6 +423,9 @@ END_VAR
     <LineIds Name="FB_ComponentBase.BlockHMIControl">
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_ComponentBase.CurrentAlarmSeverity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_ComponentBase.CyclicLogic">
       <LineId Id="57" Count="14" />
       <LineId Id="49" Count="0" />
@@ -450,6 +497,14 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Name.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.ParentResponseDefinitions.Get">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ComponentBase.ParentResponseDefinitions.Set">
+      <LineId Id="5" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.RaiseAlarm">

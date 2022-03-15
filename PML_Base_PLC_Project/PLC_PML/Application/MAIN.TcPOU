@@ -42,7 +42,7 @@ END_VAR
         <ST><![CDATA[//Top level machine initialization should happen here, in the main initialization method. Each subsequent "layer" of modules will be named within their respective "parent" intialize method
 fbMainHMIConnection.sTopLevelMachine := fbMyMachine.ModuleName;
 
-fbMyMachine.iMasterDataStructure_Adder 	:= fbMainHMIConnection.DataStructure_Adder;
+fbMyMachine.MasterDataStructure_Adder  	:= fbMainHMIConnection.DataStructure_Adder;
 fbMyMachine.Enabled 					:=  TRUE;
 fbMyMachine.ModuleName 					:=  'Test Machine';
 fbMyMachine.ModuleID 					:=  1;

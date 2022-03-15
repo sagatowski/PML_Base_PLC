@@ -15,6 +15,12 @@ VAR
 	eMode				: E_PMLUnitMode;		//Current UnitMode of the module
 	eState				: Tc3_PackML_V2.E_PMLState;
 	iMasterDataStructure_Adder : ITF_Tree_IndexBased;
+	eCurrentAlarmSeverity		: TcEventSeverity;
+	a_eParentFaultResponseDefinitions		: ARRAY[0..4] OF E_AlarmResponse := [	E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.NoResponse,
+																					E_AlarmResponse.Abort_ImmediateError,
+																					E_AlarmResponse.Abort_ImmediateError];
 	
 	//Communication Variables
 	stPMLModuleBaseHMI	: ST_PMLModuleBase_HMI;		//Handles status and control communications with the HMI
@@ -71,6 +77,7 @@ VAR
 	bSimulateAllChildren	: BOOL;
 	a_sModeNames					: ARRAY[0..31] OF STRING;
 	varInfo					: __SYSTEM.VAR_INFO;
+	bReachedInitialDefaultStateAndMode	: BOOL;		//Toggles TRUE once a module has reached the default state and mode after startup, used to mute certain alarms during startup
 	i: UDINT;
 END_VAR
 ]]></Declaration>
@@ -93,6 +100,7 @@ END_VAR
       <Folder Name="02_PrimaryStates" Id="{fdb26b20-d68a-43a5-9170-8c0cae9f966b}" />
       <Folder Name="03_Monitoring" Id="{0990b033-a812-4275-8ada-e06b2ca591b8}" />
       <Folder Name="04_HMI" Id="{0a574e76-6dab-426e-9c46-435414520792}" />
+      <Folder Name="05_AlarmHandling" Id="{ad4fcf9c-0649-4b81-962f-40ddfe173e03}" />
     </Folder>
     <Method Name="Aborted" Id="{f4c80f4a-1f00-40f6-a791-318ec4b3278d}" FolderPath="Methods\02_PrimaryStates\">
       <Declaration><![CDATA[METHOD Aborted
@@ -105,6 +113,38 @@ END_VAR
 //*************************************************************************************************************************************************************************
 
 ;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AbortImmediate" Id="{3e55effc-a31f-4c38-a8a8-79f762ad7483}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD AbortImmediate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[eStateCommand := E_PMLCommand.ePMLCommand_Abort;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AbortImmediateError" Id="{0f7de373-7b18-4301-aa32-84fc879a215e}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD AbortImmediateError : BOOL
+VAR_INPUT
+	sName		: STRING;
+	bIsModule	: BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bIsModule THEN
+	IF NOT a_fbBaseAlarms[E_BaseAlarms.SubModuleError].bRaised THEN
+		F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.SubModuleError],sModuleName,sName,'');
+	END_IF
+ELSE
+	IF NOT a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
+		F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.ComponentError],sModuleName,sName,'');
+	END_IF
+END_IF
+
+
+eStateCommand := E_PMLCommand.ePMLCommand_Abort;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Aborting" Id="{ff7d5dfb-dd97-4700-92b4-3318a8a33dc3}" FolderPath="Methods\01_TransitionStates\">
@@ -288,14 +328,15 @@ END_IF]]></ST>
     </Method>
     <Method Name="ComponentMonitor" Id="{8175b5fe-f316-43ef-bef8-f03aa4ce0b3d}" FolderPath="Methods\03_Monitoring\">
       <Declaration><![CDATA[METHOD ComponentMonitor : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
+VAR
+	a_eAlarmResponses		: ARRAY[0..4] OF E_AlarmResponse;	//Temporary response array
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-FOR i:=1 TO nNumberOfComponents DO
+        <ST><![CDATA[FOR i:=1 TO nNumberOfComponents DO
 	IF bSimulateAllChildren THEN
 		a_ITF_Components[i].Simulate := TRUE;
+	ELSE 
+		a_ITF_Components[i].Simulate := FALSE;
 	END_IF
 	
 	IF eMode = E_PMLUnitMode.ePMLUnitMode_Production THEN
@@ -304,18 +345,38 @@ FOR i:=1 TO nNumberOfComponents DO
 			AND eState <> E_PMLState.ePMLState_Clearing
 			AND eState <> E_PMLState.ePMLState_Stopped
 			AND eState <> E_PMLState.ePMLState_Stopping
-			AND	a_ITF_Components[i].Error THEN
-				IF NOT a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
-					F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.ComponentError],sModuleName,a_ITF_Components[i].Name,'');
-				END_IF
-				IF eState = E_PMLState.ePMLState_Execute THEN
-					eStateCommand :=  E_PMLCommand.ePMLCommand_Hold;
-				ELSE
-					eStateCommand := E_PMLCommand.ePMLCommand_Abort;
-				END_IF
-				
-		ELSIF a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
-			a_fbBaseAlarms[E_BaseAlarms.ComponentError].Clear(0,0);
+		THEN
+			a_eAlarmResponses := a_ITF_Components[i].ParentResponseDefinitions;
+			CASE a_eAlarmResponses[a_ITF_Components[i].CurrentAlarmSeverity] OF
+				E_AlarmResponse.Abort_ImmediateError:
+					AbortImmediateError(a_ITF_Components[i].Name, FALSE);
+				E_AlarmResponse.Abort_Immediate:
+					AbortImmediate();
+				E_AlarmResponse.Stop_Immediate:
+					StopImmediate();
+				E_AlarmResponse.Stop_Controlled:
+					StopControlled();
+				E_AlarmResponse.Hold_Immediate:
+					HoldImmediate();
+				E_AlarmResponse.Suspend_Immediate:
+					SuspendImmediate();
+				E_AlarmResponse.Suspend_Controlled:
+					SuspendControlled();
+				E_AlarmResponse.NoResponse:
+					;
+			END_CASE
+		ELSIF eState = E_PMLState.ePMLState_Stopped
+			OR eState = E_PMLState.ePMLState_Stopping 
+		THEN
+			a_eAlarmResponses := a_ITF_Components[i].ParentResponseDefinitions;
+			CASE a_eAlarmResponses[a_ITF_Components[i].CurrentAlarmSeverity] OF
+				E_AlarmResponse.Abort_ImmediateError:
+					AbortImmediateError(a_ITF_Components[i].Name, FALSE);
+				E_AlarmResponse.Abort_Immediate:
+					AbortImmediate();
+				E_AlarmResponse.NoResponse:
+					;
+			END_CASE				
 		END_IF
 	END_IF		
 END_FOR]]></ST>
@@ -343,6 +404,17 @@ bCreated2 := F_CreateAllEventsInClass(	p_aAlarms := a_fbBaseAlarms,
 							sPrefix := sID_Name);							]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CurrentAlarmSeverity" Id="{60fa6b26-f46a-4896-b539-afba05ef03bc}" FolderPath="01_ITF_PMLModuleBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentAlarmSeverity : TcEventSeverity]]></Declaration>
+      <Get Name="Get" Id="{99112b04-4f01-4857-b0c7-d9fee82ac72b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentAlarmSeverity := eCurrentAlarmSeverity;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="CyclicLogic" Id="{71af2bab-1028-44ec-8e3b-3536f0513c8e}" FolderPath="01_ITF_PMLModuleBase\02_Methods\">
       <Declaration><![CDATA[// 
 // Cyclic Code
@@ -356,6 +428,11 @@ METHOD CyclicLogic]]></Declaration>
 IF NOT bInitialized THEN			//Force initialization code of the object
 	initialize();
 	bInitialized := TRUE;
+END_IF
+
+//TODO: Condition state based on DEFAULT constant, right now it is a command, so a case statement translation to state would be necessary
+IF NOT bReachedInitialDefaultStateAndMode AND eState = E_PMLState.ePMLState_Aborted AND eMode = ePMLUNITMODEDEFAULT THEN
+	bReachedInitialDefaultStateAndMode := TRUE;
 END_IF
 
 //  call the subunits
@@ -383,18 +460,16 @@ fbExternalControl();
 SubModuleMonitor();
 ComponentMonitor();
 HMIPermissions();
+
+eCurrentAlarmSeverity := TcEventSeverity.Verbose;
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbPMLAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);
+
 fbProductionDataHMI.CyclicLogic();
 
-(*
-IF bGlobalSafetyStatus THEN
-	IF a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].bRaised THEN
-		a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].Clear(0,0);
-	END_IF
-ELSIF NOT a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].bRaised THEN
-		a_fbBaseAlarms[E_BaseAlarms.PowerNotOK].Raise(0);
-		eStateCommand := E_PMLCommand.ePMLCommand_Abort;
-END_IF
-*)
 ]]></ST>
       </Implementation>
     </Method>
@@ -556,6 +631,24 @@ CASE eMode OF
 	E_PMLUnitMode.ePMLUnitMode_Maintenance:			//=================================MAINTENANCE MODE=================================
 		AllowHMIControl(bModuleOnly := FALSE);	
 END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HoldControlled" Id="{34a57a82-a45f-4e9f-bfac-d3a59430bbc7}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD HoldControlled : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HoldImmediate" Id="{4f135bf7-6681-48b2-8727-b043804f866e}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD HoldImmediate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="Holding" Id="{4c4a9600-833f-4e2c-8c49-79d528d4d25d}" FolderPath="Methods\01_TransitionStates\">
@@ -842,6 +935,92 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Property Name="ParentResponse_Critical" Id="{e581ea96-71f5-4214-b84f-fe40e4f439cd}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Critical : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{cefd4a2e-0e84-4639-9399-50e5f85ba282}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentResponse_Critical := a_eParentFaultResponseDefinitions[TcEventSeverity.Critical];]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e602a147-21af-4f8b-a470-d7705d06bb99}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[a_eParentFaultResponseDefinitions[TcEventSeverity.Critical] := ParentResponse_Critical;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ParentResponse_Error" Id="{ea6cabed-35e0-4e31-9143-22fb00f7f237}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Error : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{90c102a5-e379-46b1-a6bc-51993d4e776d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentResponse_Error := a_eParentFaultResponseDefinitions[TcEventSeverity.Error];
+]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{2b602e0a-dc18-46ca-9ee2-e372c9159ca6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[a_eParentFaultResponseDefinitions[TcEventSeverity.Error] := ParentResponse_Error;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ParentResponse_Warning" Id="{f50e684b-4ba8-413b-b162-40d548267b62}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponse_Warning : E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{1eea4731-deef-4fce-9bd2-ce11f2ae2bde}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentResponse_Warning := a_eParentFaultResponseDefinitions[TcEventSeverity.Warning];]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d1e3f831-5a96-4cc4-83f2-65eaf98ff870}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[a_eParentFaultResponseDefinitions[TcEventSeverity.Warning] := ParentResponse_Warning;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ParentResponseDef" Id="{52bb93cb-0d1e-408e-9ae3-7e72a40e31ae}" FolderPath="01_ITF_PMLModuleBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ParentResponseDef : ARRAY[0..4] OF E_AlarmResponse]]></Declaration>
+      <Get Name="Get" Id="{af09bce5-c0c6-4b5d-8736-3bc955f63074}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ParentResponseDef[TcEventSeverity.Verbose] := a_eParentFaultResponseDefinitions[TcEventSeverity.Verbose];
+ParentResponseDef[TcEventSeverity.Info] := a_eParentFaultResponseDefinitions[TcEventSeverity.Info];
+ParentResponseDef[TcEventSeverity.Warning] := a_eParentFaultResponseDefinitions[TcEventSeverity.Warning];
+ParentResponseDef[TcEventSeverity.Error] := a_eParentFaultResponseDefinitions[TcEventSeverity.Error];
+ParentResponseDef[TcEventSeverity.Critical] := a_eParentFaultResponseDefinitions[TcEventSeverity.Critical];]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1563a3c2-6b30-418c-b3a8-c6d3cce9d9ec}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[a_eParentFaultResponseDefinitions[TcEventSeverity.Verbose] := ParentResponseDef[TcEventSeverity.Verbose];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Info] := ParentResponseDef[TcEventSeverity.Info];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Warning] := ParentResponseDef[TcEventSeverity.Warning];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Error] := ParentResponseDef[TcEventSeverity.Error];
+a_eParentFaultResponseDefinitions[TcEventSeverity.Critical] := ParentResponseDef[TcEventSeverity.Critical];]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Resetting" Id="{3807e2e0-6258-4c91-9f18-5b08f4f71847}" FolderPath="Methods\01_TransitionStates\">
       <Declaration><![CDATA[METHOD Resetting]]></Declaration>
       <Implementation>
@@ -1054,6 +1233,24 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="StopControlled" Id="{6102a8b6-63d1-4349-9c91-23d23a740d56}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD StopControlled : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StopImmediate" Id="{4be9d206-4609-4609-8610-fb627d300ed2}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD StopImmediate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[eStateCommand := E_PMLCommand.ePMLCommand_Stop;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Stopped" Id="{6cf7e365-1763-4f32-a071-b4d38aa6475f}" FolderPath="Methods\02_PrimaryStates\">
       <Declaration><![CDATA[METHOD Stopped]]></Declaration>
       <Implementation>
@@ -1096,7 +1293,8 @@ END_IF
     </Method>
     <Method Name="SubModuleMonitor" Id="{fe040716-db60-48a3-be9e-6ef7732045a6}" FolderPath="Methods\03_Monitoring\">
       <Declaration><![CDATA[METHOD SubModuleMonitor : BOOL
-VAR_INPUT
+VAR
+	a_eAlarmResponses		: ARRAY[0..4] OF E_AlarmResponse;	//Temporary response array	
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1109,31 +1307,61 @@ FOR i := 1 TO nNumberOfSubModules DO
 		a_ITF_PackMLBase[i].SimulateAllChildren := FALSE;
 	END_IF
 	
+	IF fbProductionDataHMI.NewProductionRate THEN
+		a_ITF_PackMLBase[i].TargetProductionRate := fbProductionDataHMI.TargetProductionRate;
+	END_IF
+
+	
 	IF eMode = E_PMLUnitMode.ePMLUnitMode_Production THEN		
 		IF 		eState <> E_PMLState.ePMLState_Aborted
 			AND eState <> E_PMLState.ePMLState_Aborting
 			AND eState <> E_PMLState.ePMLState_Clearing
 			AND eState <> E_PMLState.ePMLState_Stopped
 			AND eState <> E_PMLState.ePMLState_Stopping
-			AND	(a_ITF_PackMLBase[i].State = E_PMLState.ePMLState_Aborted OR a_ITF_PackMLBase[i].State = E_PMLState.ePMLState_Aborting) THEN
-				IF NOT a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].bRaised THEN
-					F_RaiseAlarmWithStringParameters(a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted],sModuleName,a_ITF_PackMLBase[i].ModuleName,'');
-				END_IF
-				IF eState = E_PMLState.ePMLState_Execute THEN
-					eStateCommand :=  E_PMLCommand.ePMLCommand_Hold;
-				ELSE
-					eStateCommand := E_PMLCommand.ePMLCommand_Stop;
-				END_IF
-				
-		ELSIF a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].bRaised THEN
-			a_fbBaseAlarms[E_BaseAlarms.SubmoduleAborted].Clear(0,0);
-		END_IF	
-		
-		IF fbProductionDataHMI.NewProductionRate THEN
-			a_ITF_PackMLBase[i].TargetProductionRate := fbProductionDataHMI.TargetProductionRate;
+		THEN
+			a_eAlarmResponses := a_ITF_PackMLBase[i].ParentResponseDef;
+			CASE a_eAlarmResponses[a_ITF_PackMLBase[i].CurrentAlarmSeverity] OF
+				E_AlarmResponse.Abort_ImmediateError:
+					AbortImmediateError(a_ITF_PackMLBase[i].ModuleName, TRUE);
+				E_AlarmResponse.Abort_Immediate:
+					AbortImmediate();
+				E_AlarmResponse.Stop_Immediate:
+					StopImmediate();
+				E_AlarmResponse.Stop_Controlled:
+					StopControlled();
+				E_AlarmResponse.Hold_Immediate:
+					HoldImmediate();
+				E_AlarmResponse.Suspend_Immediate:
+					SuspendImmediate();
+				E_AlarmResponse.Suspend_Controlled:
+					SuspendControlled();
+				E_AlarmResponse.NoResponse:
+					;
+			END_CASE
+		ELSIF eState = E_PMLState.ePMLState_Stopped
+			OR eState = E_PMLState.ePMLState_Stopping 
+		THEN
+			a_eAlarmResponses := a_ITF_PackMLBase[i].ParentResponseDef;
+			CASE a_eAlarmResponses[a_ITF_PackMLBase[i].CurrentAlarmSeverity] OF
+				E_AlarmResponse.Abort_ImmediateError:
+					AbortImmediateError(a_ITF_PackMLBase[i].ModuleName, TRUE);
+				E_AlarmResponse.Abort_Immediate:
+					AbortImmediate();
+				E_AlarmResponse.NoResponse:
+					;
+			END_CASE				
 		END_IF
 	END_IF
 END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SuspendControlled" Id="{bf848d00-2f91-43a0-ba84-c03257f1e693}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD SuspendControlled : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="Suspended" Id="{15a0521e-d09e-48c7-a5fb-e09a5fcfb990}" FolderPath="Methods\02_PrimaryStates\">
@@ -1146,6 +1374,15 @@ END_FOR]]></ST>
 //*************************************************************************************************************************************************************************
 
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SuspendImmediate" Id="{541bc486-86e8-4c04-9fa3-e6a7ca36c7a0}" FolderPath="Methods\05_AlarmHandling\">
+      <Declaration><![CDATA[METHOD SuspendImmediate : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="Suspending" Id="{9bd4e4e9-27b1-45dc-a32e-d60e4d2d284c}" FolderPath="Methods\01_TransitionStates\">
@@ -1348,6 +1585,13 @@ END_IF]]></ST>
       <LineId Id="7" Count="5" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.AbortImmediate">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.AbortImmediateError">
+      <LineId Id="6" Count="11" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Aborting">
       <LineId Id="109" Count="1" />
       <LineId Id="112" Count="1" />
@@ -1420,9 +1664,7 @@ END_IF]]></ST>
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.ComponentMonitor">
-      <LineId Id="6" Count="3" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="13" Count="20" />
+      <LineId Id="87" Count="46" />
       <LineId Id="10" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.CreateEvents">
@@ -1432,23 +1674,24 @@ END_IF]]></ST>
       <LineId Id="14" Count="0" />
       <LineId Id="16" Count="3" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.CurrentAlarmSeverity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.CyclicLogic">
-      <LineId Id="152" Count="15" />
+      <LineId Id="152" Count="8" />
+      <LineId Id="281" Count="4" />
+      <LineId Id="161" Count="6" />
       <LineId Id="247" Count="0" />
       <LineId Id="251" Count="2" />
       <LineId Id="172" Count="0" />
       <LineId Id="209" Count="0" />
       <LineId Id="173" Count="9" />
       <LineId Id="254" Count="1" />
-      <LineId Id="259" Count="1" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="273" Count="6" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="260" Count="0" />
       <LineId Id="266" Count="0" />
-      <LineId Id="183" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="199" Count="1" />
-      <LineId Id="195" Count="2" />
-      <LineId Id="201" Count="0" />
-      <LineId Id="198" Count="0" />
-      <LineId Id="229" Count="0" />
       <LineId Id="269" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Enabled.Get">
@@ -1511,6 +1754,12 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.HMIPermissions">
       <LineId Id="6" Count="3" />
       <LineId Id="12" Count="22" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.HoldControlled">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.HoldImmediate">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Holding">
@@ -1615,6 +1864,34 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.ModuleName.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Critical.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Critical.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Error.Get">
+      <LineId Id="5" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Error.Set">
+      <LineId Id="5" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Warning.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponse_Warning.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponseDef.Get">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.ParentResponseDef.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Resetting">
       <LineId Id="155" Count="5" />
       <LineId Id="124" Count="1" />
@@ -1671,6 +1948,12 @@ END_IF]]></ST>
       <LineId Id="223" Count="39" />
       <LineId Id="62" Count="0" />
     </LineIds>
+    <LineIds Name="FB_PMLModuleBase.StopControlled">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.StopImmediate">
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_PMLModuleBase.Stopped">
       <LineId Id="6" Count="5" />
       <LineId Id="5" Count="0" />
@@ -1684,35 +1967,17 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.SubModuleMonitor">
-      <LineId Id="13" Count="1" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="10" Count="2" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="30" Count="1" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="41" Count="1" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="63" Count="0" />
-      <LineId Id="32" Count="1" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="55" Count="1" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="29" Count="0" />
+      <LineId Id="67" Count="53" />
       <LineId Id="15" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.SuspendControlled">
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Suspended">
       <LineId Id="6" Count="5" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PMLModuleBase.SuspendImmediate">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.Suspending">

@@ -1859,19 +1859,5 @@ External Setpoint Generation:
 				</Instance>
 			</Project>
 		</Plc>
-		<Io/>
 	</Project>
-	<Mappings>
-		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030010" Watchdog="04000000080000000400000004000000"/>
-		<OwnerA Name="TIPC^PLC_PML^PLC_PML Instance">
-			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 1">
-				<Link VarA="PlcTask Inputs^MAIN.fbMyMachine.fbEquipmentModule1.fb_EM1_ControlModule1.fbAxis1.HardwareAxis.NcToPlc" VarB="Outputs^ToPlc"/>
-				<Link VarA="PlcTask Outputs^MAIN.fbMyMachine.fbEquipmentModule1.fb_EM1_ControlModule1.fbAxis1.HardwareAxis.PlcToNc" VarB="Inputs^FromPlc"/>
-			</OwnerB>
-			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 2">
-				<Link VarA="PlcTask Inputs^MAIN.fbMyMachine.fbEquipmentModule1.fb_EM1_ControlModule1.fbAxis1.SimulationAxis.NcToPlc" VarB="Outputs^ToPlc"/>
-				<Link VarA="PlcTask Outputs^MAIN.fbMyMachine.fbEquipmentModule1.fb_EM1_ControlModule1.fbAxis1.SimulationAxis.PlcToNc" VarB="Inputs^FromPlc"/>
-			</OwnerB>
-		</OwnerA>
-	</Mappings>
 </TcSmProject>
