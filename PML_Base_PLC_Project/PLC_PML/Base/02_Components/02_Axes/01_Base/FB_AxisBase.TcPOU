@@ -345,7 +345,7 @@ END_IF]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[JogFastVelocity : fJogFastVelocity;]]></ST>
+          <ST><![CDATA[JogFastVelocity := fJogFastVelocity;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{e489f0ad-8f0e-4429-b255-4423642cdc1a}">
