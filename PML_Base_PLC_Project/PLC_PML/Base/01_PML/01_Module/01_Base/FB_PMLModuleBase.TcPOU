@@ -707,7 +707,47 @@ stPMLModuleBaseHMI.sModuleName := sModuleName;
 stPMLModuleBaseHMI.eState := eState;	//KAB eState;
 stPMLModuleBaseHMI.bLogStateChanges := bLogStateChanges;
 stPMLModuleBaseHMI.bLogModeChanges := bLogModeChanges;
-stPMLModuleBaseHMI.a_sModeNames := a_sModeNames;]]></ST>
+stPMLModuleBaseHMI.a_sModeNames := a_sModeNames;
+
+//Production Data================================================================================================================================================
+
+//Process HMI requests
+IF stProductionDataHMI.bIncomingHMIRequest AND NOT stProductionDataHMI.bHMICommandConfirmation THEN		//If a request has been issued by the HMI, and a previous request has not just E_SequenceState.Finished being processed
+	IF stProductionDataHMI.bShiftProductionTargetHMISetRequest THEN
+		nShiftProductionTarget := stProductionDataHMI.nShiftProductionTargetHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bWarningMarginHMISetRequest THEN
+		fWarningMargin := stProductionDataHMI.fWarningMarginHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bShiftLengthHMISetRequest THEN
+		tShiftLength := stProductionDataHMI.tShiftLengthHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+	
+	IF stProductionDataHMI.bProductionRateHMISetRequest THEN
+		fProductionRate_Setpoint := stProductionDataHMI.fProductionRateHMISetValue;
+		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+	END_IF
+END_IF
+
+
+
+//Update HMI Status Info
+stProductionDataHMI.tShiftLength := tShiftLength;
+stProductionDataHMI.nShiftProductionTarget := nShiftProductionTarget;
+stProductionDataHMI.nCurrentShiftProductionCount := nCurrentShiftProductionCount;
+stProductionDataHMI.nCurrentShiftTarget := nCurrentShiftTarget;
+stProductionDataHMI.nCurrentAcceptableProductionCount := nCurrentAcceptableProductionCount;
+stProductionDataHMI.nCurrentWarningProductionCount := nCurrentWarningProductionCount;
+stProductionDataHMI.tCurrentShiftTime := tCurrentShiftTime;
+stProductionDataHMI.tRemainingShiftTime := tRemainingShiftTime;
+stProductionDataHMI.fProductionRate_Setpoint := F_LREAL_RoundToPlace(fProductionRate_Setpoint, 1);
+stProductionDataHMI.fProductionRate_Actual := F_LREAL_RoundToPlace(fProductionRate_Actual, 1);
+stProductionDataHMI.fProductionRate_Required := F_LREAL_RoundToPlace(fProductionRate_Required, 1);]]></ST>
       </Implementation>
     </Method>
     <Property Name="HMIControlAvailable" Id="{52f6c443-837f-4981-bfb9-75a309035060}" FolderPath="01_ITF_PMLModuleBase\01_Properties\02_Control\">
@@ -2166,6 +2206,8 @@ END_VAR
       <LineId Id="106" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="175" Count="0" />
+      <LineId Id="222" Count="38" />
+      <LineId Id="221" Count="0" />
     </LineIds>
     <LineIds Name="FB_PMLModuleBase.HMIControlAvailable.Get">
       <LineId Id="2" Count="0" />
