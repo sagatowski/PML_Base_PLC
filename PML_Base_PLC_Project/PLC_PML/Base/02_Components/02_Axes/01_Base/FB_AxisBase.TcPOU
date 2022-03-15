@@ -39,7 +39,7 @@ VAR
 	fbWriteParameter : MC_WriteParameter;
 	
 	//Alarming
-	fbAxisBaseAlarms : ARRAY[1..AXIS_BASE_ALARM_COUNT] OF FB_TcAlarm;
+	a_fbAxisBaseAlarms : ARRAY[1..AXIS_BASE_ALARM_COUNT] OF FB_TcAlarm;
 	
 	//Internal Variables
 	fOverride		: LREAL := 100;		//Velocity Override
@@ -115,6 +115,20 @@ END_VAR
         <ST><![CDATA[SUPER^.BlockHMIControl();
 
 stAxisBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateEvents" Id="{cd750f02-9d2b-439f-961a-0fcee54e94a8}" FolderPath="01_SUPER_Overrides\02_Methods\">
+      <Declaration><![CDATA[{attribute 'call_after_online_change_slot' := '<slot>'}
+METHOD CreateEvents : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[F_CreateAllEventsInClass(	p_aAlarms := a_fbAxisBaseAlarms,
+							nClassSize := SIZEOF(TC_EVENTS.AxisBase),
+							pInitEvent := ADR(TC_EVENTS.PMLAlarms.InitReferenceEvent),
+							sPrefix := sName);
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="DriveEnabled" Id="{c7f1ee17-db34-4e43-a694-91ab73ce00fc}" FolderPath="02_ITF_AxisBase\01_Properties\03_Status\">
@@ -297,7 +311,7 @@ END_VAR]]></Declaration>
 
 sTemp := CONCAT(CONCAT(CONCAT('Axis ', ': '), sName), ' '); 	//Creates a utility string for alarms and other messaging that reads (example text) - "Module 10 - Main Casepacker" to be followed by the alarm or message info
 //TODO: Rename Event Class to AxisBase
-F_CreateAllEventsInClass(	p_aAlarms := fbAxisBaseAlarms,
+F_CreateAllEventsInClass(	p_aAlarms := a_fbAxisBaseAlarms,
 							nClassSize := SIZEOF(TC_EVENTS.AxisBase),
 							pInitEvent := ADR(TC_EVENTS.AxisBase.InitReferenceEvent),
 							sPrefix := sTemp );]]></ST>
@@ -410,110 +424,113 @@ bAxisError := SelectedAxis.Status.Error;
 				
 //Error monitoring and event logging
 
-IF fbAxisJog.Error AND NOT fbAxisBaseAlarms[E_AxisBase.JogError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.JogError], UDINT_TO_STRING(fbAxisJog.ErrorID), '');
+IF fbAxisJog.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.JogError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.JogError], UDINT_TO_STRING(fbAxisJog.ErrorID), '');
 										
-ELSIF NOT fbAxisJog.Error AND fbAxisBaseAlarms[E_AxisBase.JogError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan)  THEN
-	fbAxisBaseAlarms[E_AxisBase.JogError].Clear(0,0);
+ELSIF NOT fbAxisJog.Error AND a_fbAxisBaseAlarms[E_AxisBase.JogError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan)  THEN
+	a_fbAxisBaseAlarms[E_AxisBase.JogError].Clear(0,0);
 END_IF
 
 
-IF fbAxisPower.Error AND NOT fbAxisBaseAlarms[E_AxisBase.PowerError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.PowerError], UDINT_TO_STRING(fbAxisPower.ErrorID), '');
+IF fbAxisPower.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.PowerError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.PowerError], UDINT_TO_STRING(fbAxisPower.ErrorID), '');
 										
-ELSIF NOT fbAxisPower.Error AND fbAxisBaseAlarms[E_AxisBase.PowerError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan)THEN
-	fbAxisBaseAlarms[E_AxisBase.PowerError].Clear(0,0);
+ELSIF NOT fbAxisPower.Error AND a_fbAxisBaseAlarms[E_AxisBase.PowerError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan)THEN
+	a_fbAxisBaseAlarms[E_AxisBase.PowerError].Clear(0,0);
 END_IF
 
 
-IF fbAxisReset.Error AND NOT fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbAxisReset.ErrorID), '');
+IF fbAxisReset.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbAxisReset.ErrorID), '');
 										
-ELSIF NOT fbAxisReset.Error AND fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.ResetError].Clear(0,0);
+ELSIF NOT fbAxisReset.Error AND a_fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.ResetError].Clear(0,0);
 END_IF
 
 
-IF fbMoveAbsolute.Error AND NOT fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError], UDINT_TO_STRING(fbMoveAbsolute.ErrorID), '');
+IF fbMoveAbsolute.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError], UDINT_TO_STRING(fbMoveAbsolute.ErrorID), '');
 										
-ELSIF NOT fbMoveAbsolute.Error AND fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].Clear(0,0);
+ELSIF NOT fbMoveAbsolute.Error AND a_fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.MoveAbsoluteError].Clear(0,0);
 END_IF
 
 
-IF fbMoveVelocity.Error AND NOT fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.MoveVelocityError], UDINT_TO_STRING(fbMoveVelocity.ErrorID), '');
+IF fbMoveVelocity.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.MoveVelocityError], UDINT_TO_STRING(fbMoveVelocity.ErrorID), '');
 										
-ELSIF NOT fbMoveVelocity.Error AND fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].Clear(0,0);
+ELSIF NOT fbMoveVelocity.Error AND a_fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.MoveVelocityError].Clear(0,0);
 END_IF
 
 
-IF fbMoveRelative.Error AND NOT fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.MoveRelativeError], UDINT_TO_STRING(fbMoveRelative.ErrorID), '');
+IF fbMoveRelative.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.MoveRelativeError], UDINT_TO_STRING(fbMoveRelative.ErrorID), '');
 										
-ELSIF NOT fbMoveRelative.Error AND fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].Clear(0,0);
+ELSIF NOT fbMoveRelative.Error AND a_fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.MoveRelativeError].Clear(0,0);
 END_IF
 
 
-IF fbAxisHalt.Error AND NOT fbAxisBaseAlarms[E_AxisBase.HaltError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.HaltError], UDINT_TO_STRING(fbAxisHalt.ErrorID), '');
+IF fbAxisHalt.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.HaltError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.HaltError], UDINT_TO_STRING(fbAxisHalt.ErrorID), '');
 										
-ELSIF NOT fbAxisHalt.Error AND fbAxisBaseAlarms[E_AxisBase.HaltError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.HaltError].Clear(0,0);
+ELSIF NOT fbAxisHalt.Error AND a_fbAxisBaseAlarms[E_AxisBase.HaltError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.HaltError].Clear(0,0);
 END_IF
 
-IF fbAxisStop.Error AND NOT fbAxisBaseAlarms[E_AxisBase.StopError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.StopError], UDINT_TO_STRING(fbAxisStop.ErrorID), '');
-ELSIF NOT fbAxisStop.Error AND fbAxisBaseAlarms[E_AxisBase.StopError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.StopError].Clear(0,0);
-END_IF
-
-
-IF fbAxisHome.Error AND NOT fbAxisBaseAlarms[E_AxisBase.HomeError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.HomeError], UDINT_TO_STRING(fbAxisHome.ErrorID), '');
-ELSIF NOT fbAxisHome.Error AND fbAxisBaseAlarms[E_AxisBase.HomeError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.HomeError].Clear(0,0);
+IF fbAxisStop.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.StopError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.StopError], UDINT_TO_STRING(fbAxisStop.ErrorID), '');
+ELSIF NOT fbAxisStop.Error AND a_fbAxisBaseAlarms[E_AxisBase.StopError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.StopError].Clear(0,0);
 END_IF
 
 
-IF fbGearIn.Error AND NOT fbAxisBaseAlarms[E_AxisBase.GearInError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.GearInError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
-ELSIF NOT fbGearIn.Error AND fbAxisBaseAlarms[E_AxisBase.GearInError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.GearInError].Clear(0,0);
+IF fbAxisHome.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.HomeError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.HomeError], UDINT_TO_STRING(fbAxisHome.ErrorID), '');
+ELSIF NOT fbAxisHome.Error AND a_fbAxisBaseAlarms[E_AxisBase.HomeError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.HomeError].Clear(0,0);
 END_IF
 
 
-IF fbResetDrv.Error AND NOT fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbResetDrv.AdsErrId), '');
-ELSIF NOT fbResetDrv.Error AND fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.ResetError].Clear(0,0);
+IF fbGearIn.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.GearInError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.GearInError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
+ELSIF NOT fbGearIn.Error AND a_fbAxisBaseAlarms[E_AxisBase.GearInError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.GearInError].Clear(0,0);
 END_IF
 
 
-IF fbAxisPower.Override = 0 AND bActive AND NOT fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].bRaised THEN
-	RaiseAlarm(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited]);										
-ELSIF fbAxisPower.Override <> 0 AND fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].Clear(0,0);
+IF fbResetDrv.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.ResetError], UDINT_TO_STRING(fbResetDrv.AdsErrId), '');
+ELSIF NOT fbResetDrv.Error AND a_fbAxisBaseAlarms[E_AxisBase.ResetError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.ResetError].Clear(0,0);
 END_IF
 
 
-IF bDriveError AND NOT fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
-ELSIF NOT bAxisError AND fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.DriveError].Clear(0,0);
+IF fbAxisPower.Override = 0 AND bActive AND NOT a_fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].bRaised THEN
+	RaiseAlarm(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited]);										
+ELSIF fbAxisPower.Override <> 0 AND a_fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.CommandWhileInhibited].Clear(0,0);
 END_IF
 
 
-IF bAxisError AND NOT fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
-ELSIF NOT bAxisError AND fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
-	fbAxisBaseAlarms[E_AxisBase.AxisError].Clear(0,0);
+IF bDriveError AND NOT a_fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
+ELSIF NOT bAxisError AND a_fbAxisBaseAlarms[E_AxisBase.DriveError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.DriveError].Clear(0,0);
 END_IF
 
-bReady := bEnabled AND bDriveEnabled AND NOT bError;]]></ST>
+
+IF bAxisError AND NOT a_fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.DriveError], UDINT_TO_STRING(SimulationAxis.Status.ErrorID), '');
+ELSIF NOT bAxisError AND a_fbAxisBaseAlarms[E_AxisBase.AxisError].bRaised AND NOT (bResetHappenedLastScan OR bResetHappenedThisScan) THEN
+	a_fbAxisBaseAlarms[E_AxisBase.AxisError].Clear(0,0);
+END_IF
+
+bReady := bEnabled AND bDriveEnabled AND NOT bError;
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbAxisBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{24aa628f-77c9-4939-b88a-d6572a4e5a53}" FolderPath="Methods\">
@@ -939,6 +956,10 @@ END_VAR
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_AxisBase.CreateEvents">
+      <LineId Id="7" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_AxisBase.DriveEnabled.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1107,6 +1128,8 @@ END_VAR
       <LineId Id="179" Count="0" />
       <LineId Id="264" Count="0" />
       <LineId Id="263" Count="0" />
+      <LineId Id="269" Count="1" />
+      <LineId Id="268" Count="0" />
     </LineIds>
     <LineIds Name="FB_AxisBase.MotionControl">
       <LineId Id="7" Count="17" />

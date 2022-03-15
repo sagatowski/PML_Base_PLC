@@ -13,7 +13,7 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	eLastState : E_PMLState := E_PMLState.ePMLState_Undefined;		//Saves the previous state each time the block is run
+	eLastState : E_PMLState := E_PMLState.ePMLState_Aborted;		//Saves the previous state each time the block is run
 	refTempAlarm : REFERENCE TO FB_TcAlarm;		//Temporary reference that makes severity checking simpler vs individually checking each change alarm within the case statement
 END_VAR]]></Declaration>
     <Implementation>

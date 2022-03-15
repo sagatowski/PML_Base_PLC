@@ -53,6 +53,12 @@
     <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLSubUnitInfoExt.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_ProductionData_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_PMLControl.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_PMLModuleBase.TcIO">
       <SubType>Code</SubType>
     </Compile>
@@ -235,7 +241,16 @@
     <Compile Include="Base\03_Utilities\03_HMI_Connections\FB_MainHMI_Connection.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base\03_Utilities\03_HMI_Connections\ST_PMLControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\03_HMI_Connections\ST_PMLControl_Simplified.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base\03_Utilities\04_Statistics\FB_ProductionData.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base\03_Utilities\04_Statistics\ITF_ProductionData.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\03_Utilities\04_Statistics\ST_ProductionDataHMI.TcDUT">
