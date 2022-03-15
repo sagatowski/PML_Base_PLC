@@ -247,12 +247,6 @@
     <Compile Include="Base\03_Utilities\03_HMI_Connections\ST_PMLControl_Simplified.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base\03_Utilities\04_Statistics\FB_ProductionData.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\04_Statistics\ST_ProductionDataHMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Base\03_Utilities\05_Math\01_LREAL\F_LREAL_RoundToPlace.TcPOU">
       <SubType>Code</SubType>
     </Compile>
