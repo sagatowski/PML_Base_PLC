@@ -80,6 +80,20 @@ END_VAR
         <ST><![CDATA[stComponentBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CreateEvents" Id="{540c8e54-f71b-4d76-84cd-99f008f0d07e}" FolderPath="01_ITF_ComponentBase\02_Methods\">
+      <Declaration><![CDATA[{attribute 'call_after_online_change_slot' := '<slot>'}
+METHOD CreateEvents : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[F_CreateAllEventsInClass(	p_aAlarms := a_fbComponentBaseAlarms,
+							nClassSize := SIZEOF(TC_EVENTS.ComponentBase),
+							pInitEvent := ADR(TC_EVENTS.PMLAlarms.InitReferenceEvent),
+							sPrefix := sName);
+]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="CurrentAlarmSeverity" Id="{4c1ed095-36f6-4772-b073-d37fe8b8ece6}" FolderPath="01_ITF_ComponentBase\01_Properties\03_Status\">
       <Declaration><![CDATA[PROPERTY CurrentAlarmSeverity : TcEventSeverity]]></Declaration>
       <Get Name="Get" Id="{56cbfb47-bce3-46c2-a3a7-623cff7e3583}">
@@ -110,7 +124,9 @@ END_IF
 
 Monitoring();		//Constant error and status monitoring
 HardwareUpdate();	//Passes internal commands to hardware outputs and vice versa for inputs, implement via extended FB override
-HMICommunication();	//Keeps the HMI data up to date, and processes requests from the HMI for this component]]></ST>
+HMICommunication();	//Keeps the HMI data up to date, and processes requests from the HMI for this component
+
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="Enabled" Id="{86698bf0-894b-412a-87e8-32a70ab8aadb}" FolderPath="01_ITF_ComponentBase\01_Properties\02_Control\">
@@ -265,7 +281,12 @@ IF NOT a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].bRaised AND bS
 	a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].Raise(0);
 ELSIF a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].bRaised AND NOT bSimulate THEN
 	a_fbComponentBaseAlarms[E_ComponentBase.SimulationWarning].Clear(0,0);
-END_IF]]></ST>
+END_IF
+
+eCurrentAlarmSeverity := TcEventSeverity.Verbose;
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbComponentBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
     <Property Name="Name" Id="{8d65d0ee-79e5-44fd-9af0-abf9b261fcfa}" FolderPath="01_ITF_ComponentBase\01_Properties\01_Config\">
@@ -423,12 +444,18 @@ END_VAR
     <LineIds Name="FB_ComponentBase.BlockHMIControl">
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_ComponentBase.CreateEvents">
+      <LineId Id="7" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_ComponentBase.CurrentAlarmSeverity.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.CyclicLogic">
       <LineId Id="57" Count="14" />
       <LineId Id="49" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="73" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Enabled.Get">
       <LineId Id="2" Count="0" />
@@ -492,6 +519,8 @@ END_VAR
       <LineId Id="26" Count="1" />
       <LineId Id="29" Count="1" />
       <LineId Id="28" Count="0" />
+      <LineId Id="39" Count="3" />
+      <LineId Id="38" Count="0" />
     </LineIds>
     <LineIds Name="FB_ComponentBase.Name.Get">
       <LineId Id="2" Count="0" />

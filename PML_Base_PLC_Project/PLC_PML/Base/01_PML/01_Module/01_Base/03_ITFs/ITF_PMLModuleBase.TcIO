@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <Itf Name="ITF_PMLModuleBase" Id="{eca4a56b-850e-483e-b687-2de3b3950c24}">
-    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase
+    <Declaration><![CDATA[INTERFACE ITF_PMLModuleBase EXTENDS ITF_PMLControl
+
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{b9b76dff-8c1e-4a81-8fb8-90bae0384924}">
       <Folder Name="01_Config" Id="{c034098c-56e3-4732-a681-b27df2a6a3ee}" />
@@ -69,18 +70,6 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="Mode" Id="{68aa19f0-a027-4849-bb10-f5584ab8d043}" FolderPath="01_Properties\03_Status\">
-      <Declaration><![CDATA[PROPERTY Mode : E_PMLUnitMode]]></Declaration>
-      <Get Name="Get" Id="{e4c0be11-49fb-4f99-95fb-f87a759ebdeb}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Property Name="ModeCommand" Id="{11907bf7-f645-420b-85af-3bf0127cd7f1}" FolderPath="01_Properties\02_Control\">
-      <Declaration><![CDATA[PROPERTY ModeCommand : DINT]]></Declaration>
-      <Set Name="Set" Id="{0cf2eb2e-aedc-4e54-afcc-be209278627f}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Set>
-    </Property>
     <Property Name="ModuleID" Id="{b15ae476-29f6-49b3-bc0b-8d8de1f9a2ad}" FolderPath="01_Properties\01_Config\">
       <Declaration><![CDATA[PROPERTY ModuleID : UDINT]]></Declaration>
       <Get Name="Get" Id="{15915578-ed14-421a-b902-68fca348c24a}">
@@ -141,18 +130,6 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{c531c7fa-5d73-4c05-905b-cee2a27a5492}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Set>
-    </Property>
-    <Property Name="State" Id="{43595dac-7213-416e-a39c-be01c96ab13c}" FolderPath="01_Properties\03_Status\">
-      <Declaration><![CDATA[PROPERTY State : E_PMLState]]></Declaration>
-      <Get Name="Get" Id="{21f6fac7-5f70-4bd9-8ec4-66822702fbf5}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Property Name="StateCommand" Id="{1c454ada-e18d-4933-8772-ef90079bfec6}" FolderPath="01_Properties\02_Control\">
-      <Declaration><![CDATA[PROPERTY StateCommand : E_PMLCommand]]></Declaration>
-      <Set Name="Set" Id="{3495e55a-b4ad-4161-a7ba-1793fe13d390}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>

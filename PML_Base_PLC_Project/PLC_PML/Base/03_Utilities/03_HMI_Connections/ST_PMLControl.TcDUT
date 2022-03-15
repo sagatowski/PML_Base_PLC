@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <DUT Name="ST_PMLControl" Id="{b98df5eb-74fe-4f0b-aa48-e46153fa07dc}">
+    <Declaration><![CDATA[TYPE ST_PMLControl :
+STRUCT
+	bNewCommand		: BOOL;
+	bConfirmation	: BOOL;
+	
+	eMode			: E_PMLUnitMode;
+	eModeCommand	: E_PMLUnitMode;
+	
+	eState			: E_PMLState;
+	eStateCommand	: E_PMLCommand;
+	
+	a_sModeNames	: ARRAY[0..31] OF STRING;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

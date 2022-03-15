@@ -8,7 +8,7 @@ VAR_OUTPUT
 END_VAR
 VAR
 	//I/O definitions
-	fbHomeSensor		: FB_Sensor;
+	fbHomeSensor		: FB_Sensor := (Name := 'Home Sensor');
 	
 	//Internal Property Variables
 	fHomePositionSetpoint		: LREAL := 0;

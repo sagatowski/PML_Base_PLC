@@ -66,11 +66,11 @@ IF fbWriteParameter.Done AND fbWriteParameter.ParameterNumber = MC_AxisParameter
 	fModuloFactor := fbWriteParameter.Value;
 END_IF
 
-IF fbWriteParameter.Error AND NOT fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
+IF fbWriteParameter.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
 										
-ELSIF NOT fbAxisPower.Error AND fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
+ELSIF NOT fbAxisPower.Error AND a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
+	a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
 END_IF
 
 SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>

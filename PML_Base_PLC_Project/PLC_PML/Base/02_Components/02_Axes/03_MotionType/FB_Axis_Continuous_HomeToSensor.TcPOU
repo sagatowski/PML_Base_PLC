@@ -66,14 +66,17 @@ IF fbWriteParameter.Done AND fbWriteParameter.ParameterNumber = MC_AxisParameter
 	fModuloFactor := fbWriteParameter.Value;
 END_IF
 
-IF fbWriteParameter.Error AND NOT fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	RaiseAlarmWithStrings(	fbAlarm :=  fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
+IF fbWriteParameter.Error AND NOT a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
+	RaiseAlarmWithStrings(	fbAlarm :=  a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError], UDINT_TO_STRING(fbWriteParameter.ErrorID), '');
 										
-ELSIF NOT fbAxisPower.Error AND fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
-	fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
+ELSIF NOT fbAxisPower.Error AND a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].bRaised THEN
+	a_fbAxisBaseAlarms[E_AxisBase.WriteParameterError].Clear(0,0);
 END_IF
 
-SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done]]></ST>
+SUPER^.Monitoring();		//Called last to allow the bReady bit to be evaluated after all error checking is done
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbAxisBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotionControl" Id="{5ed14d51-d145-4b12-b9b6-42755a0e8a41}" FolderPath="01_SUPER_Overrides\">
@@ -160,6 +163,8 @@ END_IF]]></ST>
       <LineId Id="8" Count="0" />
       <LineId Id="32" Count="0" />
       <LineId Id="31" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="33" Count="0" />
     </LineIds>
     <LineIds Name="FB_Axis_Continuous_HomeToSensor.MotionControl">
       <LineId Id="5" Count="0" />

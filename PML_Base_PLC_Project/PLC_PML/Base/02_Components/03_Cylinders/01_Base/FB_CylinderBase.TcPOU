@@ -83,6 +83,20 @@ END_VAR
 stCylinderBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CreateEvents" Id="{f1336455-33ac-493a-815d-77a8acee710d}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[{attribute 'call_after_online_change_slot' := '<slot>'}
+METHOD CreateEvents : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[F_CreateAllEventsInClass(	p_aAlarms := a_fbCylinderBaseAlarms,
+							nClassSize := SIZEOF(TC_EVENTS.CylinderBase),
+							pInitEvent := ADR(TC_EVENTS.PMLAlarms.InitReferenceEvent),
+							sPrefix := sName);
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ErrorOperation" Id="{8d55c932-b7f7-4c17-b6cb-b28020145d63}" FolderPath="01_SUPER_Overrides\">
       <Declaration><![CDATA[METHOD ErrorOperation : BOOL
 VAR_INPUT
@@ -318,7 +332,7 @@ IF NOT bError THEN
 	
 	//If the cylinder takes longer than expected to extend, throw a timeout error
 	IF fbExtensionTimeout_TON.Q THEN
-		RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout]);
+		RaiseAlarmWithStrings(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout],TIME_TO_STRING(tExtensionTimeout), '');
 	END_IF
 	
 	//If the cylinder takes longer than expected to retract, throw a timeout error
@@ -358,7 +372,10 @@ ELSE
 	bExtending := FALSE;
 END_IF
 
-bReady := bEnabled AND NOT bError;]]></ST>
+bReady := bEnabled AND NOT bError;
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbCylinderBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
     <Method Name="Reset" Id="{2939002c-4b5f-4b1b-957e-dc41265429f6}" FolderPath="01_SUPER_Overrides\">
@@ -520,6 +537,10 @@ END_VAR
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_CylinderBase.CreateEvents">
+      <LineId Id="7" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_CylinderBase.ErrorOperation">
       <LineId Id="5" Count="1" />
     </LineIds>
@@ -643,6 +664,8 @@ END_VAR
       <LineId Id="215" Count="0" />
       <LineId Id="235" Count="0" />
       <LineId Id="234" Count="0" />
+      <LineId Id="242" Count="1" />
+      <LineId Id="241" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderBase.Reset">
       <LineId Id="3" Count="0" />
