@@ -694,7 +694,7 @@ VAR
 	i : UDINT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[sID_Name := CONCAT(CONCAT(CONCAT(CONCAT(CONCAT('Module ', sAncestorIDs), DINT_TO_STRING(nModuleID)), ' - '), sModuleName), ' '); 	//Creates a utility string for alarms and other messaging that reads (example text) - "Module 10 - Main Casepacker" to be followed by the alarm or message info
+        <ST><![CDATA[sID_Name := CONCAT(CONCAT(CONCAT(CONCAT(CONCAT('Module ', sAncestorIDs), UDINT_TO_STRING(nModuleID)), ' - '), sModuleName), ' '); 	//Creates a utility string for alarms and other messaging that reads (example text) - "Module 10 - Main Casepacker" to be followed by the alarm or message info
 CreateEvents();
 
 // Figure out how many Submodules were instantiated - they should be from 1 to X and not skip any indices.

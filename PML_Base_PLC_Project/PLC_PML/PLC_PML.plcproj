@@ -22,9 +22,6 @@
     <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_PMLUnitMode.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_SequenceState.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS\T_PackMLTags.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -97,7 +94,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="Base\01_PML\99_Templates\01_ModuleTemplate\FB_ApplicationModule_TEMPLATE.TcPOU">
+    <Compile Include="Base\01_PML\99_Templates\FB_Module_TEMPLATE.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base\02_Components\01_Base\FB_ComponentBase.TcPOU">
@@ -293,7 +290,6 @@
     <Folder Include="Base\01_PML\03_Visualizations" />
     <Folder Include="Base\01_PML\98_EventDefinitions" />
     <Folder Include="Base\01_PML\99_Templates" />
-    <Folder Include="Base\01_PML\99_Templates\01_ModuleTemplate" />
     <Folder Include="Base\01_PML\README_REFERENCES" />
     <Folder Include="Base\02_Components" />
     <Folder Include="Base\02_Components\01_Base" />

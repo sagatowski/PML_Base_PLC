@@ -11,7 +11,7 @@ VAR
 														Enabled 					:=  TRUE,
 														ModuleName 					:=  'Test Equipment 1',
 														ModuleID 					:=  1,
-														AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_'));
+														AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
 	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
@@ -70,7 +70,7 @@ fbEquipmentModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
 fbEquipmentModule1.Enabled 						:=  TRUE;
 fbEquipmentModule1.ModuleName 					:=  'Test Equipment 1';
 fbEquipmentModule1.ModuleID 					:=  1;
-fbEquipmentModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_');
+fbEquipmentModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_');
 
 iMasterDataStructure_Adder.AddNodeAsChildByName(fbEquipmentModule1.ModuleName, sModuleName);
 

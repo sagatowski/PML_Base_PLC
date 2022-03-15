@@ -23,8 +23,8 @@ END_VAR]]></Declaration>
 	initialize();
 END_IF]]></ST>
     </Implementation>
-    <Folder Name="01_ITF_Tree_IndexBased" Id="{a3bc00ea-a8f6-421c-938a-2a78cd275621}" />
-    <Method Name="AddNodeAsChildByName" Id="{cf8f65b6-5cf8-45a5-99be-5fee703fb657}" FolderPath="01_ITF_Tree_IndexBased\">
+    <Folder Name="01_ITF_Tree" Id="{a3bc00ea-a8f6-421c-938a-2a78cd275621}" />
+    <Method Name="AddNodeAsChildByName" Id="{cf8f65b6-5cf8-45a5-99be-5fee703fb657}" FolderPath="01_ITF_Tree\">
       <Declaration><![CDATA[METHOD AddNodeAsChildByName : BOOL
 VAR_INPUT
 	sNewName 	: STRING;

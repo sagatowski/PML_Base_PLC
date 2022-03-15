@@ -66,7 +66,7 @@ fb_EM1_ControlModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
 fb_EM1_ControlModule1.Enabled 						:=  TRUE;
 fb_EM1_ControlModule1.ModuleName 					:=  'Test Control 1';
 fb_EM1_ControlModule1.ModuleID 						:=  1;
-fb_EM1_ControlModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, DINT_TO_STRING(nModuleID)), '_');
+fb_EM1_ControlModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_');
 
 iMasterDataStructure_Adder.AddNodeAsChildByName(fb_EM1_ControlModule1.ModuleName, sModuleName);
 
