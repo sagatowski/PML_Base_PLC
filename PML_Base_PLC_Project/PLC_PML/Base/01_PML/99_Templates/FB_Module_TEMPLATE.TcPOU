@@ -4,9 +4,17 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Module_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
 	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
-	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1');
+	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1'iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
+																	Enabled 					:=  TRUE,
+																	ModuleName 					:=  'Test Equipment 1',
+																	ModuleID 					:=  1,
+																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
 	*)
 	(*fbSubModule2				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 2');
+																	Enabled 					:=  TRUE,
+																	ModuleName 					:=  'Test Equipment 1',
+																	ModuleID 					:=  1,
+																	AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
 	*)
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
