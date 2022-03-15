@@ -162,18 +162,8 @@ FOR nIndex := 1 TO nNumberOfSubModules DO
 	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Abort;
 END_FOR
 
-FOR nIndex:=1 TO nNumberOfComponents DO
-	IF a_ITF_Components[nIndex].Enabled THEN
-		a_ITF_Components[nIndex].Enabled := FALSE;
-	END_IF
-END_FOR
-
 // All subunits in requested state?
 bSubModulesReady := TRUE;
-
-FOR nIndex:=1 TO nNumberOfComponents DO		
-	bSubModulesReady := bSubModulesReady AND NOT (a_ITF_Components[nIndex].Ready OR a_ITF_Components[nIndex].Enabled);
-END_FOR
 
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Aborted);
@@ -260,8 +250,16 @@ END_FOR]]></ST>
 //Perform State tasks here
 // Send clear command to all sub modules
 FOR nIndex := 1 TO nNumberOfSubModules DO	
-	a_ITF_PackMLBase[nIndex].StateCommand	:=	ePMLCommand_Clear;
+	a_ITF_PackMLBase[nIndex].StateCommand := ePMLCommand_Clear;
 END_FOR
+
+IF a_fbBaseAlarms[E_BaseAlarms.ComponentError].bRaised THEN
+	a_fbBaseAlarms[E_BaseAlarms.ComponentError].Clear(0,0);
+END_IF;
+
+IF a_fbBaseAlarms[E_BaseAlarms.SubModuleError].bRaised THEN
+	a_fbBaseAlarms[E_BaseAlarms.SubModuleError].Clear(0,0);
+END_IF;
 
 
 // All subunits in requested state?
@@ -869,14 +867,15 @@ fbModeManager(
 	nErrorId				=> 
 	);
 	
-IF fbModeManager.bError THEN
+IF fbModeManager.bError AND bReachedInitialDefaultStateAndMode THEN
 	IF NOT a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].bRaised THEN
 		a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].Raise(0);
 	END_IF
+ELSIF a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].bRaised THEN
+	a_fbPMLAlarms[E_PMLAlarms.ModeCommandInvalid].Clear(0,0);
 END_IF
 
 // Reset mode control command
-eModeCommand := E_PMLUnitMode.ePMLUnitMode_Invalid;
 fbModeManager.bExecute 		:= FALSE;
 
 //If PackML mode has changed
@@ -1097,19 +1096,18 @@ END_VAR
 //This particular method's functionality can be overriden in the extended block by creating a method of the same name, with desired functionality therein
 //If the functionality of this base module is to be retained, but more functionality is desired, the extended method can contain a SUPER^.ThisMethodName(); call, which will call this code
 //*************************************************************************************************************************************************************************
-(*
+
 //Perform State tasks here
 // Send start command to all sub modules
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	a_ITF_PackMLBase[nIndex].StateCommand:=ePMLCommand_Start;
 END_FOR
-*)		//Direct PML state control means we don't want all children immediately going into starting with the parent, only once the parent has deemed the situation appropriate for the child to execute
 
 // All subunits in requested state?
-bSubModulesReady	:= TRUE; (*
+bSubModulesReady	:= TRUE; 
 FOR nIndex := 1 TO nNumberOfSubModules DO
 	bSubModulesReady := bSubModulesReady AND (a_ITF_PackMLBase[nIndex].State = ePMLState_Execute);
-END_FOR *)
+END_FOR 
 IF bSubModulesReady AND (bStateTasksComplete OR bNoStateTasksToComplete) THEN
 	bNoStateTasksToComplete := TRUE;
 	bStateTasksComplete := FALSE;
@@ -1184,12 +1182,14 @@ IF eState <> eLastState  THEN
 	eLastState := eState; 
 END_IF 
 	
-//Log appropriate state changes
-fbPMLStateLogger(
-	a_fbPMLAlarms := a_fbPMLAlarms, 
-	sModulePrefix := SID_Name, 
-	eState := eState,
-	bLogAllChanges := bLogStateChanges);	
+IF bReachedInitialDefaultStateAndMode THEN
+	//Log appropriate state changes
+	fbPMLStateLogger(
+		a_fbPMLAlarms := a_fbPMLAlarms, 
+		sModulePrefix := SID_Name, 
+		eState := eState,
+		bLogAllChanges := bLogStateChanges);	
+END_IF
 
 // Call appropriate method depending on current PackML state
 CASE eState OF
@@ -1598,11 +1598,9 @@ END_IF]]></ST>
       <LineId Id="111" Count="0" />
       <LineId Id="108" Count="0" />
       <LineId Id="86" Count="4" />
-      <LineId Id="116" Count="5" />
-      <LineId Id="93" Count="2" />
-      <LineId Id="124" Count="2" />
-      <LineId Id="122" Count="0" />
-      <LineId Id="127" Count="0" />
+      <LineId Id="116" Count="0" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="124" Count="0" />
       <LineId Id="96" Count="3" />
       <LineId Id="114" Count="0" />
       <LineId Id="106" Count="0" />
@@ -1641,6 +1639,7 @@ END_IF]]></ST>
       <LineId Id="105" Count="2" />
       <LineId Id="109" Count="0" />
       <LineId Id="111" Count="0" />
+      <LineId Id="170" Count="7" />
       <LineId Id="158" Count="2" />
       <LineId Id="147" Count="1" />
       <LineId Id="161" Count="2" />
@@ -1833,15 +1832,10 @@ END_IF]]></ST>
       <LineId Id="110" Count="0" />
       <LineId Id="93" Count="11" />
       <LineId Id="108" Count="0" />
-      <LineId Id="140" Count="1" />
-      <LineId Id="144" Count="0" />
-      <LineId Id="142" Count="0" />
-      <LineId Id="145" Count="0" />
-      <LineId Id="143" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="149" Count="6" />
       <LineId Id="109" Count="0" />
-      <LineId Id="105" Count="0" />
-      <LineId Id="136" Count="0" />
-      <LineId Id="106" Count="0" />
+      <LineId Id="105" Count="1" />
       <LineId Id="111" Count="5" />
       <LineId Id="121" Count="0" />
       <LineId Id="124" Count="1" />
@@ -1919,7 +1913,6 @@ END_IF]]></ST>
     <LineIds Name="FB_PMLModuleBase.Starting">
       <LineId Id="160" Count="5" />
       <LineId Id="139" Count="4" />
-      <LineId Id="170" Count="0" />
       <LineId Id="146" Count="5" />
       <LineId Id="166" Count="3" />
       <LineId Id="154" Count="0" />
@@ -1943,8 +1936,7 @@ END_IF]]></ST>
       <LineId Id="179" Count="4" />
       <LineId Id="196" Count="14" />
       <LineId Id="218" Count="1" />
-      <LineId Id="278" Count="0" />
-      <LineId Id="273" Count="4" />
+      <LineId Id="281" Count="7" />
       <LineId Id="223" Count="39" />
       <LineId Id="62" Count="0" />
     </LineIds>
