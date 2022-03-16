@@ -1435,10 +1435,6 @@ External Setpoint Generation:
 					<Name>MC-Task (MPT)</Name>
 				</Task>
 			</Tasks>
-			<TypeSystem>
-				<AdditionalTmcFile Name="PMLBase_TMC" File="PLC_PML\Base\01_PML\98_EventDefinitions\PMLBase_TMC.tmc"/>
-				<AdditionalTmcFile Name="BasicComponents_AlarmDefinitions" File="PLC_PML\Base\02_Components\99_EventDefinitions\BasicComponents_AlarmDefinitions.tmc"/>
-			</TypeSystem>
 		</System>
 		<Motion>
 			<NC>
