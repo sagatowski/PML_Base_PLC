@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_MainHMI_Connection" Id="{c1188b0b-fda8-400d-83a0-4bed5c564a86}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MainHMI_Connection
+VAR_IN_OUT
+END_VAR
+VAR_INPUT
+	sTopLevelMachine : STRING;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbModuleTree : FB_Tree_IndexBased;
+	a_stMachineTreeNodes	: ARRAY[0..63] OF ST_Tree_IndexBased_Node;
+	bInitialized : BOOL;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bInitialized THEN
+	(*
+	sTopLevelMachine := 'My machine';		//TODO: Proper implementation of auto-generating tree structure
+	fbModuleTree(a_stNodes := stMachineTreeNodes, sHead := sTopLevelMachine);
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'EM1', sParentName := 'My machine');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM1', sParentName := 'EM1');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP1', sParentName := 'CM1');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP2', sParentName := 'CM1');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM2', sParentName := 'EM1');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM3', sParentName := 'EM1');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP3', sParentName := 'CM3');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'EM2', sParentName := 'My machine');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM4', sParentName := 'EM2');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM5', sParentName := 'EM2');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP4', sParentName := 'CM5');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP5', sParentName := 'CM5');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP10', sParentName := 'CM5');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP11', sParentName := 'CM5');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP12', sParentName := 'CM5');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM6', sParentName := 'EM2');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM7', sParentName := 'EM2');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP7', sParentName := 'CM7');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'EM3', sParentName := 'My machine');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM8', sParentName := 'EM3');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CM9', sParentName := 'EM3');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP8', sParentName := 'CM9');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'CP9', sParentName := 'CM9');
+	fbModuleTree.AddNodeAsChildByName(sNewName := 'EM4', sParentName := 'My machine');
+	*)
+	fbModuleTree(a_stNodes := a_stMachineTreeNodes, sHead := sTopLevelMachine);
+	
+	bInitialized := TRUE;
+END_IF]]></ST>
+    </Implementation>
+    <Property Name="DataStructure_Adder" Id="{acd045ca-4fdd-4391-9486-4c599ce99025}">
+      <Declaration><![CDATA[PROPERTY DataStructure_Adder : ITF_Tree_IndexBased]]></Declaration>
+      <Get Name="Get" Id="{7fccfe0b-bcf0-439a-b53c-58c304b9527a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DataStructure_Adder := fbModuleTree;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_MainHMI_Connection">
+      <LineId Id="18" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="42" Count="2" />
+      <LineId Id="65" Count="2" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MainHMI_Connection.DataStructure_Adder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

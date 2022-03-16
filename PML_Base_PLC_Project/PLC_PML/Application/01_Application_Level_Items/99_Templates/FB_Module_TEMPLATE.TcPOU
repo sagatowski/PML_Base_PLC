@@ -1,0 +1,772 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_Module_TEMPLATE" Id="{44c00981-3585-4538-bbce-d21beee256d9}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Module_TEMPLATE EXTENDS FB_PMLModuleBase
+VAR
+	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
+	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1');
+	*)
+	(*fbSubModule2				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 2');
+	*)
+	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
+																							 	fbSubModule2*)];
+
+	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+	*)
+	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)	
+	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [(*	fbComponent1,
+																											fbComponent2*)];
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//*********************************************************
+//Body of block is not called by base code, only implement application
+//code in CyclicUpdate or in methods called by it or its subcalls
+//*********************************************************]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{f8d8b220-72f9-48a9-9ea0-e208740f789c}">
+      <Folder Name="01_Properties" Id="{057d9d1a-ee49-4f19-8a8e-42e6aa4c339e}">
+        <Folder Name="01_Config" Id="{331100b9-f98f-4747-8f54-d0fce7db7a42}" />
+        <Folder Name="02_Control" Id="{ae3e5afd-d53d-4093-8ebe-aff2e7e7d938}" />
+        <Folder Name="03_Status" Id="{33277d99-4da9-43f5-93be-20a601b15ef0}" />
+      </Folder>
+      <Folder Name="02_Methods" Id="{19c5cdd7-570a-4a8c-8c2e-0d3729a276d3}" />
+      <Folder Name="03_TransitionStates" Id="{dc4f9408-7e17-43e6-92f9-f3fb8ef0556c}" />
+      <Folder Name="04_PrimaryStates" Id="{38edaf77-9798-4b46-b36f-091ed1d56038}" />
+    </Folder>
+    <Folder Name="02_Properties" Id="{622b930f-94e4-47af-8e64-1bce8c192706}">
+      <Folder Name="01_Config" Id="{60f94e06-65b6-4e11-88a4-cbfadd90a020}" />
+      <Folder Name="02_Control" Id="{0df8385a-1171-4989-abde-723998077e92}" />
+      <Folder Name="03_Status" Id="{49d473b9-52dd-4d23-948d-b6a2dc357f76}" />
+    </Folder>
+    <Folder Name="03_Methods" Id="{7a7ecdb0-5f2b-448e-937a-8df184a6286e}" />
+    <Method Name="Aborted" Id="{115f0d92-9b74-4207-98d9-01bbe419601d}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Aborted
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Aborting" Id="{f8525f20-f595-4df6-a37f-5015b53b7fec}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Aborting]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Aborting();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clearing" Id="{ff990ee6-ab5b-4b58-a115-900e05af0a3f}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Clearing]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Clearing();
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Complete" Id="{b03e4f78-5c1e-4da5-bdad-0d056e0792b4}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Complete]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Completing" Id="{b10641f1-5701-4ac0-9217-732c3b77e29d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Completing]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Completing();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{12422e5e-a5c0-4929-9ad9-b99a74293d93}" FolderPath="01_SUPER_Overrides\02_Methods\">
+      <Declaration><![CDATA[// 
+// Cyclic Code
+METHOD CyclicLogic
+VAR
+	i								: UDINT;		//Generic iteration value
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Main loop of the parent module
+SUPER^.CyclicLogic();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Execute" Id="{4241bd48-fc56-47ed-a03f-f06bee0b8de4}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Execute ]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Held" Id="{8b7d10d4-56d1-44a0-b483-b75edbbd5aa4}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Held ]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Holding" Id="{13997f8d-82e7-42dd-a219-e0992db665ee}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Holding]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Holding();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Idle" Id="{ba890787-538d-464f-9cf3-cf1fe940fbce}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Idle ]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{442f3bf5-5552-4c37-b5b2-a49ca36d752d}" FolderPath="01_SUPER_Overrides\02_Methods\">
+      <Declaration><![CDATA[METHOD Initialize
+VAR
+	i								: UDINT;		//Generic iteration value
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
+FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
+	a_ITF_PackMLBase[i] := a_ITF_PackMLBase_init[i];
+END_FOR
+
+FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
+	a_ITF_Components[i] := a_ITF_Components_init[i];
+END_FOR
+
+// Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
+SUPER^.Initialize();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Resetting" Id="{7565530e-bb29-4323-9478-8b5cf80eeec5}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Resetting]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Resetting();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Starting" Id="{d7fb0679-54a8-4166-bc3f-65cfbf96a41a}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Starting]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Starting();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stopped" Id="{98c12991-c1d2-4cb1-a15e-a79edff2bbe1}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Stopped]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stopping" Id="{a2353e86-b48b-4844-8cfa-38fb6356963a}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Stopping]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Stopping();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Suspended" Id="{abaf0f7b-1797-42dc-8264-67066b23666c}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Suspended]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Suspending" Id="{4a96f516-2ab2-4259-856f-ce4b47b47f7d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Suspending]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Suspending();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Undefined" Id="{3c51e684-53f6-47f3-bf4c-ce7a21a58158}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
+      <Declaration><![CDATA[METHOD Undefined ]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Unholding" Id="{3c1714cd-0eb3-473b-b55c-c60b1d11d33e}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Unholding]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Unholding();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Unsuspending" Id="{922b0ce4-9914-4a7f-862d-70e53c049c14}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
+      <Declaration><![CDATA[METHOD Unsuspending]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//bNoStateTasksToComplete := TRUE;		// Change to False if not used
+
+//Implement state Tasks here
+(*
+IF (insert your completion conditions) THEN
+
+bStateTasksComplete := TRUE;				//Once these actions are completed successfully, set bStateTasksComplete to allow the base code to advance once all children have also reached the proper state
+
+END_IF
+*)
+
+SUPER^.Unsuspending();
+
+(*	Reference State Machine for mode specific actions - Be sure to paste above the SUPER^ Call if used - Delete if not needed
+
+CASE eMode OF
+//	====================================================================PRODUCTION MODE=========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Production:			
+		;
+//	====================================================================MANUAL MODE=============================================================	
+	E_PMLUnitMode.ePMLUnitMode_Manual:				
+		;
+//	=====================================================================MAINTENANCE MODE=======================================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
+		;	
+//	=====================================================================CUSTOM MODE 1==========================================================	
+(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+		;*)
+//	======================================================================INVALID MODE==========================================================	
+	E_PMLUnitMode.ePMLUnitMode_Invalid:				
+		;
+END_CASE
+*)]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Module_TEMPLATE">
+      <LineId Id="89" Count="1" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="91" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Aborted">
+      <LineId Id="86" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Aborting">
+      <LineId Id="17" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="25" Count="3" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="38" Count="3" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="95" Count="11" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="108" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Clearing">
+      <LineId Id="199" Count="9" />
+      <LineId Id="151" Count="1" />
+      <LineId Id="209" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Complete">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Completing">
+      <LineId Id="112" Count="9" />
+      <LineId Id="64" Count="1" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="122" Count="18" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.CyclicLogic">
+      <LineId Id="54" Count="1" />
+      <LineId Id="52" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Execute">
+      <LineId Id="116" Count="16" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="23" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Held">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Holding">
+      <LineId Id="205" Count="9" />
+      <LineId Id="157" Count="2" />
+      <LineId Id="215" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Idle">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Initialize">
+      <LineId Id="108" Count="0" />
+      <LineId Id="100" Count="1" />
+      <LineId Id="106" Count="1" />
+      <LineId Id="116" Count="3" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="112" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Resetting">
+      <LineId Id="225" Count="9" />
+      <LineId Id="177" Count="2" />
+      <LineId Id="235" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Starting">
+      <LineId Id="230" Count="9" />
+      <LineId Id="182" Count="2" />
+      <LineId Id="240" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Stopped">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Stopping">
+      <LineId Id="121" Count="9" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="131" Count="18" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Suspended">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Suspending">
+      <LineId Id="256" Count="9" />
+      <LineId Id="208" Count="2" />
+      <LineId Id="266" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Undefined">
+      <LineId Id="29" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Unholding">
+      <LineId Id="271" Count="9" />
+      <LineId Id="223" Count="2" />
+      <LineId Id="281" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Module_TEMPLATE.Unsuspending">
+      <LineId Id="284" Count="9" />
+      <LineId Id="236" Count="2" />
+      <LineId Id="294" Count="18" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

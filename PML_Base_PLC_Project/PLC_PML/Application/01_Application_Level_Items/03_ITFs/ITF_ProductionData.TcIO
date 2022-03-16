@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <Itf Name="ITF_ProductionData" Id="{385c5811-f62c-4a92-b377-0bca2435c55d}">
+    <Declaration><![CDATA[INTERFACE ITF_ProductionData
+]]></Declaration>
+    <Folder Name="01_Properties" Id="{8078a151-53fe-400a-8762-678a23b702cd}">
+      <Folder Name="01_Config" Id="{f86c6fcf-5925-410a-a775-66742848057a}" />
+      <Folder Name="02_Control" Id="{04d14c25-a201-43af-af53-0fb6d28bfc02}" />
+      <Folder Name="03_Status" Id="{b4b17b14-95ec-4d78-a203-c5b06ad0812c}" />
+    </Folder>
+    <Property Name="CurrentShiftAcceptableProduction" Id="{f99e4f02-7537-4331-afda-71522398c1c0}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftAcceptableProduction : DINT]]></Declaration>
+      <Get Name="Get" Id="{01e076cc-258e-4c04-8bb8-df7546f0d168}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{09b543c5-f983-4746-93ae-08482b72fda2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="CurrentShiftProductionCount" Id="{08ce43d8-c1e8-405c-a922-10e44b814996}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftProductionCount : DINT]]></Declaration>
+      <Get Name="Get" Id="{f2dd4e8e-a4e1-4187-9f89-fd1396fbbb47}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftTarget" Id="{95005ec8-7279-4e1a-8102-99daed3695ee}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftTarget : DINT]]></Declaration>
+      <Get Name="Get" Id="{376e6f54-3494-403a-a988-970c003eb72d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftTime" Id="{53313951-2db0-4688-b067-4b68c3f9453d}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftTime : TIME]]></Declaration>
+      <Get Name="Get" Id="{cf27bec5-662c-4afc-9703-e33fd087458b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="CurrentShiftWarningProduction" Id="{f64661b2-179e-421f-b940-a6e30da4bb19}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY CurrentShiftWarningProduction : DINT]]></Declaration>
+      <Get Name="Get" Id="{62a27186-7f54-4184-a57f-5142aea6da0a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{e0be16b4-73bc-4057-8c10-fe7ba0004e9b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="NewProductionRate" Id="{76524fe7-326f-4be4-8d64-60c5f0cb9675}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY NewProductionRate : bool]]></Declaration>
+      <Get Name="Get" Id="{c95d1755-fc8e-4e2d-8660-8f268ad75578}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ProductComplete" Id="{d9104369-c842-42aa-a23c-411c9c46491b}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ProductComplete : bool]]></Declaration>
+      <Get Name="Get" Id="{cbb64762-b8bd-45e0-9133-ad3245ad9233}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{a1d9cac7-ccd7-4f3e-afa9-58d530a137c8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ProductionRate_Actual" Id="{f3c1e02c-7585-4133-8bff-b092b9b4db2a}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ProductionRate_Actual : lreal]]></Declaration>
+      <Get Name="Get" Id="{e63ad945-59b6-49ba-8709-d452bf4af75b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ProductionRate_Required" Id="{fc7ba1b5-faf8-4a2b-85d8-a3529d1619b0}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ProductionRate_Required : lreal]]></Declaration>
+      <Get Name="Get" Id="{28a365b2-e879-4b8b-872a-903e3762d40a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{89cdbc0a-b73c-411f-a7d1-c304bef28abe}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ProductionRate_Setpoint" Id="{9a25ca13-9882-4ca8-916b-9d3d00e7a16c}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ProductionRate_Setpoint : lreal]]></Declaration>
+      <Get Name="Get" Id="{03e55210-f071-4967-8e90-5052eb4a45b5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{11b2cbe5-ce9e-4699-8444-30c12b7837b5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="RateAveragingCount" Id="{d5d00085-f3c9-4bd2-a777-4dfe2e7a6e6d}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY RateAveragingCount : DINT]]></Declaration>
+      <Get Name="Get" Id="{769a4204-5cc3-4f8e-bf23-4a35580b4d46}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{863f70f1-aecc-4202-91e7-9ee11722e7ca}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="RemainingShiftTime" Id="{5e4bd34f-a7c2-482d-beee-8b891d73460e}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY RemainingShiftTime : TIME]]></Declaration>
+      <Get Name="Get" Id="{10e3ca56-b798-4a6f-8ddc-f99a92270904}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{366a4071-625e-4cd0-af9c-bf5b2a92deef}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ShiftComplete" Id="{576d3278-26dd-4ee1-a2f6-f6da517a33f5}" FolderPath="01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ShiftComplete : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9ce2d284-4356-45c2-aee1-5f8b451ea5a8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ShiftLength" Id="{28a0a7b7-5a3c-4732-8a21-0183efbee719}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ShiftLength : TIME]]></Declaration>
+      <Get Name="Get" Id="{afe4f98d-5e1b-42e5-b447-47ec95ca6744}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{298f4947-589f-4c55-bce7-9f024e4b2c8f}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ShiftProductionTarget" Id="{4da88bf0-44ed-4f1e-9210-eb1550f0cd97}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ShiftProductionTarget : DINT]]></Declaration>
+      <Get Name="Get" Id="{c77f6239-d6d2-434e-b27d-f5e4c3b7fd1a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{10257813-ac00-4a78-8986-4055099b71c1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="WarningMargin" Id="{bb1602fc-adb1-47ad-9673-2317de9782ca}" FolderPath="01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY WarningMargin : LREAL//0 to 100, interpreted as a percentage difference between the current rate and the required rate to meet the production target, decimal values permitted
+]]></Declaration>
+      <Get Name="Get" Id="{5cddaaa4-d002-490c-b219-1b6e16eabde8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{3f2a141c-9f02-405c-b129-fb6c97ed4c71}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

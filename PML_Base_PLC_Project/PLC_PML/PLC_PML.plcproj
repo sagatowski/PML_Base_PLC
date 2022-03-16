@@ -22,12 +22,33 @@
     <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_PMLUnitMode.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Application\01_Application_Level_Items\02_DUT\02_STRUCT\ST_ProductionData_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS\T_PackMLTags.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Application\01_Application_Level_Items\99_VISU\V_Application.TcVIS">
+    <Compile Include="Application\01_Application_Level_Items\03_ITFs\ITF_ProductionData.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\FB_MainHMI_Connection.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\ST_PMLControl.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\ST_PMLControl_Simplified.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\999_VISU\V_Application.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\99_Templates\FB_Module_TEMPLATE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Application\01_Application_Level_Items\FB_ProductionMonitor.TcPOU">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\02_MachineModules\FB_TestMachine.TcPOU">
       <SubType>Code</SubType>
@@ -36,218 +57,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\MAIN.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\01_ENUM\E_AlarmResponse.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLModuleBase_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLModuleBase_VISU.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_PMLSubUnitInfoExt.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT\ST_ProductionData_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_PMLControl.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_PMLModuleBase.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\03_ITFs\ITF_ProductionData.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\01_Base\FB_PMLModuleBase.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\02_Events\FB_PMLModeLogger.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\02_Events\FB_PMLStateLogger.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\03_ITFs\ITF_PackML_ExternalControl.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\03_ITFs\ITF_PackML_ExternalControl_Simplified.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\FB_ModuleExternalCommandControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\FB_PackML_ExternalControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\FB_PackML_PushButtonControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\03_PMLControl\ITF_PackML_ExternalControl_Simplified_old.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\01_Module\05_Visualizations\V_Module.TcVIS">
-      <SubType>Code</SubType>
-      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
-    </Compile>
-    <Compile Include="Base\01_PML\02_GVL\GVL_PML_Base.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\01_PML\03_Visualizations\V_MachineModule.TcVIS">
-      <SubType>Code</SubType>
-      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
-    </Compile>
-    <Compile Include="Base\01_PML\99_Templates\FB_Module_TEMPLATE.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\01_Base\FB_ComponentBase.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\01_Base\ITF_ComponentBase.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\01_Base\ST_ComponentBase_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\01_Base\FB_AxisBase.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\01_Base\ITF_AxisBase.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\01_Base\ST_AxisBase_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToExternalForceFeedback.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToHardStop.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToMotorToque.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_HomeToSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\02_Homing\FB_Axis_NoHoming.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Continuous_HomeToSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Continuous_NoHoming.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Discrete_HomeToExternalForce.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\FB_Axis_Discrete_HomeToSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\ITF_Axis_Continuous.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\02_Axes\03_MotionType\ITF_Axis_Discrete.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\01_Base\FB_CylinderBase.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\01_Base\ITF_CylinderBase.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\01_Base\ST_CylinderBase_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_DualSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_ExtendedSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_NoSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_RetractedSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\02_Feedback\FB_Cylinder_SingleSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_DualTimer.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualPWM_SingleSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\03_Actuation\FB_Cylinder_DualSolenoid_DualSensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\03_Cylinders\04_Utilities\FB_Enfield_LSV_PWM_SolenoidControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\01_Base\E_DebounceMode.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\01_Base\E_SensorSimulationMode.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\01_Base\FB_SensorBase.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\01_Base\ITF_SensorBase.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\01_Base\ST_SensorBase_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\02_Components\04_Sensors\02_Sensor\FB_Sensor.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\01_Events\F_CreateAllEventsInClass.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\01_Events\F_GetMaxSeverityRaised.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmAndSetFlags.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmWithStringParameters.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\01_Events\F_RaiseAlarmWithStringsAndFlags.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\FB_Tree_IndexBased.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\ITF_Tree_IndexBased.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased\ST_Tree_IndexBased_Node.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\02_DataStructures\02_FIFO\FB_FIFO_ULINT_Array.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\03_HMI_Connections\FB_MainHMI_Connection.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\03_HMI_Connections\ST_PMLControl.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\03_HMI_Connections\ST_PMLControl_Simplified.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Base\03_Utilities\05_Math\01_LREAL\F_LREAL_RoundToPlace.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GlobalTextList.TcGTLO">
@@ -267,62 +76,22 @@
     <Folder Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS" />
     <Folder Include="Application\01_Application_Level_Items\01_GVL" />
     <Folder Include="Application\01_Application_Level_Items\02_DUT" />
-    <Folder Include="Application\01_Application_Level_Items\99_VISU" />
+    <Folder Include="Application\01_Application_Level_Items\04_HMI_Connections" />
+    <Folder Include="Application\01_Application_Level_Items\999_VISU" />
+    <Folder Include="Application\01_Application_Level_Items\03_ITFs" />
+    <Folder Include="Application\01_Application_Level_Items\99_Templates" />
+    <Folder Include="Application\01_Application_Level_Items\README_REFERENCES" />
     <Folder Include="Application\02_MachineModules" />
     <Folder Include="Application\03_EquipmentModules" />
     <Folder Include="Application\01_Application_Level_Items" />
     <Folder Include="Application" />
     <Folder Include="Application\04_Components" />
-    <Folder Include="Base" />
-    <Folder Include="Base\01_PML" />
-    <Folder Include="Base\01_PML\01_Module" />
-    <Folder Include="Base\01_PML\01_Module\01_Base" />
-    <Folder Include="Base\01_PML\01_Module\01_Base\01_GVL" />
-    <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT" />
-    <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT\01_ENUM" />
-    <Folder Include="Base\01_PML\01_Module\01_Base\02_DUT\02_STRUCT" />
-    <Folder Include="Base\01_PML\01_Module\01_Base\03_ITFs" />
-    <Folder Include="Base\01_PML\01_Module\02_Events" />
-    <Folder Include="Base\01_PML\01_Module\02_Events\01_GVL" />
-    <Folder Include="Base\01_PML\01_Module\02_Events\02_DUT" />
-    <Folder Include="Base\01_PML\01_Module\02_Events\03_ITFs" />
-    <Folder Include="Base\01_PML\01_Module\03_PMLControl" />
-    <Folder Include="Base\01_PML\01_Module\03_PMLControl\01_GVL" />
-    <Folder Include="Base\01_PML\01_Module\03_PMLControl\02_DUT" />
-    <Folder Include="Base\01_PML\01_Module\03_PMLControl\03_ITFs" />
-    <Folder Include="Base\01_PML\01_Module\05_Visualizations" />
-    <Folder Include="Base\01_PML\02_GVL" />
-    <Folder Include="Base\01_PML\03_Visualizations" />
-    <Folder Include="Base\01_PML\98_EventDefinitions" />
-    <Folder Include="Base\01_PML\99_Templates" />
-    <Folder Include="Base\01_PML\README_REFERENCES" />
-    <Folder Include="Base\02_Components" />
-    <Folder Include="Base\02_Components\01_Base" />
-    <Folder Include="Base\02_Components\02_Axes" />
-    <Folder Include="Base\02_Components\02_Axes\01_Base" />
-    <Folder Include="Base\02_Components\02_Axes\02_Homing" />
-    <Folder Include="Base\02_Components\02_Axes\03_MotionType" />
-    <Folder Include="Base\02_Components\03_Cylinders" />
-    <Folder Include="Base\02_Components\03_Cylinders\01_Base" />
-    <Folder Include="Base\02_Components\03_Cylinders\02_Feedback" />
-    <Folder Include="Base\02_Components\03_Cylinders\03_Actuation" />
-    <Folder Include="Base\02_Components\03_Cylinders\04_Utilities" />
-    <Folder Include="Base\02_Components\04_Sensors" />
-    <Folder Include="Base\02_Components\04_Sensors\01_Base" />
-    <Folder Include="Base\02_Components\04_Sensors\02_Sensor" />
-    <Folder Include="Base\02_Components\99_EventDefinitions" />
-    <Folder Include="Base\03_Utilities" />
-    <Folder Include="Base\03_Utilities\01_Events" />
-    <Folder Include="Base\03_Utilities\02_DataStructures" />
-    <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree" />
-    <Folder Include="Base\03_Utilities\02_DataStructures\01_Tree\01_Tree_IndexBased" />
-    <Folder Include="Base\03_Utilities\02_DataStructures\02_FIFO" />
-    <Folder Include="Base\03_Utilities\03_HMI_Connections" />
-    <Folder Include="Base\03_Utilities\04_Statistics" />
-    <Folder Include="Base\03_Utilities\05_Math" />
-    <Folder Include="Base\03_Utilities\05_Math\01_LREAL" />
   </ItemGroup>
   <ItemGroup>
+    <PlaceholderReference Include="PML_Base_Library">
+      <DefaultResolution>PML_Base_Library, * (SPT)</DefaultResolution>
+      <Namespace>PML_Base_Library</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="System_VisuElemMeter">
       <DefaultResolution>VisuElemMeter, 3.5.13.0 (System)</DefaultResolution>
       <Namespace>VisuElemMeter</Namespace>
@@ -404,19 +173,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Base\01_PML\98_EventDefinitions\PMLBase_TMC.tmc">
+    <Content Include="Application\01_Application_Level_Items\README_REFERENCES\01_PML_Module_GettingStarted.txt">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Base\01_PML\98_EventDefinitions\PMLBase_TMCTemplate.xlsx">
+    <Content Include="Application\01_Application_Level_Items\README_REFERENCES\02_PML_State_Description.txt">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Base\01_PML\README_REFERENCES\01_PML_Module_GettingStarted.txt">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Base\01_PML\README_REFERENCES\02_PML_State_Description.txt">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Base\01_PML\README_REFERENCES\03_PML_Mode_Description.txt">
+    <Content Include="Application\01_Application_Level_Items\README_REFERENCES\03_PML_Mode_Description.txt">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
