@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
   <POU Name="FB_TestEquipment" Id="{01abdd42-f6e2-45ed-86cd-d63dea0e7096}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TestEquipment EXTENDS FB_PMLModuleBase
 VAR
@@ -15,6 +15,8 @@ VAR
 	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
 	*)	
 	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+
+	
 	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [];
 
 	// Other machine specific variables here

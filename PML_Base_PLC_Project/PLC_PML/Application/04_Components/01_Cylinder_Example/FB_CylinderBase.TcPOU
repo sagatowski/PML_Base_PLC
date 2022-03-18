@@ -1,0 +1,745 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+  <POU Name="FB_CylinderBase" Id="{52da9de5-3fad-4063-acc0-baf4f434d3da}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ABSTRACT FB_CylinderBase EXTENDS FB_ComponentBase IMPLEMENTS ITF_CylinderBase		//Abstract (non-instantiable) base definition from which numerous varieties of Cylinders may be derived through function block extension.
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR CONSTANT
+	//Constant declarations
+	CYLINDER_BASE_ALARM_COUNT	: UDINT := 16;
+END_VAR
+VAR
+	//ITF_Cylinder internal property variables
+	tExtendTime		: TIME := T#3S;		//Approximate expected time for the cylinder to complete an extension cycle
+	tRetractTime 	: TIME := T#3S;		//Approximate expected time for the cylinder to complete a retraction cycle
+	fTimeoutFactor	: LREAL := 1.5;		//Multiplicative factor that determines error timeout threshold based on the expected cycle time
+	bExtended 		: BOOL;				//Status bit for the position of the cylinder
+	bRetracted		: BOOL;				//Status bit for the position of the cylinder
+	bExtending		: BOOL;				//Cylinder is currently extending
+	bRetracting		: BOOL;				//Cylinder is currently retracting
+	bExtendOutput	: BOOL;				//Cylinder "extend" output is currently active
+	bRetractOutput	: BOOL; 			//Cylinder "retract" output is currently active
+
+	//Alarming
+	a_fbCylinderBaseAlarms : ARRAY[1..CYLINDER_BASE_ALARM_COUNT] OF FB_TcAlarm;
+	
+	//HMI monitoring and control structure
+	stCylinderBaseHMI		: ST_CylinderBase_HMI;
+	
+	//Internal Variables
+	fbExtensionTimeout_TON		: Tc2_Standard.TON;		//Timer for monitoring extension timeouts
+	tExtensionTimeout			: TIME;					//Extension timeout threshold calculated from expected ExtendTime and TimeoutFactor
+	fbRetractionTimeout_TON		: Tc2_Standard.TON;		//Timer for monitoring retraction timeouts
+	tRetractionTimeout			: TIME;					//Retraction timeout threshold calculated from expected RetractTime and TimeoutFactor
+	bExtendRequest				: BOOL;					//Extension request received
+	bRetractRequest				: BOOL;					//Retraction request received
+	bExtendCommand				: BOOL;					//Direct command to be sent to outputs
+	bRetractCommand				: BOOL;					//Direct command to be sent to outputs
+	bExtendedFeedback			: BOOL;					//Direct feedback value from inputs
+	bRetractedFeedback			: BOOL;					//Direct feedback value from inputs
+	bIncomingRequest			: BOOL;					//New external request has been made
+	
+	
+	//Simulation variables
+	fbSimExtend_TON		: Tc2_Standard.TON;
+	fbSimRetract_TON	: Tc2_Standard.TON;
+	bSimExtendCommand	: BOOL;
+	bSimRetractCommand	: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="01_SUPER_Overrides" Id="{3759e4fb-4932-4bdf-a384-c91488a99c06}" />
+    <Folder Name="02_ITF_CylinderBase" Id="{fd62914a-ce7f-45e1-a60f-6b0a8f056fa6}">
+      <Folder Name="01_Properties" Id="{8e42ea4e-7181-4c37-8410-860072bf559d}">
+        <Folder Name="01_Config" Id="{55fa993a-c06b-4028-b1a7-5143879c9882}" />
+        <Folder Name="02_Control" Id="{ccee1f0d-4c1d-4948-be0b-d67086a5625a}" />
+        <Folder Name="03_Status" Id="{a6c30b2c-9909-4495-9112-fe04e1710960}" />
+      </Folder>
+      <Folder Name="02_Methods" Id="{134e066b-1864-45a9-b950-def6585b175a}" />
+    </Folder>
+    <Method Name="AllowHMIControl" Id="{a5ee5410-0fd9-4d95-a297-dca265be3c39}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD AllowHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.AllowHMIControl();
+
+stCylinderBaseHMI.bHMIControlAvailable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BlockHMIControl" Id="{d150aa07-7c23-430a-8c55-ce8d4a658287}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD BlockHMIControl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.BlockHMIControl();
+
+stCylinderBaseHMI.bHMIControlAvailable := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateEvents" Id="{6068b42a-c1a3-47e9-846f-3a04bdbcf10f}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[//{attribute 'call_after_online_change_slot' := '<slot>'}
+METHOD CreateEvents : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CreateEvents();
+
+F_CreateAllEventsInClass(	p_aAlarms := a_fbCylinderBaseAlarms,
+							nClassSize := SIZEOF(TC_EVENTS.CylinderBase),
+							pInitEvent := ADR(TC_EVENTS.CylinderBase.InitReferenceEvent),
+							sPrefix := sName );]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ErrorOperation" Id="{8d55c932-b7f7-4c17-b6cb-b28020145d63}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD ErrorOperation : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bExtendCommand := FALSE;
+bRetractCommand := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Extend" Id="{f2f50916-95c8-4296-81fa-2eb45fed1456}" FolderPath="02_ITF_CylinderBase\02_Methods\">
+      <Declaration><![CDATA[METHOD Extend : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bExtendRequest := TRUE;
+bRetractRequest := FALSE;
+bIncomingRequest := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Extended" Id="{128445b1-3e80-4708-b9e1-19ce6b51555e}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY Extended : BOOL	//Status bit for the position of the cylinder
+]]></Declaration>
+      <Get Name="Get" Id="{781ffbcf-f0dd-4cfe-9ab3-9d16fba8d804}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Extended := bExtended;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Extending" Id="{8dc2b23f-dc4a-4aaf-9b9e-4760571c2eff}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY Extending : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b2a18490-80bd-4781-9d86-ccc9598925b0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Extending := bExtending;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ExtendOutput" Id="{a07bfd4f-6440-40b8-8c6f-596e6b612958}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY ExtendOutput : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b9d9d74a-1032-4e17-acbc-35de9f9613d9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExtendOutput := bExtendOutput;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ExtendTime" Id="{a4075211-1976-400b-8eea-c3bc8ac07233}" FolderPath="02_ITF_CylinderBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY ExtendTime : TIME	//Approximate expected time for the cylinder to complete an extension cycle
+]]></Declaration>
+      <Get Name="Get" Id="{e59f7847-22d0-41fe-998f-efe63fb99e79}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExtendTime := tExtendTime;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f413e2a7-c6ea-46a9-8129-6cd42817fadf}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[tExtendTime := ExtendTime;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="GenerateFeedback" Id="{39effa7c-ba5c-4a87-a1d4-a2f793cecf52}">
+      <Declaration><![CDATA[METHOD GenerateFeedback : BOOL
+VAR_INPUT
+	bExtend								: BOOL;
+	bRetract							: BOOL;
+END_VAR
+VAR_OUTPUT
+	bExtended_Generated					: BOOL;
+	bRetracted_Generated				: BOOL;
+END_VAR
+VAR_INST
+	bLastExtend			: BOOL;
+	bLastRetract		: BOOL;
+	bExtendedTemp		: BOOL;
+	bRetractedTemp		: BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF bExtend AND NOT bLastExtend THEN					//Whenever a new extend request comes in, check to see if we are still currently timing a retract action
+	IF fbSimRetract_TON.IN AND NOT bRetracted_Generated THEN			//If a retract action is still in progress, appropriately scale the extend time to account for the distance traveled during the in-process retraction
+		fbSimExtend_TON.PT := tExtendTime * (TIME_TO_UDINT(fbSimRetract_TON.ET) / TIME_TO_UDINT(tRetractTime));		//partial extend time = (full distance extend time) * (proportional distance covered during retraction)
+		fbSimRetract_TON.IN := FALSE;	//Disable retract timer
+	ELSIF NOT fbSimExtend_TON.IN THEN
+		fbSimExtend_TON.PT := tExtendTime;	//If no retraction was active, assume we are currently at fully retracted position, or this is the first command the cylinder has received, so initialize to full extend time
+	END_IF
+	bRetractedTemp := FALSE;
+	fbSimExtend_TON.IN := TRUE;				//Activate the extension timer
+ELSIF bRetract AND NOT bLastRetract THEN					//Same as above, but reversed
+	IF fbSimExtend_TON.IN AND NOT bExtended_Generated THEN
+		fbSimRetract_TON.PT := tRetractTime * (TIME_TO_UDINT(fbSimExtend_TON.ET) / TIME_TO_UDINT(tRetractTime));
+		fbSimExtend_TON.IN := FALSE;
+	ELSIF NOT fbSimRetract_TON.IN THEN
+		fbSimRetract_TON.PT := tRetractTime;
+	END_IF
+	bExtendedTemp := FALSE;
+	fbSimRetract_TON.IN := TRUE;
+END_IF
+
+bLastExtend := bExtend;
+bLastRetract := bRetract;
+
+IF fbSimExtend_TON.Q THEN		//Whenever the extend timer completes, set status to extended and turn off the timer
+	bExtendedTemp := TRUE;
+	fbSimExtend_TON.IN := FALSE;
+END_IF
+
+IF fbSimRetract_TON.Q THEN		//Whenever the retract timer completes, set status to retracted and turn off the timer
+	bRetractedTemp := TRUE;
+	fbSimRetract_TON.IN := FALSE;
+END_IF
+
+bExtended_Generated := bExtendedTemp;
+bRetracted_Generated := bRetractedTemp;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMICommunication" Id="{53a5999d-4f0f-49ef-ab47-409900876100}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD HMICommunication : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.HMICommunication();		//Call the base method
+
+//Process HMI requests
+IF stCylinderBaseHMI.bIncomingHMIRequest AND NOT stCylinderBaseHMI.bHMICommandConfirmation THEN		//If a request has been issued by the HMI, and a previous request has not just finished being processed
+	IF stCylinderBaseHMI.bHMIControlAvailable THEN		//If the current conditions permit HMI control (Should be determined by the extended application components)
+		IF stCylinderBaseHMI.bExtendHMIRequest THEN		//Execute the active requests
+			Extend();
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+		IF stCylinderBaseHMI.bRetractHMIRequest THEN
+			Retract();
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+		IF stCylinderBaseHMI.bIdleHMIRequest THEN
+			Idle();
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+		IF stCylinderBaseHMI.bExtendTimeHMISetRequest THEN
+			ExtendTime := stCylinderBaseHMI.tExtendTimeHMISetValue;
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+		IF stCylinderBaseHMI.bRetractTimeHMISetRequest THEN
+			RetractTime := stCylinderBaseHMI.tRetractTimeHMISetValue;
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+		IF stCylinderBaseHMI.bTimeoutFactorHMISetRequest THEN
+			TimeoutFactor := stCylinderBaseHMI.fTimeoutFactorHMISetValue;
+			stCylinderBaseHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
+		END_IF
+	END_IF
+END_IF
+
+
+//Update HMI status info
+stCylinderBaseHMI.tExtendTime := tExtendTime;
+stCylinderBaseHMI.tRetractTime := tRetractTime;
+stCylinderBaseHMI.fTimeoutFactor := fTimeoutFactor;
+stCylinderBaseHMI.bExtended := bExtended;
+stCylinderBaseHMI.bExtending := bExtending;
+stCylinderBaseHMI.bRetracted := bRetracted;
+stCylinderBaseHMI.bRetracting := bRetracting;
+stCylinderBaseHMI.bExtendCommand := bExtendCommand OR bSimExtendCommand;
+stCylinderBaseHMI.bRetractCommand := bRetractCommand OR bSimRetractCommand;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Idle" Id="{6860462f-376a-4f39-8e43-cc88a6e1061d}" FolderPath="02_ITF_CylinderBase\02_Methods\">
+      <Declaration><![CDATA[METHOD Idle : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bExtendRequest := FALSE;
+bRetractRequest := FALSE;
+bIncomingRequest := TRUE;
+
+bExtendCommand := FALSE;
+bRetractCommand := FALSE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="initialize" Id="{fb290f3c-3753-4f5a-a80b-69d733f51e19}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD initialize : BOOL
+VAR_INPUT
+END_VAR
+
+VAR
+	sTemp: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Monitoring" Id="{1b05306f-5859-4831-8fa0-dfd8904003bf}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD Monitoring : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[tExtensionTimeout := LREAL_TO_TIME(TIME_TO_LREAL(tExtendTime) * fTimeoutFactor);
+tRetractionTimeout := LREAL_TO_TIME(TIME_TO_LREAL(tRetractTime) * fTimeoutFactor);
+
+fbExtensionTimeout_TON(IN := bExtending, PT := tExtensionTimeout);	//Timer for monitoring extension timeout, PT = Extension time multiplied by the timeout factor
+fbRetractionTimeout_TON(IN := bRetracting, PT := tRetractionTimeout);	//Timer for monitoring retraction timeout, PT = Retraction time multiplied by the timeout factor
+
+
+IF NOT bError THEN
+	
+	//Simultaneous extend and retract commands throw an invalid command error
+	IF 		(bExtending AND bRetracting)
+		OR 	(bExtendRequest AND bRetractRequest)
+		OR 	(bExtendCommand AND bRetractCommand) THEN  
+			IF NOT a_fbCylinderBaseAlarms[E_CylinderBase.InvalidCommand].bRaised THEN
+				RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.InvalidCommand]);			
+			END_IF	
+		ELSIF 	a_fbCylinderBaseAlarms[E_CylinderBase.InvalidCommand].bRaised	THEN
+			a_fbCylinderBaseAlarms[E_CylinderBase.InvalidCommand].Clear(0,0);
+	END_IF
+	
+	//If both extended and retracted feedback are true at any point, throw an invalid position error
+	IF bExtended AND bRetracted THEN
+		IF NOT a_fbCylinderBaseAlarms[E_CylinderBase.InvalidPositionStatus].bRaised THEN
+			RaiseAlarm(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.InvalidPositionStatus]);			
+		END_IF	
+	ELSIF 	a_fbCylinderBaseAlarms[E_CylinderBase.InvalidPositionStatus].bRaised	THEN
+		a_fbCylinderBaseAlarms[E_CylinderBase.InvalidPositionStatus].Clear(0,0);
+	END_IF
+	
+	//If the cylinder takes longer than expected to extend, throw a timeout error
+	IF fbExtensionTimeout_TON.Q THEN
+		IF NOT a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout].bRaised THEN
+			RaiseAlarmWithStrings(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout], TIME_TO_STRING(tExtensionTimeout), '');			
+		END_IF	
+	ELSIF 	a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout].bRaised	THEN
+		a_fbCylinderBaseAlarms[E_CylinderBase.ExtendTimeout].Clear(0,0);
+	END_IF
+	
+	//If the cylinder takes longer than expected to retract, throw a timeout error
+	IF fbRetractionTimeout_TON.Q THEN
+		IF NOT a_fbCylinderBaseAlarms[E_CylinderBase.RetractTimeout].bRaised THEN
+			RaiseAlarmWithStrings(	fbAlarm :=  a_fbCylinderBaseAlarms[E_CylinderBase.RetractTimeout], TIME_TO_STRING(tRetractionTimeout), '');			
+		END_IF	
+	ELSIF 	a_fbCylinderBaseAlarms[E_CylinderBase.RetractTimeout].bRaised	THEN
+		a_fbCylinderBaseAlarms[E_CylinderBase.RetractTimeout].Clear(0,0);
+	END_IF
+END_IF
+
+//If cylinder is in motion toward a position, but it has not yet been reached, set busy bit
+IF (bExtending) OR (bRetracting) THEN
+	bActive := TRUE;
+ELSE
+	bActive := FALSE;
+END_IF
+
+IF bSimExtendCommand OR bExtendCommand THEN
+	bExtendOutput := TRUE;
+ELSE
+	bExtendOutput := FALSE;
+END_IF
+
+IF bSimRetractCommand OR bRetractCommand THEN
+	bRetractOutput := TRUE;
+ELSE
+	bRetractOutput := FALSE;
+END_IF
+
+IF bRetractOutput AND NOT bRetracted THEN
+	bRetracting := TRUE;
+ELSE
+	bRetracting := FALSE;
+END_IF
+
+IF bExtendOutput AND NOT bExtended THEN
+	bExtending := TRUE;
+ELSE
+	bExtending := FALSE;
+END_IF
+
+bReady := bEnabled AND NOT bError;
+
+eCurrentAlarmSeverity := F_GetMaxSeverityRaised(	a_fbAlarms := a_fbCylinderBaseAlarms,
+													eCurrentSeverity := eCurrentAlarmSeverity);								
+													
+SUPER^.Monitoring();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{2939002c-4b5f-4b1b-957e-dc41265429f6}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Reset();
+bError := FALSE;
+
+fbSimExtend_TON.IN := FALSE;
+fbSimRetract_TON.IN := FALSE;
+
+bExtendCommand := FALSE;
+bRetractCommand := FALSE;
+bSimExtendCommand := FALSE;
+bSimRetractCommand := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Retract" Id="{ddd5b4d4-6775-4df5-94dc-a4f52cd08d94}" FolderPath="02_ITF_CylinderBase\02_Methods\">
+      <Declaration><![CDATA[METHOD Retract : UDINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bRetractRequest := TRUE;
+bExtendRequest := FALSE;
+bIncomingRequest := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Retracted" Id="{68547752-56e1-4d64-a9dd-3a591e9a96e3}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY Retracted : BOOL	//Status bit for the position of the cylinder
+]]></Declaration>
+      <Get Name="Get" Id="{b42bac66-19df-48df-b3cc-977f073a754f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Retracted := bRetracted;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Retracting" Id="{84a5612f-2482-4d3b-a71e-8122965942f4}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY Retracting : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9078e90f-4f2f-4f58-94da-32decfc9b92e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Retracting := bRetracting;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="RetractOutput" Id="{45884ba1-8eec-4095-9faf-e3d1372e359b}" FolderPath="02_ITF_CylinderBase\01_Properties\03_Status\">
+      <Declaration><![CDATA[PROPERTY RetractOutput : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c23c6549-2e8b-4a28-a67a-38ec8e737af3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RetractOutput := bRetractOutput;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="RetractTime" Id="{f7614a09-0bff-4962-9883-4ae606194bce}" FolderPath="02_ITF_CylinderBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY RetractTime : TIME]]></Declaration>
+      <Get Name="Get" Id="{55693881-357c-432d-85c1-e641c9d1be69}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RetractTime := tRetractTime;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{14fd22a6-6df7-490a-84c4-56417826ff85}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[tRetractTime := RetractTime;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="SimulateOperation" Id="{7b675cac-d1b5-41ff-8c29-f3ee23a7c4f2}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD SimulateOperation : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bExtendCommand := FALSE;		//Hardware commands should be disabled during simulation mode
+bRetractCommand := FALSE;		//Hardware commands should be disabled during simulation mode
+
+IF bEnabled THEN
+	IF bIncomingRequest THEN
+		bSimExtendCommand := bExtendRequest;
+		bSimRetractCommand := bRetractRequest;
+		bIncomingRequest := FALSE;
+	END_IF
+
+	fbSimExtend_TON();		//Call timer FB
+	fbSimRetract_TON();		//Call timer FB
+
+	GenerateFeedback(bExtend := bSimExtendCommand,
+					 bRetract := bSimRetractCommand,
+					 bExtended_Generated => bExtended,
+					 bRetracted_Generated => bRetracted);
+ELSE
+	bIncomingRequest := FALSE;
+	fbSimExtend_TON.IN := FALSE;
+	fbSimRetract_TON.IN := FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StandardOperation" Id="{5b749516-6da3-4cb2-b6d8-1ea76986585c}" FolderPath="01_SUPER_Overrides\">
+      <Declaration><![CDATA[METHOD StandardOperation : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bEnabled THEN
+	IF bIncomingRequest THEN
+		bExtendCommand := bExtendRequest;
+		bRetractCommand := bRetractRequest;
+		bIncomingRequest := FALSE;
+	END_IF
+	
+	bExtended := bExtendedFeedback;
+	bRetracted := bRetractedFeedback;
+ELSE
+	bIncomingRequest := FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="TimeoutFactor" Id="{149cf3c6-73fd-4da9-8764-afb5280fce49}" FolderPath="02_ITF_CylinderBase\01_Properties\01_Config\">
+      <Declaration><![CDATA[PROPERTY TimeoutFactor : LREAL	//Multiplicative factor that determines error timeout threshold based on the expected time
+]]></Declaration>
+      <Get Name="Get" Id="{8cdb479a-6c81-42b4-8c38-f64e2bdbbd37}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TimeoutFactor := fTimeoutFactor;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{bd408ab2-e9a1-4e87-be5e-ba8cd910121d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fTimeoutFactor := TimeoutFactor;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_CylinderBase">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.AllowHMIControl">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.BlockHMIControl">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.CreateEvents">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="3" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.ErrorOperation">
+      <LineId Id="5" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Extend">
+      <LineId Id="14" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Extended.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Extending.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.ExtendOutput.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.ExtendTime.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.ExtendTime.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.GenerateFeedback">
+      <LineId Id="95" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="21" Count="4" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="33" Count="5" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="82" Count="7" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="111" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.HMICommunication">
+      <LineId Id="5" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="32" Count="1" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="5" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="83" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Idle">
+      <LineId Id="4" Count="1" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="12" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.initialize">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Monitoring">
+      <LineId Id="236" Count="0" />
+      <LineId Id="205" Count="0" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="203" Count="1" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="133" Count="3" />
+      <LineId Id="255" Count="0" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="254" Count="0" />
+      <LineId Id="257" Count="1" />
+      <LineId Id="138" Count="3" />
+      <LineId Id="260" Count="3" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="144" Count="2" />
+      <LineId Id="264" Count="4" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="150" Count="2" />
+      <LineId Id="269" Count="4" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="156" Count="8" />
+      <LineId Id="188" Count="0" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="189" Count="0" />
+      <LineId Id="191" Count="1" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="194" Count="4" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="211" Count="0" />
+      <LineId Id="213" Count="1" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="216" Count="4" />
+      <LineId Id="215" Count="0" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="242" Count="1" />
+      <LineId Id="241" Count="0" />
+      <LineId Id="247" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Reset">
+      <LineId Id="3" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="14" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Retract">
+      <LineId Id="4" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Retracted.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.Retracting.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.RetractOutput.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.RetractTime.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.RetractTime.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.SimulateOperation">
+      <LineId Id="232" Count="20" />
+      <LineId Id="145" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.StandardOperation">
+      <LineId Id="29" Count="0" />
+      <LineId Id="25" Count="3" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="30" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.TimeoutFactor.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderBase.TimeoutFactor.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
