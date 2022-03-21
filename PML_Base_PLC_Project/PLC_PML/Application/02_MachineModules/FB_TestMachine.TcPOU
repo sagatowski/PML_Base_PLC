@@ -7,11 +7,7 @@ VAR
 	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 	
-	fbEquipmentModule1			: FB_TestEquipment := (	iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder,
-														Enabled 					:=  TRUE,
-														ModuleName 					:=  'Test Equipment 1',
-														ModuleID 					:=  1,
-														AncestorIDs 				:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_'));
+	fbEquipmentModule1			: FB_TestEquipment := (	ModuleName 					:=  'Test Equipment 1');
 	
 	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
 	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
@@ -75,13 +71,9 @@ FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
 	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
-fbEquipmentModule1.iMasterDataStructure_Adder 	:= iMasterDataStructure_Adder;
-fbEquipmentModule1.Enabled 						:=  TRUE;
-fbEquipmentModule1.ModuleName 					:=  'Test Equipment 1';
-fbEquipmentModule1.ModuleID 					:=  1;
-fbEquipmentModule1.AncestorIDs 					:= CONCAT(CONCAT(sAncestorIDs, UDINT_TO_STRING(nModuleID)), '_');
-
-iMasterDataStructure_Adder.AddNodeAsChildByName(fbEquipmentModule1.ModuleName, sModuleName);
+FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
+	a_ITF_Components[i] := a_ITF_Components_init[i];
+END_FOR
 
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
 SUPER^.Initialize();
@@ -98,7 +90,10 @@ SUPER^.Initialize();
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.Initialize">
-      <LineId Id="123" Count="14" />
+      <LineId Id="123" Count="3" />
+      <LineId Id="142" Count="2" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="135" Count="2" />
       <LineId Id="112" Count="0" />
     </LineIds>
   </POU>

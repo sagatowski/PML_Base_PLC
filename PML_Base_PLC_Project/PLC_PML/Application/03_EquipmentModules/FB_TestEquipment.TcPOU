@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
   <POU Name="FB_TestEquipment" Id="{01abdd42-f6e2-45ed-86cd-d63dea0e7096}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TestEquipment EXTENDS FB_PMLModuleBase
 VAR
@@ -64,10 +64,13 @@ VAR
 	i								: UDINT;		//Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
+        <ST><![CDATA[// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
 FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
 	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
+END_FOR
+
+FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
+	a_ITF_Components[i] := a_ITF_Components_init[i];
 END_FOR
 
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
@@ -85,9 +88,10 @@ SUPER^.Initialize();
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestEquipment.Initialize">
-      <LineId Id="108" Count="0" />
       <LineId Id="100" Count="1" />
       <LineId Id="106" Count="1" />
+      <LineId Id="118" Count="2" />
+      <LineId Id="117" Count="0" />
       <LineId Id="113" Count="0" />
       <LineId Id="29" Count="1" />
       <LineId Id="112" Count="0" />
