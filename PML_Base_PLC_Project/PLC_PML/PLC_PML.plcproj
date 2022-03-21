@@ -19,7 +19,7 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM\E_PMLUnitMode.TcDUT">
+    <Compile Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\E_PMLUnitMode.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\01_Application_Level_Items\02_DUT\02_STRUCT\ST_ProductionData_HMI.TcDUT">
@@ -31,7 +31,7 @@
     <Compile Include="Application\01_Application_Level_Items\03_ITFs\ITF_ProductionData.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\FB_MainHMI_Connection.TcPOU">
+    <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\FB_MainModule_HMI_Connection.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Application\01_Application_Level_Items\04_HMI_Connections\ST_PMLControl.TcDUT">
@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\01_Application_Level_Items\02_DUT\01_ENUM" />
-    <Folder Include="Application\01_Application_Level_Items\02_DUT\01_ENUM\01_ENUM" />
     <Folder Include="Application\01_Application_Level_Items\02_DUT\02_STRUCT" />
     <Folder Include="Application\01_Application_Level_Items\02_DUT\03_ALIAS" />
     <Folder Include="Application\01_Application_Level_Items\01_GVL" />
@@ -164,6 +163,10 @@
       <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_System</Namespace>
     </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Utilities">
+      <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc3_EventLogger">
       <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_EventLogger</Namespace>
@@ -239,9 +242,6 @@
     <PlaceholderResolution Include="FloatingPointUtils">
       <Resolution>FloatingPointUtils, 3.5.9.0 (System)</Resolution>
     </PlaceholderResolution>
-    <PlaceholderResolution Include="PML_Base_Library">
-      <Resolution>PML_Base_Library, 0.1 (SPT)</Resolution>
-    </PlaceholderResolution>
     <PlaceholderResolution Include="Standard">
       <Resolution>Tc2_Standard, 3.3.3.0 (Beckhoff Automation GmbH)</Resolution>
     </PlaceholderResolution>
@@ -284,23 +284,11 @@
     <PlaceholderResolution Include="SysTimeRtc">
       <Resolution>SysTimeRtc, 3.5.5.0 (System)</Resolution>
     </PlaceholderResolution>
-    <PlaceholderResolution Include="Tc2_Drive">
-      <Resolution>Tc2_Drive, 3.3.8.0 (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
     <PlaceholderResolution Include="Tc2_EtherCAT">
       <Resolution>Tc2_EtherCAT, 3.3.19.0 (Beckhoff Automation GmbH)</Resolution>
     </PlaceholderResolution>
-    <PlaceholderResolution Include="Tc2_IoFunctions">
-      <Resolution>Tc2_IoFunctions, 3.3.13.0 (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
     <PlaceholderResolution Include="Tc2_Math">
       <Resolution>Tc2_Math, 3.3.1.0 (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Tc2_MC2">
-      <Resolution>Tc2_MC2, 3.3.46.0 (Beckhoff Automation GmbH)</Resolution>
-    </PlaceholderResolution>
-    <PlaceholderResolution Include="Tc2_MC2_Drive">
-      <Resolution>Tc2_MC2_Drive, 3.3.25.0 (Beckhoff Automation GmbH)</Resolution>
     </PlaceholderResolution>
     <PlaceholderResolution Include="Tc2_Standard">
       <Resolution>Tc2_Standard, 3.3.3.0 (Beckhoff Automation GmbH)</Resolution>
