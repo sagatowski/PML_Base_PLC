@@ -1,27 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_TestEquipment" Id="{01abdd42-f6e2-45ed-86cd-d63dea0e7096}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TestEquipment EXTENDS FB_PMLModuleBase
 VAR
-	//Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
-	
-	
-	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [];
+    //Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
 
-	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+    //temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
+    a_itfPackMLBase_init : ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [];
+
+    //Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+    (*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
 	*)
-	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
-	*)	
-	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+    (*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)
+    //temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
 
-	
-	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [];
+    a_ITF_Components_init : ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase := [];
 
-	// Other machine specific variables here
-END_VAR
-]]></Declaration>
+    // Other machine specific variables here
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//*********************************************************
 // Code implementation only in Execute() method for consistency with templates
@@ -49,51 +46,42 @@ END_VAR
 // Cyclic Code
 METHOD CyclicLogic
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Main loop of the parent module
-SUPER^.CyclicLogic();
-
-]]></ST>
+SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{b554b6de-48bd-4c1f-986f-6949f129fd96}" FolderPath="03_Methods\">
       <Declaration><![CDATA[METHOD Initialize
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
 FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
-	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
+    a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
 FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
-	a_ITF_Components[i] := a_ITF_Components_init[i];
+    a_ITF_Components[i] := a_ITF_Components_init[i];
 END_FOR
 
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
-SUPER^.Initialize();
-]]></ST>
+SUPER^.Initialize();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_TestEquipment">
-      <LineId Id="89" Count="2" />
+      <LineId Id="129" Count="2" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestEquipment.CyclicLogic">
-      <LineId Id="54" Count="1" />
-      <LineId Id="52" Count="0" />
+      <LineId Id="72" Count="0" />
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestEquipment.Initialize">
-      <LineId Id="100" Count="1" />
-      <LineId Id="106" Count="1" />
-      <LineId Id="118" Count="2" />
-      <LineId Id="117" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="29" Count="1" />
+      <LineId Id="127" Count="9" />
       <LineId Id="112" Count="0" />
     </LineIds>
   </POU>

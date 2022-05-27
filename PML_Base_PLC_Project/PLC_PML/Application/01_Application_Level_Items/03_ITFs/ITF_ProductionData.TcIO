@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <Itf Name="ITF_ProductionData" Id="{385c5811-f62c-4a92-b377-0bca2435c55d}">
-    <Declaration><![CDATA[INTERFACE ITF_ProductionData
-]]></Declaration>
+    <Declaration><![CDATA[INTERFACE ITF_ProductionData]]></Declaration>
     <Folder Name="01_Properties" Id="{8078a151-53fe-400a-8762-678a23b702cd}">
       <Folder Name="01_Config" Id="{f86c6fcf-5925-410a-a775-66742848057a}" />
       <Folder Name="02_Control" Id="{04d14c25-a201-43af-af53-0fb6d28bfc02}" />
@@ -126,7 +125,7 @@
       </Set>
     </Property>
     <Property Name="WarningMargin" Id="{bb1602fc-adb1-47ad-9673-2317de9782ca}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY WarningMargin : LREAL//0 to 100, interpreted as a percentage difference between the current rate and the required rate to meet the production target, decimal values permitted
+      <Declaration><![CDATA[PROPERTY WarningMargin : LREAL //0 to 100, interpreted as a percentage difference between the current rate and the required rate to meet the production target, decimal values permitted
 ]]></Declaration>
       <Get Name="Get" Id="{5cddaaa4-d002-490c-b219-1b6e16eabde8}">
         <Declaration><![CDATA[]]></Declaration>

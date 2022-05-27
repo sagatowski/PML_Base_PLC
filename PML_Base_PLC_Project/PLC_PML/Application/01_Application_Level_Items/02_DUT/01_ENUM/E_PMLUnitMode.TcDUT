@@ -1,23 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <DUT Name="E_PMLUnitMode" Id="{962da953-7f21-4a12-b408-960e8aa4bae0}">
-    <Declaration><![CDATA[{attribute 'qualified_only'}		//Note that this is not "Strict" since it needs to interact with the mode manager, which uses DINTs for mode
-TYPE E_PMLUnitMode:
-(
-	ePMLUnitMode_Invalid 		:= 0,
-	ePMLUnitMode_Production		:= 1,
-	ePMLUnitMode_Maintenance	:= 2,
-	ePMLUnitMode_Manual			:= 3
-	// User defined modes
+    <Declaration><![CDATA[{attribute 'qualified_only'} //Note that this is not "Strict" since it needs to interact with the mode manager, which uses DINTs for mode
+TYPE E_PMLUnitMode : (
+        ePMLUnitMode_Invalid     := 0,
+        ePMLUnitMode_Production  := 1,
+        ePMLUnitMode_Maintenance := 2,
+        ePMLUnitMode_Manual      := 3
+    // User defined modes
     (*ePMLUnitMode_SemiAutomatic  :=  4,
     ePMLUnitMode_DryRun         :=  5,
 	ePMLUnitMode_Standalone		:=  6,
 	ePMLUnitMode_Usermode4		:=  7,
 	ePMLUnitMode_Usermode5 		:=  8,
 	ePMLUnitMode_Usermode6 		:=  9,
-	ePMLUnitMode_Usermode7 		:=  10 *)	
-) DINT;
-END_TYPE
-]]></Declaration>
+	ePMLUnitMode_Usermode7 		:=  10 *)
+    ) DINT;
+END_TYPE]]></Declaration>
   </DUT>
 </TcPlcObject>

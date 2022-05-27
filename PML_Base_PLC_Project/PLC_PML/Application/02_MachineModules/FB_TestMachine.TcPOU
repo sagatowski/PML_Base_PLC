@@ -1,29 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_TestMachine" Id="{2c95093d-76ee-4cc3-8575-572228d0f33c}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_TestMachine EXTENDS FB_PMLModuleBase
 VAR
-	//Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
-	//fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	//fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
-	
-	fbEquipmentModule1			: FB_TestEquipment := (	ModuleName 					:=  'Test Equipment 1');
-	
-	//temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-	a_itfPackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1](*, fbSubModule2,*);
+    //Define the Sub modules here for this module.  Also set the Interfaces in the initialize method.
+    //fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
+    //fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 
-	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+    fbEquipmentModule1 : FB_TestEquipment := (ModuleName := 'Test Equipment 1');
+
+    //temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
+    a_itfPackMLBase_init : ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1] (*, fbSubModule2,*) ;
+
+    //Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+    (*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
 	*)
-	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
-	*)	
+    (*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)
 
-	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
-	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [(*fbComponent1,fbComponent2*)];
+    //temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+    a_ITF_Components_init : ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase := [ (*fbComponent1,fbComponent2*) ];
 
-	// Other machine specific variables here
-END_VAR
-]]></Declaration>
+    // Other machine specific variables here
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//*********************************************************
 // Code implementation only in Execute() method for consistency with templates
@@ -51,49 +50,42 @@ END_VAR
 // Cyclic Code
 METHOD CyclicLogic
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Main loop of the parent module
-SUPER^.CyclicLogic();
-
-]]></ST>
+SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{bd9fa938-471e-42b0-b567-b03b19ce3ef2}" FolderPath="03_Methods\">
       <Declaration><![CDATA[METHOD Initialize
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
 FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
-	a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
+    a_ITF_PackMLBase[i] := a_itfPackMLBase_init[i];
 END_FOR
 
 FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
-	a_ITF_Components[i] := a_ITF_Components_init[i];
+    a_ITF_Components[i] := a_ITF_Components_init[i];
 END_FOR
 
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
-SUPER^.Initialize();
-]]></ST>
+SUPER^.Initialize();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_TestMachine">
-      <LineId Id="89" Count="2" />
+      <LineId Id="135" Count="2" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.CyclicLogic">
-      <LineId Id="54" Count="1" />
-      <LineId Id="52" Count="0" />
+      <LineId Id="72" Count="0" />
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.Initialize">
-      <LineId Id="123" Count="3" />
-      <LineId Id="142" Count="2" />
-      <LineId Id="141" Count="0" />
-      <LineId Id="135" Count="2" />
+      <LineId Id="151" Count="9" />
       <LineId Id="112" Count="0" />
     </LineIds>
   </POU>

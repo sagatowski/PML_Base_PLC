@@ -1,31 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="MAIN" Id="{ea287bb8-b345-4656-b603-ee461cbe7d52}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-	fbMainModuleHMIConnection		: FB_MainModule_HMI_Connection;	
+    fbMainModuleHMIConnection : FB_MainModule_HMI_Connection;
 
-	// Define the top level Machine as defined in the Application/01_MachineModules folder here
-	fbMyMachine				: FB_TestMachine := (		MasterDataStructure_Adder 	:= fbMainModuleHMIConnection.DataStructure_Adder,
-														LogStateChanges				:= TRUE,
-														ModuleID					:= 1,
-														ModuleName 					:= 'My Machine Module');	
+    // Define the top level Machine as defined in the Application/01_MachineModules folder here
+    fbMyMachine : FB_TestMachine := (MasterDataStructure_Adder := fbMainModuleHMIConnection.DataStructure_Adder, LogStateChanges := TRUE,
+                                     ModuleID := 1, ModuleName := 'My Machine Module');
 
-	bInitialized			: BOOL;
-END_VAR
-]]></Declaration>
+    bInitialized : BOOL;
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[CyclicLogic();]]></ST>
     </Implementation>
     <Method Name="CyclicLogic" Id="{5d3afc59-d698-49af-9648-a60196d60bb0}">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF NOT bInitialized THEN
-	Initialize();
-	bInitialized := TRUE;
+    Initialize();
+    bInitialized := TRUE;
 END_IF
 
 fbMainModuleHMIConnection.CyclicLogic();
@@ -33,36 +29,27 @@ fbMainModuleHMIConnection.CyclicLogic();
 //The Top level machine CyclicLogic call should be made here, all sub modules should be called from within their respective parent CyclicLogic methods
 fbMyMachine.CyclicLogic();
 
-
 // Add other Main CyclicLogic here]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{0c84ac41-2efe-4430-b0e8-a78a2e3a34ca}">
       <Declaration><![CDATA[METHOD Initialize : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Top level machine initialization should happen here, in the main initialization method. Each subsequent "layer" of modules will be named within their respective "parent" intialize method
-fbMainModuleHMIConnection.MainModule := fbMyMachine;
-]]></ST>
+fbMainModuleHMIConnection.MainModule := fbMyMachine;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="MAIN">
       <LineId Id="128" Count="0" />
     </LineIds>
     <LineIds Name="MAIN.CyclicLogic">
-      <LineId Id="33" Count="2" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="43" Count="1" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="6" Count="2" />
-      <LineId Id="23" Count="0" />
+      <LineId Id="50" Count="9" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="MAIN.Initialize">
-      <LineId Id="7" Count="0" />
-      <LineId Id="15" Count="0" />
+      <LineId Id="26" Count="0" />
       <LineId Id="20" Count="0" />
     </LineIds>
   </POU>

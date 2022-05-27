@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <DUT Name="T_PackMLTags" Id="{1ed0eb96-7045-4fb1-ad91-8e920b725e44}">
     <Declaration><![CDATA[(*	Change the type depending on the needs, minimum packml set or full
 Tc3_PackML_V2.ST_PackMLv30 // Tc3_PackML_V2.ST_PackMLv30min*)
-TYPE T_PackMLTags : Tc3_PackML_V2.ST_PackMLv30; END_TYPE
-]]></Declaration>
+TYPE T_PackMLTags : Tc3_PackML_V2.ST_PackMLv30;
+END_TYPE]]></Declaration>
   </DUT>
 </TcPlcObject>

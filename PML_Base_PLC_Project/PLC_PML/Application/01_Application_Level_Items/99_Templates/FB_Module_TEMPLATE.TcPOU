@@ -1,33 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_Module_TEMPLATE" Id="{44c00981-3585-4538-bbce-d21beee256d9}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Module_TEMPLATE EXTENDS FB_PMLModuleBase
 VAR
-	//Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
-	(*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1');
+    //Define the Sub modules here for this module. (If any)  Also set the Interfaces in the initialize method.
+    (*fbSubModule1				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 1');
 	*)
-	(*fbSubModule2				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 2');
+    (*fbSubModule2				: FB_ApplicationModule_TEMPLATE := (ModuleName :=  'Test Module 2');
 	*)
-	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
-	a_ITF_PackMLBase_init		: ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [(*	fbSubModule1,
-																							 	fbSubModule2*)];
+    //temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+    a_ITF_PackMLBase_init : ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase
+        := [ (*	fbSubModule1,
+																							 	fbSubModule2*) ];
 
-	//Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
-	(*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
+    //Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
+    (*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
 	*)
-	(*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
-	*)	
-	//temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
-	a_ITF_Components_init		: ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS ] OF ITF_ComponentBase := [(*	fbComponent1,
-																											fbComponent2*)];
-	
-END_VAR
-]]></Declaration>
+    (*fbComponent2				: FB_ComponentBase (Extension):= (Name := 'Test Component 2');
+	*)
+    //temporary array of module base interfaces to be copied over to the base class a_itfPackMLBase variable
+    a_ITF_Components_init : ARRAY[1..GVL_PML_Base.MAX_NO_OF_COMPONENTS] OF ITF_ComponentBase := [ (*	fbComponent1,
+																											fbComponent2*)
+    ];
+
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//*********************************************************
 //Body of block is not called by base code, only implement application
 //code in CyclicUpdate or in methods called by it or its subcalls
-//*********************************************************]]></ST>
+//********************************************************* ]]></ST>
     </Implementation>
     <Folder Name="01_SUPER_Overrides" Id="{f8d8b220-72f9-48a9-9ea0-e208740f789c}">
       <Folder Name="01_Properties" Id="{057d9d1a-ee49-4f19-8a8e-42e6aa4c339e}">
@@ -46,27 +47,25 @@ END_VAR
     </Folder>
     <Folder Name="03_Methods" Id="{7a7ecdb0-5f2b-448e-937a-8df184a6286e}" />
     <Method Name="Aborted" Id="{115f0d92-9b74-4207-98d9-01bbe419601d}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
-      <Declaration><![CDATA[METHOD Aborted
-]]></Declaration>
+      <Declaration><![CDATA[METHOD Aborted]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Aborting" Id="{f8525f20-f595-4df6-a37f-5015b53b7fec}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -148,23 +147,22 @@ END_CASE
       <Declaration><![CDATA[METHOD Complete]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Completing" Id="{b10641f1-5701-4ac0-9217-732c3b77e29d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -210,59 +208,55 @@ END_CASE
 // Cyclic Code
 METHOD CyclicLogic
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Main loop of the parent module
-SUPER^.CyclicLogic();
-]]></ST>
+SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Execute" Id="{4241bd48-fc56-47ed-a03f-f06bee0b8de4}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
-      <Declaration><![CDATA[METHOD Execute ]]></Declaration>
+      <Declaration><![CDATA[METHOD Execute]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Held" Id="{8b7d10d4-56d1-44a0-b483-b75edbbd5aa4}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
-      <Declaration><![CDATA[METHOD Held ]]></Declaration>
+      <Declaration><![CDATA[METHOD Held]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Holding" Id="{13997f8d-82e7-42dd-a219-e0992db665ee}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -304,47 +298,44 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="Idle" Id="{ba890787-538d-464f-9cf3-cf1fe940fbce}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
-      <Declaration><![CDATA[METHOD Idle ]]></Declaration>
+      <Declaration><![CDATA[METHOD Idle]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{442f3bf5-5552-4c37-b5b2-a49ca36d752d}" FolderPath="01_SUPER_Overrides\02_Methods\">
       <Declaration><![CDATA[METHOD Initialize
 VAR
-	i								: UDINT;		//Generic iteration value
+    i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
+        <ST><![CDATA[// Define the interfaces to the different subunits (Must take place before SUPER^.initialize call)
 FOR i := 1 TO MAX_NO_OF_SUBMODULES DO
-	a_ITF_PackMLBase[i] := a_ITF_PackMLBase_init[i];
+    a_ITF_PackMLBase[i] := a_ITF_PackMLBase_init[i];
 END_FOR
 
 FOR i := 1 TO MAX_NO_OF_COMPONENTS DO
-	a_ITF_Components[i] := a_ITF_Components_init[i];
+    a_ITF_Components[i] := a_ITF_Components_init[i];
 END_FOR
 
 // Init of the parent class object (Must be called AFTER most local init code, since the sub module interface array assignments should be made here, and then operated on within the module base init
-SUPER^.Initialize();
-]]></ST>
+SUPER^.Initialize();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Resetting" Id="{7565530e-bb29-4323-9478-8b5cf80eeec5}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -427,23 +418,22 @@ END_CASE
       <Declaration><![CDATA[METHOD Stopped]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Stopping" Id="{a2353e86-b48b-4844-8cfa-38fb6356963a}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -488,23 +478,22 @@ END_CASE
       <Declaration><![CDATA[METHOD Suspended]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Suspending" Id="{4a96f516-2ab2-4259-856f-ce4b47b47f7d}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -546,26 +535,25 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="Undefined" Id="{3c51e684-53f6-47f3-bf4c-ce7a21a58158}" FolderPath="01_SUPER_Overrides\04_PrimaryStates\">
-      <Declaration><![CDATA[METHOD Undefined ]]></Declaration>
+      <Declaration><![CDATA[METHOD Undefined]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE eMode OF
-//	====================================================================PRODUCTION MODE=========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Production:			
-		;
-//	====================================================================MANUAL MODE=============================================================	
-	E_PMLUnitMode.ePMLUnitMode_Manual:				
-		;
-//	=====================================================================MAINTENANCE MODE=======================================================	
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:			
-		;	
-//	=====================================================================CUSTOM MODE 1==========================================================	
-(*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
+    //	====================================================================PRODUCTION MODE=========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        ;
+    //	====================================================================MANUAL MODE=============================================================	
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+    //	=====================================================================MAINTENANCE MODE=======================================================	
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        ;
+    //	=====================================================================CUSTOM MODE 1==========================================================	
+    (*	E_PMLUnitMode.ePMLUnitMode_YOURCUSTOMMODE		
 		;*)
-//	======================================================================INVALID MODE==========================================================	
-	E_PMLUnitMode.ePMLUnitMode_Invalid:				
-		;
-END_CASE
-]]></ST>
+    //	======================================================================INVALID MODE==========================================================	
+    E_PMLUnitMode.ePMLUnitMode_Invalid:
+        ;
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="Unholding" Id="{3c1714cd-0eb3-473b-b55c-c60b1d11d33e}" FolderPath="01_SUPER_Overrides\03_TransitionStates\">
@@ -645,127 +633,87 @@ END_CASE
       </Implementation>
     </Method>
     <LineIds Name="FB_Module_TEMPLATE">
-      <LineId Id="89" Count="1" />
-      <LineId Id="136" Count="0" />
+      <LineId Id="180" Count="2" />
       <LineId Id="91" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Aborted">
-      <LineId Id="86" Count="16" />
+      <LineId Id="103" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Aborting">
-      <LineId Id="17" Count="0" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="25" Count="3" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="38" Count="3" />
-      <LineId Id="112" Count="0" />
-      <LineId Id="95" Count="11" />
-      <LineId Id="37" Count="0" />
+      <LineId Id="113" Count="31" />
       <LineId Id="108" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Clearing">
-      <LineId Id="199" Count="9" />
-      <LineId Id="151" Count="1" />
-      <LineId Id="209" Count="18" />
+      <LineId Id="228" Count="30" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Complete">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Completing">
-      <LineId Id="112" Count="9" />
-      <LineId Id="64" Count="1" />
-      <LineId Id="141" Count="0" />
-      <LineId Id="122" Count="18" />
+      <LineId Id="142" Count="31" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.CyclicLogic">
-      <LineId Id="54" Count="1" />
+      <LineId Id="66" Count="0" />
       <LineId Id="52" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Execute">
-      <LineId Id="116" Count="16" />
-      <LineId Id="39" Count="0" />
+      <LineId Id="133" Count="15" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Held">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Holding">
-      <LineId Id="205" Count="9" />
-      <LineId Id="157" Count="2" />
-      <LineId Id="215" Count="18" />
+      <LineId Id="234" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Idle">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Initialize">
-      <LineId Id="108" Count="0" />
-      <LineId Id="100" Count="1" />
-      <LineId Id="106" Count="1" />
-      <LineId Id="116" Count="3" />
-      <LineId Id="99" Count="0" />
-      <LineId Id="29" Count="1" />
+      <LineId Id="126" Count="9" />
       <LineId Id="112" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Resetting">
-      <LineId Id="225" Count="9" />
-      <LineId Id="177" Count="2" />
-      <LineId Id="235" Count="18" />
+      <LineId Id="254" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Starting">
-      <LineId Id="230" Count="9" />
-      <LineId Id="182" Count="2" />
-      <LineId Id="240" Count="18" />
+      <LineId Id="259" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Stopped">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Stopping">
-      <LineId Id="121" Count="9" />
-      <LineId Id="73" Count="2" />
-      <LineId Id="131" Count="18" />
+      <LineId Id="150" Count="31" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Suspended">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Suspending">
-      <LineId Id="256" Count="9" />
-      <LineId Id="208" Count="2" />
-      <LineId Id="266" Count="18" />
+      <LineId Id="285" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Undefined">
-      <LineId Id="29" Count="16" />
+      <LineId Id="46" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Unholding">
-      <LineId Id="271" Count="9" />
-      <LineId Id="223" Count="2" />
-      <LineId Id="281" Count="18" />
+      <LineId Id="300" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
     <LineIds Name="FB_Module_TEMPLATE.Unsuspending">
-      <LineId Id="284" Count="9" />
-      <LineId Id="236" Count="2" />
-      <LineId Id="294" Count="18" />
+      <LineId Id="313" Count="31" />
       <LineId Id="16" Count="0" />
     </LineIds>
   </POU>

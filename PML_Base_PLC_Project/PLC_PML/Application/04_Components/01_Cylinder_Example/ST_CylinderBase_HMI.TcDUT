@@ -1,35 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <DUT Name="ST_CylinderBase_HMI" Id="{895b4d70-c400-47e3-9faf-87afe240dbf2}">
-    <Declaration><![CDATA[TYPE ST_CylinderBase_HMI:
-STRUCT
-	//Status information
-	tExtendTime		: TIME;
-	tRetractTime	: TIME;
-	fTimeoutFactor	: LREAL;
-	bExtended		: BOOL;
-	bRetracted		: BOOL;
-	bExtending		: BOOL;
-	bRetracting		: BOOL;
-	bRetractCommand	: BOOL;
-	bExtendCommand	: BOOL;
-	
-	//Control information
-	bHMIControlAvailable	: BOOL;		//Set TRUE *FROM PLC* when HMI requests can be processed
-	bIncomingHMIRequest 	: BOOL;		//Pulses TRUE when an HMI request is issued
-		bHMICommandConfirmation	: BOOL;		//Confirms receipt and subsequent processing of the command sent by the HMI
-	
-	bExtendHMIRequest			: BOOL;			//HMI requests to extend the cylinder
-	bRetractHMIRequest			: BOOL;			//HMI requests to retract the cylinder
-	bIdleHMIRequest				: BOOL;			//HMI requests to idle the cylinder (no active output)
-	bExtendTimeHMISetRequest	: BOOL;			//HMI requests to set the cylinder's expected extend time
-	tExtendTimeHMISetValue		: TIME;			//HMI setpoint value for the expected extend time
-	bRetractTimeHMISetRequest	: BOOL;			//HMI requests to set the cylinder's expected retract time
-	tRetractTimeHMISetValue		: TIME;			//HMI setpoint value for the expected retract time
-	bTimeoutFactorHMISetRequest	: BOOL;			//HMI requests to set the timeout factor for the cylinder
-	fTimeoutFactorHMISetValue	: LREAL;		//HMI setpoint value for the cylinder's timeout factor
-END_STRUCT
-END_TYPE
-]]></Declaration>
+    <Declaration><![CDATA[TYPE ST_CylinderBase_HMI :
+    STRUCT
+        //Status information
+        tExtendTime     : TIME;
+        tRetractTime    : TIME;
+        fTimeoutFactor  : LREAL;
+        bExtended       : BOOL;
+        bRetracted      : BOOL;
+        bExtending      : BOOL;
+        bRetracting     : BOOL;
+        bRetractCommand : BOOL;
+        bExtendCommand  : BOOL;
+
+        //Control information
+        bHMIControlAvailable    : BOOL; //Set TRUE *FROM PLC* when HMI requests can be processed
+        bIncomingHMIRequest     : BOOL; //Pulses TRUE when an HMI request is issued
+        bHMICommandConfirmation : BOOL; //Confirms receipt and subsequent processing of the command sent by the HMI
+
+        bExtendHMIRequest           : BOOL;  //HMI requests to extend the cylinder
+        bRetractHMIRequest          : BOOL;  //HMI requests to retract the cylinder
+        bIdleHMIRequest             : BOOL;  //HMI requests to idle the cylinder (no active output)
+        bExtendTimeHMISetRequest    : BOOL;  //HMI requests to set the cylinder's expected extend time
+        tExtendTimeHMISetValue      : TIME;  //HMI setpoint value for the expected extend time
+        bRetractTimeHMISetRequest   : BOOL;  //HMI requests to set the cylinder's expected retract time
+        tRetractTimeHMISetValue     : TIME;  //HMI setpoint value for the expected retract time
+        bTimeoutFactorHMISetRequest : BOOL;  //HMI requests to set the timeout factor for the cylinder
+        fTimeoutFactorHMISetValue   : LREAL; //HMI setpoint value for the cylinder's timeout factor
+    END_STRUCT
+END_TYPE]]></Declaration>
   </DUT>
 </TcPlcObject>

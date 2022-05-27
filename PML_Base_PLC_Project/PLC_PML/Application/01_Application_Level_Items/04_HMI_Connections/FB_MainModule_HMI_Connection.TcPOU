@@ -1,72 +1,71 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MainModule_HMI_Connection" Id="{29a85f61-3eae-4303-a077-190cde69d3cf}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MainModule_HMI_Connection
 VAR CONSTANT
-	//Constant declarations
-	PRODUCTION_DATA_ALARM_COUNT	: UDINT := 16;
+    //Constant declarations
+    PRODUCTION_DATA_ALARM_COUNT : UDINT := 16;
 END_VAR
 VAR PERSISTENT
-	//ITF_ProductionData internal variables
-	tShiftLength: TIME := T#10M;
-	nShiftProductionTarget	: DINT := 1000;
-	fWarningMargin			: LREAL := 10;
-	fProductionRate_Setpoint	: LREAL := 30;
-	nRateAveragingCount		: DINT := 10;
+    //ITF_ProductionData internal variables
+    tShiftLength             : TIME  := T#10M;
+    nShiftProductionTarget   : DINT  := 1000;
+    fWarningMargin           : LREAL := 10;
+    fProductionRate_Setpoint : LREAL := 30;
+    nRateAveragingCount      : DINT  := 10;
 END_VAR
 VAR
-	//Internal Property Variables
-	itfMainModule			: ITF_PMLModuleBase;
+    //Internal Property Variables
+    itfMainModule : ITF_PMLModuleBase;
 
-	//Program Tree variables
-	fbModuleTree : FB_Tree_IndexBased;
-	a_stMachineTreeNodes	: ARRAY[0..63] OF ST_Tree_IndexBased_Node;
-	sTopLevelMachine 		: STRING;
-	
-	//PML Control Variables
-	stMainPMLControl_Simplified		: ST_PMLControl_Simplified;
-	stMainPMLControl_Standard		: ST_PMLControl;
-	
-	//Status Variables
-	stMainProductionData			: REFERENCE TO ST_ProductionData_HMI;
-	
-	//Production Data variables
-	bShiftComplete: BOOL;
-	bProductComplete: BOOL;
-	nCurrentShiftProductionCount: INT;
-	nCurrentShiftTarget: DINT;
-	tCurrentShiftTime: TIME;
-	tRemainingShiftTime: TIME;
-	tShiftStartTimeStamp			: TIMESTRUCT;
-	tShiftStartTimeStamp_UTC		: STRING;
-	nCurrentWarningProductionCount	: DINT;
-	nCurrentAcceptableProductionCount	: DINT;
-	
-	fProductionRate_Required : LREAL;
-	fProductionRate_Actual	: LREAL;
-	
-	a_nLastProductTimestamps : ARRAY[1..100] OF ULINT;	//Array of ULINT values (1 unit = 1ns) for the relative time of each of the last 100 completed products
-	fbShiftTimer: TON;
-	fbGetTime		: NT_GetTime;
-	fbProductComplete_RT: R_TRIG;
-	
-	bResetMaxProductionCount: BOOL;
-	bResetTotalProductionCount: BOOL;
-	
-	nMaxProductionCount : DINT;
-	nTotalProductionCount : DINT;
-	
-	stProductionDataHMI				: ST_ProductionData_HMI;
-	fbFIFO							: FB_FIFO_ULINT_Array;
-	a_fbProductionDataAlarms		: ARRAY[1..PRODUCTION_DATA_ALARM_COUNT] OF FB_TcAlarm;
-	fTemp : LREAL;
-	
-	//Other Internal Variables
-	bInitialized 	: BOOL;
-	i				: UDINT;
-	
-END_VAR
-]]></Declaration>
+    //Program Tree variables
+    fbModuleTree         : FB_Tree_IndexBased;
+    a_stMachineTreeNodes : ARRAY[0..63] OF ST_Tree_IndexBased_Node;
+    sTopLevelMachine     : STRING;
+
+    //PML Control Variables
+    stMainPMLControl_Simplified : ST_PMLControl_Simplified;
+    stMainPMLControl_Standard   : ST_PMLControl;
+
+    //Status Variables
+    stMainProductionData : REFERENCE TO ST_ProductionData_HMI;
+
+    //Production Data variables
+    bShiftComplete                    : BOOL;
+    bProductComplete                  : BOOL;
+    nCurrentShiftProductionCount      : INT;
+    nCurrentShiftTarget               : DINT;
+    tCurrentShiftTime                 : TIME;
+    tRemainingShiftTime               : TIME;
+    tShiftStartTimeStamp              : TIMESTRUCT;
+    tShiftStartTimeStamp_UTC          : STRING;
+    nCurrentWarningProductionCount    : DINT;
+    nCurrentAcceptableProductionCount : DINT;
+
+    fProductionRate_Required : LREAL;
+    fProductionRate_Actual   : LREAL;
+
+    a_nLastProductTimestamps : ARRAY[1..100] OF ULINT; //Array of ULINT values (1 unit = 1ns) for the relative time of each of the last 100 completed products
+    fbShiftTimer             : TON;
+    fbGetTime                : NT_GetTime;
+    fbProductComplete_RT     : R_TRIG;
+
+    bResetMaxProductionCount   : BOOL;
+    bResetTotalProductionCount : BOOL;
+
+    nMaxProductionCount   : DINT;
+    nTotalProductionCount : DINT;
+
+    stProductionDataHMI      : ST_ProductionData_HMI;
+    fbFIFO                   : FB_FIFO_ULINT_Array;
+    a_fbProductionDataAlarms : ARRAY[1..PRODUCTION_DATA_ALARM_COUNT] OF FB_TcAlarm;
+    fTemp                    : LREAL;
+
+    //Other Internal Variables
+    bInitialized : BOOL;
+    i            : UDINT;
+
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -75,23 +74,22 @@ END_VAR
     <Method Name="CyclicLogic" Id="{5c063bf9-65ea-4baf-b61f-7150061157cb}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD CyclicLogic : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF NOT bInitialized THEN
-	initialize();
-	bInitialized := TRUE;
+    initialize();
+    bInitialized := TRUE;
 END_IF
 
-stMainPMLControl_Standard.eMode 	:= itfMainModule.Mode;
-stMainPMLControl_Standard.eState 	:= itfMainModule.State;
+stMainPMLControl_Standard.eMode  := itfMainModule.Mode;
+stMainPMLControl_Standard.eState := itfMainModule.State;
 
 FOR i := 1 TO 5 DO
-	stMainPMLControl_Standard.a_sModeNames[i] := F_UnitModeToString(i);
+    stMainPMLControl_Standard.a_sModeNames[i] := F_UnitModeToString(i);
 END_FOR
 
 stMainPMLControl_Standard.eState := itfMainModule.State;
-stMainPMLControl_Standard.eMode := itfMainModule.Mode;
+stMainPMLControl_Standard.eMode  := itfMainModule.Mode;
 
 MainCycleControl();
 
@@ -107,8 +105,7 @@ HMICommunication();
       <Declaration><![CDATA[PROPERTY DataStructure_Adder : ITF_Tree_IndexBased]]></Declaration>
       <Get Name="Get" Id="{14e3c69f-4a48-43e3-9c08-75dacf81fb07}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[DataStructure_Adder := fbModuleTree;]]></ST>
         </Implementation>
@@ -117,147 +114,143 @@ END_VAR
     <Method Name="HMICommunication" Id="{2d80e043-8b82-4d02-97d7-ee848195e25b}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD HMICommunication : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Production Data================================================================================================================================================
 
 //Process HMI requests
-IF stProductionDataHMI.bIncomingHMIRequest AND NOT stProductionDataHMI.bHMICommandConfirmation THEN		//If a request has been issued by the HMI, and a previous request has not just E_SequenceState.Finished being processed
-	IF stProductionDataHMI.bShiftProductionTargetHMISetRequest THEN
-		nShiftProductionTarget := stProductionDataHMI.nShiftProductionTargetHMISetValue;
-		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
-	END_IF
-	
-	IF stProductionDataHMI.bWarningMarginHMISetRequest THEN
-		fWarningMargin := stProductionDataHMI.fWarningMarginHMISetValue;
-		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
-	END_IF
-	
-	IF stProductionDataHMI.bShiftLengthHMISetRequest THEN
-		tShiftLength := stProductionDataHMI.tShiftLengthHMISetValue;
-		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
-	END_IF
-	
-	IF stProductionDataHMI.bProductionRateHMISetRequest THEN
-		fProductionRate_Setpoint := stProductionDataHMI.fProductionRateHMISetValue;
-		stProductionDataHMI.bHMICommandConfirmation := TRUE;	//Confirm that the request has been processed
-	END_IF
+IF stProductionDataHMI.bIncomingHMIRequest AND NOT stProductionDataHMI.bHMICommandConfirmation
+    THEN //If a request has been issued by the HMI, and a previous request has not just E_SequenceState.Finished being processed
+    IF stProductionDataHMI.bShiftProductionTargetHMISetRequest THEN
+        nShiftProductionTarget                      := stProductionDataHMI.nShiftProductionTargetHMISetValue;
+        stProductionDataHMI.bHMICommandConfirmation := TRUE; //Confirm that the request has been processed
+    END_IF
+
+    IF stProductionDataHMI.bWarningMarginHMISetRequest THEN
+        fWarningMargin                              := stProductionDataHMI.fWarningMarginHMISetValue;
+        stProductionDataHMI.bHMICommandConfirmation := TRUE; //Confirm that the request has been processed
+    END_IF
+
+    IF stProductionDataHMI.bShiftLengthHMISetRequest THEN
+        tShiftLength                                := stProductionDataHMI.tShiftLengthHMISetValue;
+        stProductionDataHMI.bHMICommandConfirmation := TRUE; //Confirm that the request has been processed
+    END_IF
+
+    IF stProductionDataHMI.bProductionRateHMISetRequest THEN
+        fProductionRate_Setpoint                    := stProductionDataHMI.fProductionRateHMISetValue;
+        stProductionDataHMI.bHMICommandConfirmation := TRUE; //Confirm that the request has been processed
+    END_IF
 END_IF
 
-
-
 //Update HMI Status Info
-stProductionDataHMI.tShiftLength := tShiftLength;
-stProductionDataHMI.nShiftProductionTarget := nShiftProductionTarget;
-stProductionDataHMI.nCurrentShiftProductionCount := nCurrentShiftProductionCount;
-stProductionDataHMI.nCurrentShiftTarget := nCurrentShiftTarget;
+stProductionDataHMI.tShiftLength                      := tShiftLength;
+stProductionDataHMI.nShiftProductionTarget            := nShiftProductionTarget;
+stProductionDataHMI.nCurrentShiftProductionCount      := nCurrentShiftProductionCount;
+stProductionDataHMI.nCurrentShiftTarget               := nCurrentShiftTarget;
 stProductionDataHMI.nCurrentAcceptableProductionCount := nCurrentAcceptableProductionCount;
-stProductionDataHMI.nCurrentWarningProductionCount := nCurrentWarningProductionCount;
-stProductionDataHMI.tCurrentShiftTime := tCurrentShiftTime;
-stProductionDataHMI.tRemainingShiftTime := tRemainingShiftTime;
-stProductionDataHMI.tShiftStartTimeStamp := tShiftStartTimeStamp;
-stProductionDataHMI.tShiftStartTimeStamp_UTC := tShiftStartTimeStamp_UTC;
-stProductionDataHMI.fProductionRate_Setpoint := F_LREAL_RoundToPlace(fProductionRate_Setpoint, 1);
-stProductionDataHMI.fProductionRate_Actual := F_LREAL_RoundToPlace(fProductionRate_Actual, 1);
-stProductionDataHMI.fProductionRate_Required := F_LREAL_RoundToPlace(fProductionRate_Required, 1);]]></ST>
+stProductionDataHMI.nCurrentWarningProductionCount    := nCurrentWarningProductionCount;
+stProductionDataHMI.tCurrentShiftTime                 := tCurrentShiftTime;
+stProductionDataHMI.tRemainingShiftTime               := tRemainingShiftTime;
+stProductionDataHMI.tShiftStartTimeStamp              := tShiftStartTimeStamp;
+stProductionDataHMI.tShiftStartTimeStamp_UTC          := tShiftStartTimeStamp_UTC;
+stProductionDataHMI.fProductionRate_Setpoint          := F_LREAL_RoundToPlace(fProductionRate_Setpoint, 1);
+stProductionDataHMI.fProductionRate_Actual            := F_LREAL_RoundToPlace(fProductionRate_Actual, 1);
+stProductionDataHMI.fProductionRate_Required          := F_LREAL_RoundToPlace(fProductionRate_Required, 1);]]></ST>
       </Implementation>
     </Method>
     <Method Name="initialize" Id="{ffbfb937-19fd-4f8d-b7c0-20d6dfd428c4}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD initialize : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[sTopLevelMachine := itfMainModule.ModuleName;
 
 fbModuleTree(a_stNodes := a_stMachineTreeNodes, sHead := sTopLevelMachine);
 
-F_CreateAllEventsInClass(	p_aAlarms := a_fbProductionDataAlarms,
-							nClassSize := SIZEOF(TC_EVENTS.ProductionData),
-							pInitEvent := ADR(TC_EVENTS.ProductionData.InitReferenceEvent),
-							sPrefix := MainModule.ModuleName);]]></ST>
+F_CreateAllEventsInClass(p_aAlarms  := a_fbProductionDataAlarms,
+                         nClassSize := SIZEOF(TC_EVENTS.ProductionData),
+                         pInitEvent := ADR(TC_EVENTS.ProductionData.InitReferenceEvent),
+                         sPrefix    := MainModule.ModuleName);]]></ST>
       </Implementation>
     </Method>
     <Method Name="MainCycleControl" Id="{0565e6c2-e509-4b5f-9e34-8868f836c9d6}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD MainCycleControl : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Simplified Commands
 //Handle button presses
 IF NOT stMainPMLControl_Simplified.bConfirmation AND stMainPMLControl_Simplified.bStartPressed THEN
-	IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Idle THEN
-		itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Start;
-	ELSIF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Held THEN
-		itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Unhold;
-	END_IF
-	stMainPMLControl_Simplified.bConfirmation := TRUE;
+    IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Idle THEN
+        itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Start;
+    ELSIF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Held THEN
+        itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Unhold;
+    END_IF
+
+    stMainPMLControl_Simplified.bConfirmation := TRUE;
 END_IF
 
 IF NOT stMainPMLControl_Simplified.bConfirmation AND stMainPMLControl_Simplified.bStopPressed THEN
-	itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Stop;
-	stMainPMLControl_Simplified.bConfirmation := TRUE;
+    itfMainModule.StateCommand                := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Stop;
+    stMainPMLControl_Simplified.bConfirmation := TRUE;
 END_IF
 
 IF NOT stMainPMLControl_Simplified.bConfirmation AND stMainPMLControl_Simplified.bResetPressed THEN
-	itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Reset;
-	stMainPMLControl_Simplified.bConfirmation := TRUE;
+    itfMainModule.StateCommand                := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Reset;
+    stMainPMLControl_Simplified.bConfirmation := TRUE;
 END_IF
 
 IF NOT stMainPMLControl_Simplified.bConfirmation AND stMainPMLControl_Simplified.bClearPressed THEN
-	itfMainModule.StateCommand := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Clear;
-	stMainPMLControl_Simplified.bConfirmation := TRUE;
+    itfMainModule.StateCommand                := Tc3_PackML_V2.E_PMLCommand.ePMLCommand_Clear;
+    stMainPMLControl_Simplified.bConfirmation := TRUE;
 END_IF
 
 //Handle enabling of the Start button
-IF 		stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Idle
-	OR	stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Held 	THEN
-	stMainPMLControl_Simplified.bStartEnabled := TRUE;
+IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Idle
+       OR stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Held THEN
+    stMainPMLControl_Simplified.bStartEnabled := TRUE;
 ELSE
-	stMainPMLControl_Simplified.bStartEnabled := FALSE;
+    stMainPMLControl_Simplified.bStartEnabled := FALSE;
 END_IF
 
 //Handle enabling of the Stop button
-IF 		stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Stopped
-	AND	stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Clearing
-	AND	stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Aborted
-	AND	stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Aborting
-	AND	stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Undefined 	THEN
-	stMainPMLControl_Simplified.bStopEnabled := TRUE;
+IF stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Stopped
+       AND stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Clearing
+       AND stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Aborted
+       AND stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Aborting
+       AND stMainPMLControl_Standard.eState <> Tc3_PackML_V2.E_PMLState.ePMLState_Undefined THEN
+    stMainPMLControl_Simplified.bStopEnabled := TRUE;
 ELSE
-	stMainPMLControl_Simplified.bStopEnabled := FALSE;
+    stMainPMLControl_Simplified.bStopEnabled := FALSE;
 END_IF
 
 //Handle enabling of the Reset button
-IF 		stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Complete
-	OR	stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Stopped 	THEN
-	stMainPMLControl_Simplified.bResetEnabled := TRUE;
+IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Complete
+       OR stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Stopped THEN
+    stMainPMLControl_Simplified.bResetEnabled := TRUE;
 ELSE
-	stMainPMLControl_Simplified.bResetEnabled := FALSE;
+    stMainPMLControl_Simplified.bResetEnabled := FALSE;
 END_IF
 
 //Handle enabling of the Clear button
-IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Aborted	THEN
-	stMainPMLControl_Simplified.bClearEnabled := TRUE;
+IF stMainPMLControl_Standard.eState = Tc3_PackML_V2.E_PMLState.ePMLState_Aborted THEN
+    stMainPMLControl_Simplified.bClearEnabled := TRUE;
 ELSE
-	stMainPMLControl_Simplified.bClearEnabled := FALSE;
+    stMainPMLControl_Simplified.bClearEnabled := FALSE;
 END_IF
-
 
 //Standard Commands
 
 IF NOT stMainPMLControl_Standard.bConfirmation AND stMainPMLControl_Standard.bNewCommand THEN
-	IF stMainPMLControl_Standard.eStateCommand <> E_PMLCommand.ePMLCommand_Undefined THEN
-		itfMainModule.StateCommand := stMainPMLControl_Standard.eStateCommand;
-		stMainPMLControl_Standard.bConfirmation := TRUE;
-	END_IF
-	
-	IF stMainPMLControl_Standard.eModeCommand <> E_PMLUnitMode.ePMLUnitMode_Invalid THEN
-		itfMainModule.StateCommand := stMainPMLControl_Standard.eStateCommand;
-		stMainPMLControl_Standard.bConfirmation := TRUE;
-	END_IF
+    IF stMainPMLControl_Standard.eStateCommand <> E_PMLCommand.ePMLCommand_Undefined THEN
+        itfMainModule.StateCommand              := stMainPMLControl_Standard.eStateCommand;
+        stMainPMLControl_Standard.bConfirmation := TRUE;
+    END_IF
+
+    IF stMainPMLControl_Standard.eModeCommand <> E_PMLUnitMode.ePMLUnitMode_Invalid THEN
+        itfMainModule.StateCommand              := stMainPMLControl_Standard.eStateCommand;
+        stMainPMLControl_Standard.bConfirmation := TRUE;
+    END_IF
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -265,16 +258,14 @@ END_IF]]></ST>
       <Declaration><![CDATA[PROPERTY MainModule : ITF_PMLModuleBase]]></Declaration>
       <Get Name="Get" Id="{d18b0935-2934-4e1e-98a7-94797d2d5ebc}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[MainModule := itfMainModule;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{ba5a633c-3828-4abe-9f73-6f68941c8d6c}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[itfMainModule := MainModule;]]></ST>
         </Implementation>
@@ -283,78 +274,83 @@ END_VAR
     <Method Name="ProductionMonitor" Id="{d5d692fa-984f-49bf-ac43-457314d7a9ac}" FolderPath="02_Methods\">
       <Declaration><![CDATA[METHOD ProductionMonitor : BOOL
 VAR_INPUT
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF NOT bInitialized THEN
-	initialize();
-	bInitialized := TRUE;
+    initialize();
+    bInitialized := TRUE;
 END_IF
 
-fbGetTime(
-	NETID:= '', 
-	START:= NOT bShiftComplete, 
-	TMOUT:= , 
-	BUSY=> , 
-	ERR=> , 
-	ERRID=> , 
-	TIMESTR=> tShiftStartTimeStamp);
-	
+fbGetTime(NETID   := '',
+          START   := NOT bShiftComplete,
+          TMOUT   :=,
+          BUSY    =>,
+          ERR     =>,
+          ERRID   =>,
+          TIMESTR => tShiftStartTimeStamp);
+
 IF NOT fbGetTime.BUSY THEN
-	tShiftStartTimeStamp_UTC := SYSTEMTIME_TO_ISO8601(tShiftstartTimeStamp, 0, FALSE, 3);
-	tShiftStartTimeStamp_UTC := LEFT(STR := tShiftStartTimeStamp_UTC, SIZE := FIND(tShiftStartTimeStamp_UTC, '+') - 1);
+    tShiftStartTimeStamp_UTC := SYSTEMTIME_TO_ISO8601(tShiftstartTimeStamp, 0, FALSE, 3);
+    tShiftStartTimeStamp_UTC := LEFT(STR := tShiftStartTimeStamp_UTC, SIZE := FIND(tShiftStartTimeStamp_UTC, '+') - 1);
 END_IF
 
 fbFIFO(a_FIFO := a_nLastProductTimestamps);
 
 fbShiftTimer(IN := NOT bShiftComplete, PT := tShiftLength, Q => bShiftComplete, ET => tCurrentShiftTime);
 tRemainingShiftTime := tShiftLength - tCurrentShiftTime;
+
 IF TIME_TO_DINT(tRemainingShiftTime) > 0 THEN
-	fProductionRate_Required := DINT_TO_LREAL(nShiftProductionTarget - nCurrentShiftProductionCount) / (TIME_TO_LREAL(tRemainingShiftTime)/1000/60);
-	
-	nCurrentAcceptableProductionCount := nCurrentShiftTarget;
-	
-	nCurrentWarningProductionCount := nShiftProductionTarget - (LREAL_TO_DINT((fProductionRate_Actual * (1 + fWarningMargin/100)) * (TIME_TO_LREAL(tRemainingShiftTime)/1000/60)));
-	IF nCurrentWarningProductionCount < 0 THEN
-		nCurrentWarningProductionCount := 0;
-	END_IF
+    fProductionRate_Required :=
+        DINT_TO_LREAL(nShiftProductionTarget - nCurrentShiftProductionCount) / (TIME_TO_LREAL(tRemainingShiftTime) / 1000 / 60);
+
+    nCurrentAcceptableProductionCount := nCurrentShiftTarget;
+
+    nCurrentWarningProductionCount :=
+        nShiftProductionTarget
+            - (LREAL_TO_DINT((fProductionRate_Actual * (1 + fWarningMargin / 100)) * (TIME_TO_LREAL(tRemainingShiftTime) / 1000 / 60)));
+
+    IF nCurrentWarningProductionCount < 0 THEN
+        nCurrentWarningProductionCount := 0;
+    END_IF
 END_IF
 
-fbProductComplete_RT(CLK:= bProductComplete);
+fbProductComplete_RT(CLK := bProductComplete);
 
 IF fbProductComplete_RT.Q THEN
-	nCurrentShiftProductionCount := nCurrentShiftProductionCount + 1;
-	nTotalProductionCount := nTotalProductionCount + 1;
-	IF nCurrentShiftProductionCount > nMaxProductionCount THEN
-		nMaxProductionCount := nCurrentShiftProductionCount;
-	END_IF
-	fbFIFO.AddEntry(nEntry := F_GetSystemTime());
+    nCurrentShiftProductionCount := nCurrentShiftProductionCount + 1;
+    nTotalProductionCount        := nTotalProductionCount + 1;
+
+    IF nCurrentShiftProductionCount > nMaxProductionCount THEN
+        nMaxProductionCount := nCurrentShiftProductionCount;
+    END_IF
+
+    fbFIFO.AddEntry(nEntry := F_GetSystemTime());
 END_IF
 
 IF (fbFIFO.EntryCount > nRateAveragingCount) THEN
-	fbFIFO.RemoveEntry();
+    fbFIFO.RemoveEntry();
 END_IF
 
-fTemp := (TIME_TO_LREAL(ULINT_TO_TIME(fbFIFO.LastInValue - fbFIFO.NextOutValue))/10000/1000/60);
+fTemp := (TIME_TO_LREAL(ULINT_TO_TIME(fbFIFO.LastInValue - fbFIFO.NextOutValue)) / 10000 / 1000 / 60);
+
 IF fTemp > 0 AND fbFIFO.EntryCount > 1 THEN
-	fProductionRate_Actual := F_LREAL_RoundToPlace(DINT_TO_LREAL(fbFIFO.EntryCount - 1) / fTemp, 2);
+    fProductionRate_Actual := F_LREAL_RoundToPlace(DINT_TO_LREAL(fbFIFO.EntryCount - 1) / fTemp, 2);
 END_IF
 
 IF TIME_TO_DINT(tShiftLength) > 0 THEN
-	nCurrentShiftTarget := LREAL_TO_DINT((TIME_TO_LREAL(tCurrentShiftTime) / TIME_TO_LREAL(tShiftLength)) * DINT_TO_LREAL(nShiftProductionTarget));
+    nCurrentShiftTarget := LREAL_TO_DINT((TIME_TO_LREAL(tCurrentShiftTime) / TIME_TO_LREAL(tShiftLength)) * DINT_TO_LREAL(nShiftProductionTarget));
 END_IF
 
-
 IF bShiftComplete THEN
-	nCurrentShiftProductionCount := 0;
+    nCurrentShiftProductionCount := 0;
 END_IF
 
 IF bResetMaxProductionCount THEN
-	nMaxProductionCount := nCurrentShiftProductionCount;
+    nMaxProductionCount := nCurrentShiftProductionCount;
 END_IF
 
 IF bResetTotalProductionCount THEN
-	nTotalProductionCount := 0;
+    nTotalProductionCount := 0;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -362,53 +358,22 @@ END_IF]]></ST>
       <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.CyclicLogic">
-      <LineId Id="22" Count="10" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="33" Count="1" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="48" Count="0" />
+      <LineId Id="54" Count="21" />
       <LineId Id="47" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.DataStructure_Adder.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.HMICommunication">
-      <LineId Id="6" Count="39" />
+      <LineId Id="51" Count="38" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.initialize">
-      <LineId Id="16" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="21" Count="3" />
+      <LineId Id="30" Count="6" />
       <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.MainCycleControl">
-      <LineId Id="85" Count="0" />
-      <LineId Id="6" Count="3" />
-      <LineId Id="11" Count="1" />
-      <LineId Id="14" Count="5" />
-      <LineId Id="21" Count="4" />
-      <LineId Id="27" Count="4" />
-      <LineId Id="33" Count="34" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="84" Count="0" />
-      <LineId Id="76" Count="1" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="81" Count="2" />
-      <LineId Id="80" Count="0" />
+      <LineId Id="91" Count="72" />
       <LineId Id="72" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.MainModule.Get">
@@ -418,13 +383,7 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.ProductionMonitor">
-      <LineId Id="6" Count="3" />
-      <LineId Id="71" Count="7" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="79" Count="2" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="82" Count="0" />
-      <LineId Id="10" Count="50" />
+      <LineId Id="90" Count="74" />
       <LineId Id="84" Count="0" />
     </LineIds>
   </POU>

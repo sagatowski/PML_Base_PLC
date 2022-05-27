@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.10">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <Itf Name="ITF_CylinderBase" Id="{341131b4-468e-42eb-a6b0-a67dca0a8688}">
-    <Declaration><![CDATA[INTERFACE ITF_CylinderBase//cylinder no feedback spring return solonoid
+    <Declaration><![CDATA[INTERFACE ITF_CylinderBase //cylinder no feedback spring return solonoid
 ]]></Declaration>
     <Folder Name="01_Properties" Id="{b6a350b3-87a9-4d94-952f-1d746bcd503d}">
       <Folder Name="01_Config" Id="{43a174e4-ccf3-49be-8e8c-146032af8800}" />
@@ -10,11 +10,10 @@
     </Folder>
     <Folder Name="02_Methods" Id="{7ef57548-ebf5-4dae-a304-a8844e6fa8af}" />
     <Method Name="Extend" Id="{23114865-3a0a-4898-bc94-e9562cf85b65}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD Extend : BOOL
-]]></Declaration>
+      <Declaration><![CDATA[METHOD Extend : BOOL]]></Declaration>
     </Method>
     <Property Name="Extended" Id="{f239fb64-1f4c-4854-b9dc-dea4835573b5}" FolderPath="01_Properties\03_Status\">
-      <Declaration><![CDATA[PROPERTY Extended : BOOL	//Status bit for the position of the cylinder
+      <Declaration><![CDATA[PROPERTY Extended : BOOL //Status bit for the position of the cylinder
 ]]></Declaration>
       <Get Name="Get" Id="{3e340c65-b28a-4a76-9824-ce0f037495b2}">
         <Declaration><![CDATA[]]></Declaration>
@@ -27,7 +26,7 @@
       </Get>
     </Property>
     <Property Name="ExtendTime" Id="{229c5001-0fdb-45dc-b199-d24b538b4c46}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY ExtendTime : TIME	//Approximate expected time for the cylinder to complete an extension cycle
+      <Declaration><![CDATA[PROPERTY ExtendTime : TIME //Approximate expected time for the cylinder to complete an extension cycle
 ]]></Declaration>
       <Get Name="Get" Id="{f4c53921-cd1c-4b42-a088-c948868e9275}">
         <Declaration><![CDATA[]]></Declaration>
@@ -37,15 +36,13 @@
       </Set>
     </Property>
     <Method Name="Idle" Id="{c7472d65-1ed8-4ddb-8643-1f39e3a47e0c}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD Idle : BOOL
-]]></Declaration>
+      <Declaration><![CDATA[METHOD Idle : BOOL]]></Declaration>
     </Method>
     <Method Name="Retract" Id="{85beeaa7-d2e5-41e1-a561-42650b31a0ca}" FolderPath="02_Methods\">
-      <Declaration><![CDATA[METHOD Retract : UDINT
-]]></Declaration>
+      <Declaration><![CDATA[METHOD Retract : UDINT]]></Declaration>
     </Method>
     <Property Name="Retracted" Id="{00c8c591-312a-47ea-b899-eed50767d7ca}" FolderPath="01_Properties\03_Status\">
-      <Declaration><![CDATA[PROPERTY Retracted : BOOL	//Status bit for the position of the cylinder
+      <Declaration><![CDATA[PROPERTY Retracted : BOOL //Status bit for the position of the cylinder
 ]]></Declaration>
       <Get Name="Get" Id="{831fa028-4389-4686-9765-557c4b2778ea}">
         <Declaration><![CDATA[]]></Declaration>
@@ -67,7 +64,7 @@
       </Set>
     </Property>
     <Property Name="TimeoutFactor" Id="{8658084e-739d-4edf-b642-c29237f14bec}" FolderPath="01_Properties\01_Config\">
-      <Declaration><![CDATA[PROPERTY TimeoutFactor : LREAL	//Multiplicative factor that determines error timeout threshold based on the expected time
+      <Declaration><![CDATA[PROPERTY TimeoutFactor : LREAL //Multiplicative factor that determines error timeout threshold based on the expected time
 ]]></Declaration>
       <Get Name="Get" Id="{7eebbbde-d8e9-4b76-8570-88dcd2d7c23a}">
         <Declaration><![CDATA[]]></Declaration>
