@@ -1,0 +1,32 @@
+This base is intended to handle PackML overhead to save the developer time in getting from project inception to a functional 
+	PackML program structure. Effort has been made to minimize the amount of unique user input required for the creation of
+	any given program module. Any newly created modules will, if declared correctly, automatically drive and monitor their
+	children through packml states and alarms.
+
+The first step in any new project would be determining a PackML structure for the system. This guide will assume the reader has
+	a basic understanding of PackML and its principles, as well as a prepared program structure, in order to keep this guide 
+	as focused and succinct as possible.
+
+For the developer's convenience, a test machine module and test equipment module have already been created, following the proper
+	declaration and initialization rules necessary for the 'back end' code to handle the PackML transitions, alarm monitoring,
+	and other standard operations necessary for a PackML system. It is recommended that the developer refactor the test machine
+	module and the test equipment module to have names appropriate to the application at hand, in accordance with the developer's
+	predefined PackML program structure. Any new PackML modules beyond these should be created by copy pasting the FB_Module_TEMPLATE 
+	that has been provided to the appropriate folder, and refactoring its name to fit the application. Once these new Function Blocks 
+	have been created, the declaration and initialization from the included example modules should be followed with this new
+	module as well so that it will operate properly as part of the PackML system.
+
+The basic steps to the declaration and instantiation of a new module as exemplified in he included modules are described herein.
+	Firstly, a Function Block definition is needed. The PML_ModuleBase is created as ABSTRACT, which prevents it from being declared
+	in runtime code. The developer needs to copy the included template as described above, which EXTENDS the PML_ModuleBase. This
+	Function Block will then be used to declare a runtime module. The runtime modules themselves are all based on the same
+	PML_ModuleBase, which means that the only difference between a machine module and an equipment module is its location within the
+	declaration heirarchy. The machine module would naturally be declared in MAIN, since it is the top level module. Each equipment
+	module that is a child of the machine module would be declared within that machine module, not in MAIN. If the desired PackML
+	structure that the developer is recreating requires more layers of PackML modules, there could be subsequent control modules
+	declared within these equipment modules, and even further modules declared within the control modules. It is generally best to
+	stick to 2 layers, or in certain cases 3. More layers are possible, though not recommended, if desired.
+
+	Once a Function Block definition has been created and named appropriately
+
+

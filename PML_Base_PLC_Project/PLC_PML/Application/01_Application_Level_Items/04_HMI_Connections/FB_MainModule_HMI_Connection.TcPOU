@@ -86,6 +86,7 @@ stMainPMLControl_Standard.eState := itfMainModule.State;
 
 FOR i := 1 TO 5 DO
     stMainPMLControl_Standard.a_sModeNames[i] := F_UnitModeToString(i);
+	
 END_FOR
 
 stMainPMLControl_Standard.eState := itfMainModule.State;
@@ -358,7 +359,7 @@ END_IF]]></ST>
       <LineId Id="20" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.CyclicLogic">
-      <LineId Id="54" Count="21" />
+      <LineId Id="78" Count="22" />
       <LineId Id="47" Count="0" />
     </LineIds>
     <LineIds Name="FB_MainModule_HMI_Connection.DataStructure_Adder.Get">

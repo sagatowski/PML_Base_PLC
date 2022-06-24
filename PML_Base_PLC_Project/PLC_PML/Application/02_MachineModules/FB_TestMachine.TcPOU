@@ -7,10 +7,12 @@ VAR
     //fbSubModule1				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
     //fbSubModule2				: FB_ApplicationModule_TEMPLATE;		// Sub module instantiation
 
-    fbEquipmentModule1 : FB_TestEquipment := (ModuleName := 'Test Equipment 1');
+    fbEquipmentModule1 : FB_TestEquipment := (ModuleName := 'Equipment Module 1');
+	fbEquipmentModule2 : FB_TestEquipment := (ModuleName := 'Equipment Module 2');
+	fbEquipmentModule3 : FB_TestEquipment := (ModuleName := 'Equipment Module 3');
 
     //temporary array of module base interfaces to be copied over to the base class itfPackMLBase variable
-    a_itfPackMLBase_init : ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1] (*, fbSubModule2,*) ;
+    a_itfPackMLBase_init : ARRAY[1..MAX_NO_OF_SUBMODULES] OF ITF_PMLModuleBase := [fbEquipmentModule1, fbEquipmentModule2, fbEquipmentModule3] (*, fbSubModule2,*) ;
 
     //Define the components here for this module. (If any) Also set the Interfaces in the initialize method.
     (*fbComponent1				: FB_ComponentBase (Extension):= (Name := 'Test Component 1');
@@ -53,7 +55,12 @@ VAR
     i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Main loop of the parent module
+        <ST><![CDATA[FOR i := 1 TO 5 DO
+    a_sModeNames[i] := F_UnitModeToString(i);
+	
+END_FOR
+
+// Main loop of the parent module
 SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
@@ -81,7 +88,7 @@ SUPER^.Initialize();]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.CyclicLogic">
-      <LineId Id="72" Count="0" />
+      <LineId Id="78" Count="5" />
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestMachine.Initialize">

@@ -49,7 +49,14 @@ VAR
     i : UDINT; //Generic iteration value
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Main loop of the parent module
+        <ST><![CDATA[FOR i := 1 TO 5 DO
+    a_sModeNames[i] := F_UnitModeToString(i);
+	
+END_FOR
+
+
+
+// Main loop of the parent module
 SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
@@ -77,7 +84,7 @@ SUPER^.Initialize();]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestEquipment.CyclicLogic">
-      <LineId Id="72" Count="0" />
+      <LineId Id="104" Count="7" />
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_TestEquipment.Initialize">

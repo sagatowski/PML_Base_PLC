@@ -1789,6 +1789,16 @@ External Setpoint Generation:
 							<Comment><![CDATA[Tie to hardware start pushbutton]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>MAIN.fbMyMachine.fbEquipmentModule2.fbExternalControl.fbPushButtonControl.bStartButton</Name>
+							<Comment><![CDATA[Tie to hardware start pushbutton]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.fbMyMachine.fbEquipmentModule3.fbExternalControl.fbPushButtonControl.bStartButton</Name>
+							<Comment><![CDATA[Tie to hardware start pushbutton]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Contexts>
 						<Context>
