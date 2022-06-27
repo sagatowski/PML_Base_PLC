@@ -1438,6 +1438,8 @@ External Setpoint Generation:
 			<TypeSystem>
 				<AdditionalTmcFile Name="PLC_PML" File="PLC_PML\PLC_PML.tmc"/>
 				<AdditionalTmcFile Name="PML_Base_Events" File="PLC_PML\PML_Base_Events.tmc"/>
+				<AdditionalTmcFile Name="BasicComponents_AlarmDefinitions" File="..\BasicComponents_AlarmDefinitions.tmc"/>
+				<AdditionalTmcFile Name="PMLBase_TMC" File="..\PMLBase_TMC.tmc"/>
 			</TypeSystem>
 		</System>
 		<Motion>
